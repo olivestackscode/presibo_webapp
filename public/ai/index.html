@@ -334,7 +334,7 @@
       return new Promise(resolve => {
         setTimeout(() => {
           const response = {
-            response: `This is a dummy response for: "${message}". In a real scenario, AI would provide health guidance here.`,
+            response: `Thinking about your request: "${message}".AI would provide health guidance here.`,
             doctorRecommendations: [
               { id: 1, firstname: "John", lastname: "Doe", specialization: "General Practitioner", location: "Lagos, Nigeria", phone: "08012345678", email: "john.doe@example.com", years: 10, cases: "500+", reason: "Expert in general health." },
               { id: 2, firstname: "Jane", lastname: "Smith", specialization: "Nutritionist", location: "Abuja, Nigeria", phone: "08087654321", email: "jane.smith@example.com", years: 7, cases: "300+", reason: "Specializes in diet and nutrition." }
