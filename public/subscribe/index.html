@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Standard Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Subscribe to Premium Plans</title>
+  <meta name="description" content="Subscribe to Presibo’s premium plans for AI-powered healthcare, doctor consultations, and personalized health tracking in Nigeria.">
+  <meta name="keywords" content="Presibo, subscription, AI healthcare, telemedicine, doctor consultations, health tracking, Nigerian healthcare">
+  <meta name="author" content="Presibo Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://presibo--web.vercel.app/subscribe.html">
+
+  <!-- Favicon Meta Tags -->
+  <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
+  <link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
+  <meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
+  <link rel="preload" href="assets/img/new_presibo_icon.png" as="image" importance="high">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Presibo - Subscribe to Premium Plans">
+  <meta property="og:description" content="Join Presibo’s premium plans for AI-driven health consultations, doctor bookings, and personalized health tracking in Nigeria.">
+  <meta property="og:image" content="https://presibo--web.vercel.app/assets/img/new_presibo_icon.png">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://presibo--web.vercel.app/subscribe.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Subscribe to Premium Plans">
+  <meta name="twitter:description" content="Subscribe to Presibo for AI-powered healthcare, doctor consultations, and health tracking tailored for Nigeria.">
+  <meta name="twitter:image" content="https://presibo--web.vercel.app/assets/img/new_presibo_icon.png">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Web App Manifest (PWA) -->
+  <link rel="manifest" href="assets/manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+    }
+    .toast.destructive {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+    .toast.active {
+      display: block;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #008753;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 p-4 font-sans">
+  <div id="subscribe-page" class="max-w-7xl mx-auto space-y-6">
+    <!-- Elder Care Button -->
+    <div class="text-center">
+      <button id="elder-care-btn" class="bg-gradient-to-r from-warm-orange to-golden-yellow hover:from-warm-orange/90 hover:to-golden-yellow/90 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg">
+        <i class="fas fa-heart mr-3"></i>Elder Care Services<i class="fas fa-arrow-right ml-3"></i>
+      </button>
+      <p class="text-sm text-gray-500 mt-2">Specialized care plans for elderly family members</p>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <h1 class="text-2xl font-bold text-naija-green">Choose Your Plan</h1>
+      <p class="text-gray-600">Select a subscription plan that works best for you</p>
+    </div>
+
+    <!-- Subscription Plans -->
+    <div id="subscription-plans" class="space-y-4"></div>
+
+    <!-- Benefits Section -->
+    <div class="bg-white rounded-2xl shadow">
+      <div class="p-6">
+        <h3 class="text-xl font-semibold flex items-center">
+          <i class="fas fa-star text-golden-yellow mr-2"></i>Subscription Benefits
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">AI Health Analysis</h4>
+              <p class="text-sm text-gray-600">Advanced food analysis and health recommendations</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">AI Doc Consultations</h4>
+              <p class="text-sm text-gray-600">10 weekly AI health consultations with personalized advice</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">Doctor Consultations</h4>
+              <p class="text-sm text-gray-600">Connect with verified Nigerian healthcare professionals</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">Health Tracking</h4>
+              <p class="text-sm text-gray-600">Monitor blood pressure, sugar levels, and fitness goals</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">Doctor Recommendations</h4>
+              <p class="text-sm text-gray-600">AI-powered doctor matching based on symptoms and location</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-check-circle text-naija-green mt-1"></i>
+            <div>
+              <h4 class="font-semibold">Personalized Tips</h4>
+              <p class="text-sm text-gray-600">Daily health tips tailored to Nigerian lifestyle</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start space-x-3">
+        <i class="fas fa-shield-alt text-blue-600 mt-1"></i>
+        <div>
+          <h4 class="font-semibold text-blue-800">Secure Payment</h4>
+          <p class="text-sm text-blue-600">
+            Your payment is processed securely through Paystack. We don't store your payment information.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Support -->
+    <div class="bg-gradient-to-r from-naija-green/10 to-warm-orange/10 rounded-2xl p-6 text-center">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Need Help With Your Subscription?</h3>
+      <p class="text-gray-600 mb-4">Our support team is here to help you with any questions about plans, payments, or features.</p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button id="call-support-btn" class="bg-warm-orange hover:bg-warm-orange/90 text-white px-4 py-2 rounded-lg">
+          <i class="fas fa-phone mr-2"></i>Call Support
+        </button>
+        <button id="whatsapp-support-btn" class="bg-naija-green hover:bg-naija-green/90 text-white px-4 py-2 rounded-lg">
+          <i class="fab fa-whatsapp mr-2"></i>WhatsApp Support
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <h4 id="toast-title" class="font-semibold"></h4>
+      <p id="toast-description" class="text-sm"></p>
+    </div>
+  </div>
+
+  <script>
+    // Mock User Data
+    const user = { email: 'user@example.com' };
+
+    // Subscription Plans
+    const subscriptionPlans = [
+      {
+        id: 'monthly',
+        name: 'Monthly Plan',
+        price: 10000,
+        duration: 'month',
+        amount: 1000000
+      },
+      {
+        id: 'weekly',
+        name: 'Weekly Plan',
+        price: 3000,
+        duration: 'week',
+        amount: 300000
+      },
+      {
+        id: 'daily',
+        name: 'Daily Plan',
+        price: 500,
+        duration: 'day',
+        amount: 50000
+      },
+      {
+        id: 'aidoc',
+        name: 'AI Doc Chat',
+        price: 1000,
+        duration: 'week',
+        amount: 100000
+      }
+    ];
+
+    // Auto-Renew States
+    let autoRenewStates = {
+      monthly: false,
+      weekly: false,
+      daily: false,
+      aidoc: false
+    };
+
+    // DOM Elements
+    const subscriptionPlansDiv = document.getElementById('subscription-plans');
+    const elderCareBtn = document.getElementById('elder-care-btn');
+    const callSupportBtn = document.getElementById('call-support-btn');
+    const whatsappSupportBtn = document.getElementById('whatsapp-support-btn');
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastDescription = document.getElementById('toast-description');
+
+    // Toast Notification
+    function showToast(title, description, variant = 'default') {
+      toastTitle.textContent = title;
+      toastDescription.textContent = description;
+      toast.className = `toast ${variant === 'destructive' ? 'destructive' : ''} active`;
+      setTimeout(() => {
+        toast.className = `toast ${variant === 'destructive' ? 'destructive' : ''}`;
+      }, 3000);
+    }
+
+    // Plan Benefits
+    function getPlanBenefits(planId) {
+      switch (planId) {
+        case 'aidoc':
+          return [
+            '10 AI health consultations per week',
+            'Personalized health advice',
+            'Doctor recommendations based on symptoms',
+            'Priority health alerts',
+            'Chat history saved'
+          ];
+        case 'monthly':
+          return [
+            'Unlimited food analysis',
+            'Comprehensive health tracking',
+            'Doctor consultations',
+            'Fitness goals tracking',
+            'Priority support'
+          ];
+        case 'weekly':
+          return [
+            'Limited food analysis',
+            'Basic health tracking',
+            'Doctor consultations',
+            'Fitness tracking',
+            'Standard support'
+          ];
+        case 'daily':
+          return [
+            'Basic food analysis',
+            'Daily health tips',
+            'Doctor access',
+            'Basic tracking',
+            'Community support'
+          ];
+        default:
+          return [];
+      }
+    }
+
+    // Render Subscription Plans
+    function renderSubscriptionPlans() {
+      subscriptionPlansDiv.innerHTML = '';
+      subscriptionPlans.forEach(plan => {
+        const div = document.createElement('div');
+        div.className = 'bg-white rounded-2xl shadow border-2 hover:border-naija-green transition-colors';
+        div.innerHTML = `
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold">${plan.name}</h3>
+              <span class="text-2xl font-bold text-naija-green">₦${plan.price.toLocaleString()} / ${plan.duration}</span>
+            </div>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <h4 class="font-semibold text-sm mb-2">What's included:</h4>
+              <ul class="space-y-1">
+                ${getPlanBenefits(plan.id).map(benefit => `
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-check text-naija-green mr-2 text-xs"></i>
+                    ${benefit}
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+            <div class="flex items-center justify-between">
+              <button class="subscribe-btn flex-1 mr-4 text-white px-4 py-2 rounded-lg ${plan.id === 'aidoc' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-naija-green hover:bg-naija-green/90'}" data-plan-id="${plan.id}">
+                ${plan.id === 'aidoc' ? '<i class="fas fa-robot mr-2"></i>Subscribe for AI Chat' : 'Pay Now'}
+              </button>
+              <div class="flex items-center space-x-2">
+                <label class="switch">
+                  <input type="checkbox" class="auto-renew-switch" data-plan-id="${plan.id}">
+                  <span class="slider"></span>
+                </label>
+                <span class="text-sm">Auto renew</span>
+              </div>
+            </div>
+            <div id="auto-renew-notice-${plan.id}" class="hidden bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p class="text-sm text-yellow-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                Auto-renewal is enabled. Your subscription will automatically renew every ${plan.duration}.
+              </p>
+            </div>
+          </div>
+        `;
+        subscriptionPlansDiv.appendChild(div);
+      });
+    }
+
+    // Handle Auto-Renew Change
+    function handleAutoRenewChange(planId, checked) {
+      autoRenewStates[planId] = checked;
+      const notice = document.getElementById(`auto-renew-notice-${planId}`);
+      notice.classList.toggle('hidden', !checked);
+    }
+
+    // Handle Subscription
+    function handleSubscribe(plan) {
+      if (!user.email) {
+        showToast('Authentication Required', 'Please log in to subscribe', 'destructive');
+        return;
+      }
+      if (!window.PaystackPop) {
+        showToast('Payment Loading', 'Payment system is loading. Please try again in a moment.', 'destructive');
+        return;
+      }
+      alert('Paystack payment is disabled in this demo.');
+      const startDate = new Date();
+      const endDate = new Date();
+      switch (plan.duration) {
+        case 'day':
+          endDate.setDate(startDate.getDate() + 1);
+          break;
+        case 'week':
+          endDate.setDate(startDate.getDate() + 7);
+          break;
+        case 'month':
+          endDate.setMonth(startDate.getMonth() + 1);
+          break;
+      }
+      const transaction = { reference: 'mock-ref-' + Date.now() };
+      showToast('Payment Successful!', `Welcome to the ${plan.name}! Reference: ${transaction.reference}`);
+    }
+
+    // Initialize
+    function init() {
+      // Load Paystack Script
+      const script = document.createElement('script');
+      script.src = 'https://js.paystack.co/v1/inline.js';
+      script.async = true;
+      script.onload = () => console.log('Paystack script loaded');
+      document.head.appendChild(script);
+
+      // Render Plans
+      renderSubscriptionPlans();
+
+      // Event Listeners
+      elderCareBtn.addEventListener('click', () => {
+        alert('Elder Care Services page is not implemented in this demo.');
+        window.location.href = '/elder-care';
+      });
+      callSupportBtn.addEventListener('click', () => window.open('tel:+2347032810862', '_self'));
+      whatsappSupportBtn.addEventListener('click', () => window.open('https://wa.me/2347032810862?text=Hello, I need help with my subscription', '_blank'));
+      subscriptionPlansDiv.addEventListener('click', e => {
+        if (e.target.classList.contains('subscribe-btn')) {
+          const planId = e.target.dataset.planId;
+          const plan = subscriptionPlans.find(p => p.id === planId);
+          handleSubscribe(plan);
+        }
+      });
+      subscriptionPlansDiv.addEventListener('change', e => {
+        if (e.target.classList.contains('auto-renew-switch')) {
+          const planId = e.target.dataset.planId;
+          handleAutoRenewChange(planId, e.target.checked);
+        }
+      });
+    }
+
+    // Run Initialization
+    window.onload = init;
+  </script>
+</body>
+</html>
