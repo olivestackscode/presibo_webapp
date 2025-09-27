@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tabs-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f3f4f6;
+      border-radius: 0.75rem;
+      padding: 0.25rem;
+      margin-bottom: 2rem;
+    }
+    .tab-trigger {
+      padding: 0.75rem;
+      color: #4b5563;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 0.5rem;
+    }
+    .tab-trigger.active {
+      background: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      outline: none;
+    }
+    .input:focus {
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: transparent;
+    }
+    .select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      background: white;
+      outline: none;
+    }
+    .select:focus {
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-6">
+  <div class="w-full max-w-2xl bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border border-gray-100">
+    <div class="text-center py-8">
+      <div class="w-20 h-20 mx-auto mb-4">
+        <img
+          src="https://via.placeholder.com/80?text=Presibo+Logo"
+          alt="Presibo Logo"
+          class="w-full h-full object-contain"
+        />
+      </div>
+      <h1 class="text-3xl font-semibold text-gray-900">Welcome to Presibo</h1>
+      <p class="text-gray-500 text-sm mt-2">Smart Health Anytime</p>
+    </div>
+    <div class="px-10 pb-10">
+      <div class="tabs-list">
+        <div class="tab-trigger active" data-tab="login">Sign In</div>
+        <div class="tab-trigger" data-tab="signup">Sign Up</div>
+      </div>
+
+      <div id="login" class="tab-content active space-y-6">
+        <form id="login-form" class="space-y-5">
+          <div class="space-y-2">
+            <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              class="input"
+              required
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              class="input"
+              required
+            />
+          </div>
+          <div id="login-error" class="text-red-500 text-sm hidden"></div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            id="login-button"
+          >
+            Sign In
+          </button>
+        </form>
+        <div class="text-center mt-4">
+          <a href="#" class="text-sm text-blue-600 hover:underline" onclick="alert('Forgot Password clicked')">Forgot Password?</a>
+        </div>
+      </div>
+
+      <div id="signup" class="tab-content space-y-6">
+        <form id="signup-form" class="space-y-5">
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="firstname" class="text-sm font-medium text-gray-700">First Name</label>
+              <input
+                id="firstname"
+                placeholder="First name"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="lastname" class="text-sm font-medium text-gray-700">Last Name</label>
+              <input
+                id="lastname"
+                placeholder="Last name"
+                class="input"
+                required
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="signup-email" class="text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="signup-email"
+              type="email"
+              placeholder="Enter your email"
+              class="input"
+              required
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="tel" class="text-sm font-medium text-gray-700">Phone Number</label>
+              <input
+                id="tel"
+                type="tel"
+                placeholder="Phone number"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="whatsappNumber" class="text-sm font-medium text-gray-700">WhatsApp Number</label>
+              <input
+                id="whatsappNumber"
+                type="tel"
+                placeholder="WhatsApp number"
+                class="input"
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="sex" class="text-sm font-medium text-gray-700">Gender</label>
+            <select id="sex" class="select" required>
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label for="birth" class="text-sm font-medium text-gray-700">Date of Birth</label>
+            <input
+              id="birth"
+              type="date"
+              class="input"
+              required
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="city" class="text-sm font-medium text-gray-700">City</label>
+              <input
+                id="city"
+                placeholder="City"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="country" class="text-sm font-medium text-gray-700">Country</label>
+              <input
+                id="country"
+                placeholder="Country"
+                class="input"
+                required
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="bloodGroup" class="text-sm font-medium text-gray-700">Blood Group</label>
+            <select id="bloodGroup" class="select" required>
+              <option value="">Select blood group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label for="address" class="text-sm font-medium text-gray-700">Address</label>
+            <input
+              id="address"
+              placeholder="Full address"
+              class="input"
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="referralCode" class="text-sm font-medium text-gray-700">Referral Code (Optional)</label>
+            <input
+              id="referralCode"
+              placeholder="Enter referral code (e.g., PRESIBO1)"
+              class="input"
+            />
+            <p class="text-xs text-gray-500">Have a referral code? Enter it to give your friend ₦1000 bonus!</p>
+          </div>
+          <div class="space-y-2">
+            <label for="signup-password" class="text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="signup-password"
+              type="password"
+              placeholder="Create password"
+              class="input"
+              required
+            />
+          </div>
+          <div id="signup-error" class="text-red-500 text-sm hidden"></div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            id="signup-button"
+          >
+            Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.tab-trigger');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Login form submission
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      errorDiv.classList.add('hidden');
+      errorDiv.textContent = '';
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorDiv.textContent = 'Please enter a valid email';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (password.length < 6) {
+        errorDiv.textContent = 'Password must be at least 6 characters';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('login-button').textContent = 'Signing In...';
+      document.getElementById('login-button').disabled = true;
+
+      setTimeout(() => {
+        console.log('Login attempted with:', { email, password });
+        alert('Login successful! Check console for details.');
+        document.getElementById('login-button').textContent = 'Sign In';
+        document.getElementById('login-button').disabled = false;
+      }, 1000);
+    });
+
+    // Signup form submission
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const signupData = {
+        firstname: document.getElementById('firstname').value,
+        lastname: document.getElementById('lastname').value,
+        email: document.getElementById('signup-email').value,
+        tel: document.getElementById('tel').value,
+        whatsappNumber: document.getElementById('whatsappNumber').value,
+        sex: document.getElementById('sex').value,
+        birth: document.getElementById('birth').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        bloodGroup: document.getElementById('bloodGroup').value,
+        address: document.getElementById('address').value,
+        referralCode: document.getElementById('referralCode').value.toUpperCase(),
+        password: document.getElementById('signup-password').value,
+      };
+      const errorDiv = document.getElementById('signup-error');
+      errorDiv.classList.add('hidden');
+      errorDiv.textContent = '';
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+        errorDiv.textContent = 'Please enter a valid email';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (signupData.password.length < 6) {
+        errorDiv.textContent = 'Password must be at least 6 characters';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (!signupData.firstname || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.bloodGroup) {
+        errorDiv.textContent = 'Please fill in all required fields';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('signup-button').textContent = 'Creating Account...';
+      document.getElementById('signup-button').disabled = true;
+
+      setTimeout(() => {
+        console.log('Signup attempted with:', signupData);
+        alert('Signup successful! Check console for details.');
+        document.getElementById('signup-button').textContent = 'Create Account';
+        document.getElementById('signup-button').disabled = false;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
