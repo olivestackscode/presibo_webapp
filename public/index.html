@@ -3,31 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Presibo - Nigerian Health & Wellness</title>
-    <meta name="description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence. Presibo uses AI and machine learning technology to bridge the gaps in Africa's health sector.">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Presibo - Nigerian Health & Wellness">
-  <!-- Standard Favicon -->
-<link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
+  <title>Presibo - Nigerian Health & Wellness</title>
+  <meta name="description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence. Presibo uses AI and machine learning technology to bridge the gaps in Africa's health sector.">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Presibo - Nigerian Health & Wellness">
+  <meta property="og:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence.">
+  <meta property="og:image" content="/assets/img/new_presibo_icon.png">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://app.presibo.com">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Nigerian Health & Wellness">
+  <meta name="twitter:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence.">
+  <meta name="twitter:image" content="/assets/img/new_presibo_icon.png">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  
+  <!-- Favicon Meta Tags -->
+  <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
+  <link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
+  <meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
+  <link rel="preload" href="assets/img/new_presibo_icon.png" as="image" importance="high">
 
-<!-- Apple Touch Icon (for iOS devices) -->
-<link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
-
-<!-- Microsoft Windows Tiles -->
-<meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
-    <meta property="og:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence. Presibo uses AI and machine learning technology to bridge the gaps in Africa's health sector.">
-    <meta property="og:image" content="/assets/img/new_presibo_icon.pngg">
-    <meta property="og:url" content="https://app.presibo.com">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Presibo">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Presibo - Nigerian Health & Wellness">
-    <meta name="twitter:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence.">
-    <meta name="twitter:image" content="/assets/img/new_presibo_icon.png">
-  </head>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .tabs-list {
@@ -80,6 +83,29 @@
       ring: 2px;
       ring-color: #3b82f6;
       border-color: transparent;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+    }
+    .toast.error {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+    .toast.success {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
+    .toast.active {
+      display: block;
     }
   </style>
 </head>
@@ -134,7 +160,7 @@
           </button>
         </form>
         <div class="text-center mt-4">
-          <a href="#" class="text-sm text-blue-600 hover:underline" onclick="alert('Forgot Password clicked')">Forgot Password?</a>
+          <a href="#" class="text-sm text-blue-600 hover:underline" onclick="showToast('Forgot Password', 'Forgot Password feature is not implemented yet.', 'error')">Forgot Password?</a>
         </div>
       </div>
 
@@ -282,7 +308,30 @@
     </div>
   </div>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <h4 id="toast-title" class="font-semibold"></h4>
+    <p id="toast-description" class="text-sm"></p>
+  </div>
+
   <script>
+    // API Configuration
+    const API_URL = 'https://api.presibo.com/api/users';
+    const API_KEY = 'your-secret-api-key-123456';
+
+    // Toast Notification
+    function showToast(title, description, variant = 'default') {
+      const toast = document.getElementById('toast');
+      const toastTitle = document.getElementById('toast-title');
+      const toastDescription = document.getElementById('toast-description');
+      toastTitle.textContent = title;
+      toastDescription.textContent = description;
+      toast.className = `toast ${variant} active`;
+      setTimeout(() => {
+        toast.className = `toast ${variant}`;
+      }, 3000);
+    }
+
     // Tab switching logic
     const tabs = document.querySelectorAll('.tab-trigger');
     const contents = document.querySelectorAll('.tab-content');
@@ -297,14 +346,16 @@
     });
 
     // Login form submission
-    document.getElementById('login-form').addEventListener('submit', (e) => {
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const errorDiv = document.getElementById('login-error');
+      const loginButton = document.getElementById('login-button');
       errorDiv.classList.add('hidden');
       errorDiv.textContent = '';
 
+      // Client-side validation
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errorDiv.textContent = 'Please enter a valid email';
         errorDiv.classList.remove('hidden');
@@ -316,18 +367,43 @@
         return;
       }
 
-      document.getElementById('login-button').textContent = 'Signing In...';
-      document.getElementById('login-button').disabled = true;
+      loginButton.textContent = 'Signing In...';
+      loginButton.disabled = true;
 
-      setTimeout(() => {
-        console.log('Login attempted with:', { email, password });
-        alert('Login not successful! Check username or password.');
-        document.getElementById('login-button').textContent = 'Sign In';
-        document.getElementById('login-button').disabled = false;
-      }, 1000);
+      try {
+        const response = await fetch(`${API_URL}?action=verify_password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': API_KEY
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        if (data.message === 'Password verified successfully.') {
+          // Store email in sessionStorage
+          sessionStorage.setItem('email', data.email);
+          showToast('Login Successful', `Welcome, ${data.email}! Redirecting to dashboard...`, 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 2000);
+        } else {
+          throw new Error('Invalid response from server');
+        }
+      } catch (error) {
+        showToast('Login Failed', error.message || 'Invalid email or password', 'error');
+        loginButton.textContent = 'Sign In';
+        loginButton.disabled = false;
+      }
     });
 
-    // Signup form submission
+    // Signup form submission (unchanged, mocked)
     document.getElementById('signup-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const signupData = {
@@ -370,7 +446,7 @@
 
       setTimeout(() => {
         console.log('Signup attempted with:', signupData);
-        alert('Signup successful! Check console for details.');
+        showToast('Signup Successful', 'Account created! Check console for details.', 'success');
         document.getElementById('signup-button').textContent = 'Create Account';
         document.getElementById('signup-button').disabled = false;
       }, 1000);
