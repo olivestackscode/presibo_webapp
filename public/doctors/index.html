@@ -285,7 +285,7 @@
       } else if (e.target.classList.contains('book-appointment') || e.target.parentElement.classList.contains('book-appointment')) {
         const id = e.target.dataset.id || e.target.parentElement.dataset.id;
         const doctor = doctors.find(d => d.id == id);
-        alert('Appointment booking is disabled in this demo.');
+        alert('Appointment booking is loading.');
         openModal(bookingModal, `Book an appointment with ${doctor.name}, ${doctor.specialization} in ${doctor.location}.`, doctor);
       } else if (e.target.classList.contains('message-doctor') || e.target.parentElement.classList.contains('message-doctor')) {
         const id = e.target.dataset.id || e.target.parentElement.dataset.id;
