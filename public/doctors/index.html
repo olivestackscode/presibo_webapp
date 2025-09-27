@@ -290,25 +290,25 @@
       } else if (e.target.classList.contains('message-doctor') || e.target.parentElement.classList.contains('message-doctor')) {
         const id = e.target.dataset.id || e.target.parentElement.dataset.id;
         const doctor = doctors.find(d => d.id == id);
-        alert('Doctor messaging is disabled in this demo.');
+        alert('Doctor messaging is loading in this app.');
         openModal(messageModal, `Send a message to ${doctor.name}, ${doctor.specialization}.`, doctor);
       } else if (e.target.classList.contains('call-doctor') || e.target.parentElement.classList.contains('call-doctor')) {
         const id = e.target.dataset.id || e.target.parentElement.dataset.id;
         const doctor = doctors.find(d => d.id == id);
-        alert('Doctor calling is disabled in this demo.');
+        alert('Doctor calling is loading in this app.');
         openModal(callModal, `Call ${doctor.name} at ${doctor.phone}.`, doctor);
       }
     });
 
     // Modal action buttons
     document.getElementById('call-modal-action').addEventListener('click', () => {
-      alert('Doctor calling is disabled in this demo.');
+      alert('Doctor calling is loading in this app.');
     });
     document.getElementById('message-modal-action').addEventListener('click', () => {
-      alert('Doctor messaging is disabled in this demo.');
+      alert('Doctor messaging is loading in this app.');
     });
     document.getElementById('booking-modal-action').addEventListener('click', () => {
-      alert('Appointment booking is disabled in this demo.');
+      alert('Appointment booking is loading in this app.');
     });
   </script>
 </body>
