@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.presibo.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>Presibo - Nigerian Health & Wellness</title>
+  <meta name="description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence. Presibo uses AI and machine learning technology to bridge the gaps in Africa's health sector.">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Presibo - Nigerian Health & Wellness">
+  <meta property="og:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence.">
+  <meta property="og:image" content="/assets/img/new_presibo_icon.png">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://presibo-wl.vercel.app">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Nigerian Health & Wellness">
+  <meta name="twitter:description" content="Presibo is a digital medical service that is helping patients get fast, smart, stress-free, affordable and quality medical care by leveraging on Artificial Intelligence.">
+  <meta name="twitter:image" content="/assets/img/new_presibo_icon.png">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  
+  <!-- Favicon Meta Tags -->
+  <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
+  <link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
+  <meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
+  <link rel="preload" href="assets/img/new_presibo_icon.png" as="image" importance="high">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tabs-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f3f4f6;
+      border-radius: 0.75rem;
+      padding: 0.25rem;
+      margin-bottom: 2rem;
+    }
+    .tab-trigger {
+      padding: 0.75rem;
+      color: #4b5563;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 0.5rem;
+    }
+    .tab-trigger.active {
+      background: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      outline: none;
+    }
+    .input:focus {
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: transparent;
+    }
+    .select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      background: white;
+      outline: none;
+    }
+    .select:focus {
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: transparent;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+    }
+    .toast.error {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+    .toast.success {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
+    .toast.active {
+      display: block;
+    }
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-6">
+  <div id="preloader">
+    <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+  <div id="login-container" class="w-full max-w-2xl bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl border border-gray-100" style="display: none;">
+    <div class="text-center py-8">
+      <div class="w-20 h-20 mx-auto mb-4">
+        <img
+          src="/assets/img/new_presibo_icon.png"
+          alt="Presibo Logo"
+          class="w-full h-full object-contain"
+        />
+      </div>
+      <h1 class="text-3xl font-semibold text-gray-900">Welcome to Presibo</h1>
+      <p class="text-gray-500 text-sm mt-2">Smart Health Anytime</p>
+    </div>
+    <div class="px-10 pb-10">
+      <div class="tabs-list">
+        <div class="tab-trigger active" data-tab="login">Sign In</div>
+        <div class="tab-trigger" data-tab="signup">Sign Up</div>
+      </div>
+
+      <div id="login" class="tab-content active space-y-6">
+        <form id="loginForm" class="space-y-5">
+          <div class="space-y-2">
+            <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              class="input"
+              required
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              class="input"
+              required
+            />
+          </div>
+          <div id="errorMessage" class="text-red-500 text-sm hidden">Invalid email or password</div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            id="loginButton"
+          >
+            Sign In
+          </button>
+        </form>
+        <div class="text-center mt-4">
+          <a href="#" class="text-sm text-blue-600 hover:underline" onclick="showToast('Forgot Password', 'Forgot Password feature is not implemented yet.', 'error')">Forgot Password?</a>
+        </div>
+      </div>
+
+      <div id="signup" class="tab-content space-y-6">
+        <form id="signupForm" class="space-y-5">
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="firstname" class="text-sm font-medium text-gray-700">First Name</label>
+              <input
+                id="firstname"
+                placeholder="First name"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="lastname" class="text-sm font-medium text-gray-700">Last Name</label>
+              <input
+                id="lastname"
+                placeholder="Last name"
+                class="input"
+                required
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="signupEmail" class="text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="signupEmail"
+              type="email"
+              placeholder="Enter your email"
+              class="input"
+              required
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="tel" class="text-sm font-medium text-gray-700">Phone Number</label>
+              <input
+                id="tel"
+                type="tel"
+                placeholder="Phone number"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="whatsappNumber" class="text-sm font-medium text-gray-700">WhatsApp Number</label>
+              <input
+                id="whatsappNumber"
+                type="tel"
+                placeholder="WhatsApp number"
+                class="input"
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="sex" class="text-sm font-medium text-gray-700">Gender</label>
+            <select id="sex" class="select" required>
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label for="birth" class="text-sm font-medium text-gray-700">Date of Birth</label>
+            <input
+              id="birth"
+              type="date"
+              class="input"
+              required
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-1">
+            <div class="space-y-2">
+              <label for="city" class="text-sm font-medium text-gray-700">City</label>
+              <input
+                id="city"
+                placeholder="City"
+                class="input"
+                required
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="country" class="text-sm font-medium text-gray-700">Country</label>
+              <input
+                id="country"
+                placeholder="Country"
+                class="input"
+                required
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="bloodGroup" class="text-sm font-medium text-gray-700">Blood Group</label>
+            <select id="bloodGroup" class="select" required>
+              <option value="">Select blood group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label for="address" class="text-sm font-medium text-gray-700">Address</label>
+            <input
+              id="address"
+              placeholder="Full address"
+              class="input"
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="referralCode" class="text-sm font-medium text-gray-700">Referral Code (Optional)</label>
+            <input
+              id="referralCode"
+              placeholder="Enter referral code (e.g., PRESIBO1)"
+              class="input"
+            />
+            <p class="text-xs text-gray-500">Have a referral code? Enter it to give your friend ₦1000 bonus!</p>
+          </div>
+          <div class="space-y-2">
+            <label for="signupPassword" class="text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="signupPassword"
+              type="password"
+              placeholder="Create password"
+              class="input"
+              required
+            />
+          </div>
+          <div id="signupError" class="text-red-500 text-sm hidden"></div>
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            id="signupButton"
+          >
+            Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <h4 id="toastTitle" class="font-semibold"></h4>
+    <p id="toastDescription" class="text-sm"></p>
+  </div>
+
+  <script>
+    // API Configuration
+    const API_URL = 'https://api.presibo.com/api/users';
+
+    // Show preloader for 1 second
+    window.onload = function() {
+      setTimeout(() => {
+        document.getElementById('preloader').style.display = 'none';
+        document.getElementById('login-container').style.display = 'block';
+      }, 1000);
+    };
+
+    // Toast Notification
+    function showToast(title, description, variant = 'default') {
+      const toast = document.getElementById('toast');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastDescription = document.getElementById('toastDescription');
+      toastTitle.textContent = title;
+      toastDescription.textContent = description;
+      toast.className = `toast ${variant} active`;
+      setTimeout(() => {
+        toast.className = `toast ${variant}`;
+      }, 3000);
+    }
+
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.tab-trigger');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const upperCaseEmail = document.getElementById('email').value;
+      const trimmedEmail = upperCaseEmail.replace(/\s+/g, '');
+      const email = trimmedEmail.toLowerCase();
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('errorMessage');
+      const loginButton = document.getElementById('loginButton');
+      errorMessage.style.display = 'none';
+      errorMessage.textContent = '';
+
+      // Client-side validation
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorMessage.textContent = 'Please enter a valid email';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      if (password.length < 6) {
+        errorMessage.textContent = 'Password must be at least 6 characters';
+        errorMessage.style.display = 'block';
+        return;
+      }
+
+      loginButton.textContent = 'Signing In...';
+      loginButton.disabled = true;
+
+      try {
+        const response = await fetch(`${API_URL}?action=verify_password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        if (data.message === 'Password verified successfully.') {
+          sessionStorage.setItem('email', data.email);
+          showToast('Login Successful', `Welcome, ${data.email}! Redirecting to dashboard...`, 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 2000);
+        } else {
+          throw new Error('Invalid response from server');
+        }
+      } catch (error) {
+        errorMessage.textContent = error.message || 'Invalid email or password';
+        errorMessage.style.display = 'block';
+        loginButton.textContent = 'Sign In';
+        loginButton.disabled = false;
+      }
+    });
+
+    // Signup form submission (mocked)
+    document.getElementById('signupForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const signupData = {
+        firstname: document.getElementById('firstname').value,
+        lastname: document.getElementById('lastname').value,
+        email: document.getElementById('signupEmail').value,
+        tel: document.getElementById('tel').value,
+        whatsappNumber: document.getElementById('whatsappNumber').value,
+        sex: document.getElementById('sex').value,
+        birth: document.getElementById('birth').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        bloodGroup: document.getElementById('bloodGroup').value,
+        address: document.getElementById('address').value,
+        referralCode: document.getElementById('referralCode').value.toUpperCase(),
+        password: document.getElementById('signupPassword').value,
+      };
+      const errorDiv = document.getElementById('signupError');
+      errorDiv.classList.add('hidden');
+      errorDiv.textContent = '';
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+        errorDiv.textContent = 'Please enter a valid email';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (signupData.password.length < 6) {
+        errorDiv.textContent = 'Password must be at least 6 characters';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      if (!signupData.firstname || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.bloodGroup) {
+        errorDiv.textContent = 'Please fill in all required fields';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('signupButton').textContent = 'Creating Account...';
+      document.getElementById('signupButton').disabled = true;
+
+      setTimeout(() => {
+        console.log('Signup attempted with:', signupData);
+        showToast('Signup Successful', 'Account created! Check console for details.', 'success');
+        document.getElementById('signupButton').textContent = 'Create Account';
+        document.getElementById('signupButton').disabled = false;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
