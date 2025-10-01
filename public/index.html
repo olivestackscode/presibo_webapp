@@ -314,141 +314,138 @@
     <p id="toast-description" class="text-sm"></p>
   </div>
 
-  <script>
-    // API Configuration
-    const API_URL = 'https://app.presibo.com/database.json';
+ <script>
+  // API Configuration
+  const API_URL = 'https://app.presibo.com/database.json';
 
-    // Toast Notification
-    function showToast(title, description, variant = 'default') {
-      const toast = document.getElementById('toast');
-      const toastTitle = document.getElementById('toast-title');
-      const toastDescription = document.getElementById('toast-description');
-      toastTitle.textContent = title;
-      toastDescription.textContent = description;
-      toast.className = `toast ${variant} active`;
-      setTimeout(() => {
-        toast.className = `toast ${variant}`;
-      }, 3000);
+  // Toast Notification
+  function showToast(title, description, variant = 'default') {
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastDescription = document.getElementById('toast-description');
+    toastTitle.textContent = title;
+    toastDescription.textContent = description;
+    toast.className = `toast ${variant} active`;
+    setTimeout(() => {
+      toast.className = `toast ${variant}`;
+    }, 3000);
+  }
+
+  // Tab switching logic
+  const tabs = document.querySelectorAll('.tab-trigger');
+  const contents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Login form submission
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('login-error');
+    const loginButton = document.getElementById('login-button');
+    errorDiv.classList.add('hidden');
+    errorDiv.textContent = '';
+
+    // Client-side validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errorDiv.textContent = 'Please enter a valid email';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+    if (password.length < 6) {
+      errorDiv.textContent = 'Password must be at least 6 characters';
+      errorDiv.classList.remove('hidden');
+      return;
     }
 
-    // Tab switching logic
-    const tabs = document.querySelectorAll('.tab-trigger');
-    const contents = document.querySelectorAll('.tab-content');
+    loginButton.textContent = 'Signing In...';
+    loginButton.disabled = true;
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
-      });
-    });
-
-    // Login form submission
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('login-error');
-      const loginButton = document.getElementById('login-button');
-      errorDiv.classList.add('hidden');
-      errorDiv.textContent = '';
-
-      // Client-side validation
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errorDiv.textContent = 'Please enter a valid email';
-        errorDiv.classList.remove('hidden');
-        return;
+    try {
+      const response = await fetch(API_URL); // GET request (default method)
+      if (!response.ok) {
+        throw new Error(`Failed to load database: ${response.status} ${response.statusText}`);
       }
-      if (password.length < 6) {
-        errorDiv.textContent = 'Password must be at least 6 characters';
-        errorDiv.classList.remove('hidden');
-        return;
+      const users = await response.json(); // Parse the JSON array of users
+
+      // Find matching user (case-sensitive; adjust if your emails are lowercased)
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (user) {
+        // Store email in sessionStorage
+        sessionStorage.setItem('email', email);
+        showToast('Login Successful', `Welcome back, ${user.FirstName || email}! Redirecting to dashboard...`, 'success');
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 2000);
+      } else {
+        throw new Error('Invalid email or password');
       }
+    } catch (error) {
+      console.error('Login error:', error); // For debugging
+      showToast('Login Failed', error.message || 'Something went wrong. Please try again.', 'error');
+      loginButton.textContent = 'Sign In';
+      loginButton.disabled = false;
+    }
+  });
 
-      loginButton.textContent = 'Signing In...';
-      loginButton.disabled = true;
+  // Signup form submission (mocked - no changes needed, but you could add client-side "save" logic if desired)
+  document.getElementById('signup-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const signupData = {
+      firstname: document.getElementById('firstname').value,
+      lastname: document.getElementById('lastname').value,
+      email: document.getElementById('signup-email').value,
+      tel: document.getElementById('tel').value,
+      whatsappNumber: document.getElementById('whatsappNumber').value,
+      sex: document.getElementById('sex').value,
+      birth: document.getElementById('birth').value,
+      city: document.getElementById('city').value,
+      country: document.getElementById('country').value,
+      bloodGroup: document.getElementById('bloodGroup').value,
+      address: document.getElementById('address').value,
+      referralCode: document.getElementById('referralCode').value.toUpperCase(),
+      password: document.getElementById('signup-password').value,
+    };
+    const errorDiv = document.getElementById('signup-error');
+    errorDiv.classList.add('hidden');
+    errorDiv.textContent = '';
 
-      try {
-        const response = await fetch(`${API_URL}?action=verify_password`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email, password })
-        });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+      errorDiv.textContent = 'Please enter a valid email';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+    if (signupData.password.length < 6) {
+      errorDiv.textContent = 'Password must be at least 6 characters';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+    if (!signupData.firstname || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.bloodGroup) {
+      errorDiv.textContent = 'Please fill in all required fields';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
 
-        const data = await response.json();
+    document.getElementById('signup-button').textContent = 'Creating Account...';
+    document.getElementById('signup-button').disabled = true;
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Login failed');
-        }
-
-        if (data.message === 'Password verified successfully.') {
-          // Store email in sessionStorage
-          sessionStorage.setItem('email', data.email);
-          showToast('Login Successful', `Welcome, ${data.email}! Redirecting to dashboard...`, 'success');
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 2000);
-        } else {
-          throw new Error('Invalid response from server');
-        }
-      } catch (error) {
-        showToast('Login Failed', error.message || 'Invalid email or password', 'error');
-        loginButton.textContent = 'Sign In';
-        loginButton.disabled = false;
-      }
-    });
-
-    // Signup form submission (mocked)
-    document.getElementById('signup-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const signupData = {
-        firstname: document.getElementById('firstname').value,
-        lastname: document.getElementById('lastname').value,
-        email: document.getElementById('signup-email').value,
-        tel: document.getElementById('tel').value,
-        whatsappNumber: document.getElementById('whatsappNumber').value,
-        sex: document.getElementById('sex').value,
-        birth: document.getElementById('birth').value,
-        city: document.getElementById('city').value,
-        country: document.getElementById('country').value,
-        bloodGroup: document.getElementById('bloodGroup').value,
-        address: document.getElementById('address').value,
-        referralCode: document.getElementById('referralCode').value.toUpperCase(),
-        password: document.getElementById('signup-password').value,
-      };
-      const errorDiv = document.getElementById('signup-error');
-      errorDiv.classList.add('hidden');
-      errorDiv.textContent = '';
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
-        errorDiv.textContent = 'Please enter a valid email';
-        errorDiv.classList.remove('hidden');
-        return;
-      }
-      if (signupData.password.length < 6) {
-        errorDiv.textContent = 'Password must be at least 6 characters';
-        errorDiv.classList.remove('hidden');
-        return;
-      }
-      if (!signupData.firstname || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.bloodGroup) {
-        errorDiv.textContent = 'Please fill in all required fields';
-        errorDiv.classList.remove('hidden');
-        return;
-      }
-
-      document.getElementById('signup-button').textContent = 'Creating Account...';
-      document.getElementById('signup-button').disabled = true;
-
-      setTimeout(() => {
-        console.log('Signup attempted with:', signupData);
-        showToast('Signup Successful', 'Account created! Check console for details.', 'success');
-        document.getElementById('signup-button').textContent = 'Create Account';
-        document.getElementById('signup-button').disabled = false;
-      }, 1000);
-    });
-  </script>
+    setTimeout(() => {
+      console.log('Signup attempted with:', signupData);
+      // Optional: For a "real" mock, you could fetch the JSON, append signupData to the array, and log the new array
+      showToast('Signup Successful', 'Account created! Check console for details.', 'success');
+      document.getElementById('signup-button').textContent = 'Create Account';
+      document.getElementById('signup-button').disabled = false;
+    }, 1000);
+  });
+</script>
 </body>
 </html>
