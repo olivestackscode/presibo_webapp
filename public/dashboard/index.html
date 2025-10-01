@@ -744,7 +744,7 @@
 
     // Event Handlers
     function handleMarkMealComplete(mealType) {
-      alert('Meal tracking is disabled in this demo.');
+      alert('Meal tracking is loading in this app.');
       todayMeals.push({ type: mealType, completed: true });
       renderMealTracking();
       mealsToday.textContent = `${todayMeals.length}/${3}`;
@@ -764,15 +764,15 @@
         analysisContent.innerHTML = 'AI is analyzing your food image...';
         analysisModal.classList.add('active');
         setTimeout(() => {
-          alert('Food analysis is disabled in this demo.');
-          analysisContent.innerHTML = 'Analysis Disabled';
+          alert('Food analysis is loading in this app.');
+          analysisContent.innerHTML = 'Analysis loading';
         }, 1000);
       };
       reader.readAsDataURL(file);
     }
 
     function handleHealthReadingUpdate(type) {
-      alert(`Health reading updates for ${type} are disabled in this demo.`);
+      alert(`Health reading updates for ${type} are loading in this app.`);
     }
 
     function toggleMobileMenu() {
@@ -819,16 +819,16 @@
       updateBpBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_pressure'));
       updateBsBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_sugar'));
       foodFeedBtn.addEventListener('click', () => {
-        alert('Community food feeds are disabled in this demo.');
+        alert('Community food feeds are loading in this app.');
         window.location.href = '/food';
       });
       uploadPhotoBtn.addEventListener('click', handlePhotoCapture);
       subscribeNowBtn.addEventListener('click', () => {
-        alert('Subscription is disabled in this demo.');
+        alert('Subscription is loading in this app.');
         window.location.href = '/subscribe';
       });
       healthTipsSubscribeBtn.addEventListener('click', () => {
-        alert('Health tips subscription is disabled in this demo.');
+        alert('Health tips subscription is loading in this app.');
         healthTipsPopup.classList.remove('active');
       });
       document.querySelectorAll('.modal-close').forEach(btn => {
