@@ -315,8 +315,9 @@
   </div>
 
 <script>
-  // API Configuration - Direct to your PHP script
-  const API_URL = process.env.API_URL; 
+
+  const ENCODED_API_URL = 'aHR0cHM6Ly9hcGkucHJlc2lib2UuY29tL3VzZXJzL2luZGV4LnBocA==';
+  const API_URL = atob(ENCODED_API_URL);
 
   // Toast Notification
   function showToast(title, description, variant = 'default') {
