@@ -315,8 +315,8 @@
   </div>
 
 <script>
-  // API Configuration - Now using Vercel proxy
-  const API_URL = 'https://api.presibo.com/users';
+  // API Configuration - Direct to your PHP script
+  const API_URL = 'https://api.presibo.com/users/index.php';
 
   // Toast Notification
   function showToast(title, description, variant = 'default') {
@@ -377,33 +377,33 @@
         },
         body: JSON.stringify({ email, password })
       });
-      console.log('Proxy response status:', response.status, response.ok);
-      console.log('Proxy response headers:', [...response.headers.entries()]); // Debug: Check Content-Type
+      console.log('Direct API response status:', response.status, response.ok);
+      console.log('Direct API response headers:', [...response.headers.entries()]); // Debug: Check Content-Type
 
       if (!response.ok) {
         // Safely get error body
         let errorData = {};
         try {
           const text = await response.text();
-          console.log('Proxy error body (raw):', text); // Debug: See forwarded error
+          console.log('Direct API error body (raw):', text); // Debug: See what's returned
           errorData = JSON.parse(text);
         } catch (parseErr) {
-          console.error('Failed to parse proxy error body:', parseErr);
+          console.error('Failed to parse direct API error body:', parseErr);
         }
-        throw new Error(errorData.error || `Proxy/server error: ${response.status}`);
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
       // Safely parse success body
       let data = {};
       try {
         const text = await response.text();
-        console.log('Proxy success body (raw):', text); // Debug: Verify forwarded JSON
+        console.log('Direct API success body (raw):', text); // Debug: Verify JSON
         data = JSON.parse(text);
       } catch (parseErr) {
-        console.error('Failed to parse proxy success body:', parseErr);
-        throw new Error('Invalid JSON from proxy (check raw body in console)');
+        console.error('Failed to parse direct API success body:', parseErr);
+        throw new Error('Invalid JSON from API (check raw body in console)');
       }
-      console.log('Parsed data from proxy:', data);
+      console.log('Parsed data from API:', data);
 
       if (data.message === 'Password verified successfully.') {
         // Store in sessionStorage
@@ -414,7 +414,7 @@
           window.location.href = '/dashboard';
         }, 2000);
       } else {
-        throw new Error('Invalid response from proxy');
+        throw new Error('Invalid response from API');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -424,7 +424,7 @@
     }
   });
 
-  // Signup form submission (mocked - update to use proxy when ready, e.g., ?action=create_user)
+  // Signup form submission (mocked - add ?action=create_user later if needed)
   document.getElementById('signup-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const signupData = {
