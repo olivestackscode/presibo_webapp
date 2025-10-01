@@ -315,8 +315,7 @@
   </div>
 
 <script>
-
-  //const ENCODED_API_URL = 'aHR0cHM6Ly9hcGkucHJlc2lib2UuY29tL3VzZXJzL2luZGV4LnBocA==';
+  // API Configuration - Plain direct URL
   const API_URL = 'https://api.presibo.com/users/index.php';
 
   // Toast Notification
@@ -378,39 +377,32 @@
         },
         body: JSON.stringify({ email, password })
       });
-      console.log('Direct API response status:', response.status, response.ok);
-      console.log('Direct API response headers:', [...response.headers.entries()]); // Debug: Check Content-Type
+      console.log('API response status:', response.status, response.ok);
 
       if (!response.ok) {
-        // Safely get error body
         let errorData = {};
         try {
           const text = await response.text();
-          console.log('Direct API error body (raw):', text); // Debug: See what's returned
+          console.log('API error body (raw):', text); // Debug
           errorData = JSON.parse(text);
-        } catch (parseErr) {
-          console.error('Failed to parse direct API error body:', parseErr);
-        }
+        } catch {}
         throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
-      // Safely parse success body
       let data = {};
       try {
         const text = await response.text();
-        console.log('Direct API success body (raw):', text); // Debug: Verify JSON
+        console.log('API success body (raw):', text); // Debug
         data = JSON.parse(text);
-      } catch (parseErr) {
-        console.error('Failed to parse direct API success body:', parseErr);
-        throw new Error('Invalid JSON from API (check raw body in console)');
+      } catch {
+        throw new Error('Invalid JSON from API');
       }
-      console.log('Parsed data from API:', data);
+      console.log('Parsed data:', data);
 
       if (data.message === 'Password verified successfully.') {
-        // Store in sessionStorage
         sessionStorage.setItem('email', data.email);
         sessionStorage.setItem('userId', data.user_id);
-        showToast('Login Successful', 'success');
+        showToast('Login Successful', `Welcome back! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 2000);
@@ -425,7 +417,7 @@
     }
   });
 
-  // Signup form submission (mocked - add ?action=create_user later if needed)
+  // Signup form submission (mocked)
   document.getElementById('signup-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const signupData = {
