@@ -278,4 +278,555 @@
           <div class="text-xs opacity-90">Excellent</div>
         </div>
         <div class="info-gradient rounded-xl p-4 text-white">
-          <div class="flex
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-utensils"></i>
+            <span class="text-sm">Meals Today</span>
+          </div>
+          <div id="meals-today" class="text-2xl font-bold mt-1">0/3</div>
+          <div id="meals-status" class="text-xs opacity-90">More meals needed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center">
+        <i class="fas fa-upload text-warm-orange mr-2"></i>Analyze Your Food
+      </h3>
+      <div class="camera-preview rounded-xl h-48 mb-4 flex items-center justify-center relative overflow-hidden">
+        <div class="text-center text-white">
+          <i class="fas fa-upload text-4xl mb-2 opacity-70"></i>
+          <p class="text-sm opacity-90">Tap to upload your meal photo</p>
+        </div>
+        <button id="upload-btn" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50">
+          <i class="fas fa-upload text-naija-green text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Meal Tracking -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Today's Meals</h3>
+      <div id="meal-tracking" class="space-y-4"></div>
+    </div>
+
+    <!-- Health Metrics -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-semibold text-sm">Blood Pressure</h4>
+          <i class="fas fa-heart text-health-pink"></i>
+        </div>
+        <div id="blood-pressure" class="text-xl font-bold text-gray-800">120/80</div>
+        <div id="blood-pressure-status" class="text-xs text-naija-green mt-1">Normal</div>
+        <button id="update-bp-btn" class="w-full mt-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 rounded-lg">Update</button>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-semibold text-sm">Blood Sugar</h4>
+          <i class="fas fa-tint text-trust-blue"></i>
+        </div>
+        <div id="blood-sugar" class="text-xl font-bold text-gray-800">90 mg/dL</div>
+        <div id="blood-sugar-status" class="text-xs text-naija-green mt-1">Normal</div>
+        <button id="update-bs-btn" class="w-full mt-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 rounded-lg">Update</button>
+      </div>
+    </div>
+
+    <!-- Daily Health Tip -->
+    <div class="warning-gradient rounded-2xl p-6 text-white">
+      <div class="flex items-start space-x-3">
+        <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+          <i class="fas fa-lightbulb text-lg"></i>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-semibold mb-2">Today's Health Tip</h4>
+          <p id="health-tip" class="text-sm opacity-95"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nigerian Food Recommendations -->
+    <div id="food-recommendations" class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center">
+        <i class="fas fa-star text-golden-yellow mr-2"></i>Recommended Nigerian Foods
+      </h3>
+      <div id="food-recommendations-list" class="space-y-3"></div>
+    </div>
+
+    <!-- Rotating Nigerian Food Recommendations -->
+    <div id="rotation-foods" class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-naija-green rounded-full flex items-center justify-center">
+            <i class="fas fa-globe-africa text-white text-sm"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800">Nigerian Food Recommendations</h3>
+          </div>
+        </div>
+        <div id="rotation-update-time" class="text-xs text-gray-500"></div>
+      </div>
+      <div id="rotation-foods-list" class="space-y-3"></div>
+    </div>
+
+    <!-- Community Food Feeds -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-naija-green rounded-full flex items-center justify-center">
+            <i class="fas fa-users text-white text-sm"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800">Community Food Feeds</h3>
+            <p class="text-xs text-gray-600">Discover what others are eating</p>
+          </div>
+        </div>
+        <button id="food-feed-btn" class="bg-naija-green hover:bg-naija-green/90 text-white px-4 py-2 rounded-lg">
+          <i class="fas fa-eye mr-2"></i>View Feed
+        </button>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="file-upload-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Upload Meal Photo</h2>
+        <input type="file" id="photo-input" accept="image/*" class="mb-4">
+        <div class="flex gap-2">
+          <button id="upload-photo-btn" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Upload</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+    <div id="analysis-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Food Analysis</h2>
+        <div id="analysis-content" class="text-sm text-gray-700 mb-4"></div>
+        <div class="flex gap-2">
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+    <div id="subscription-popup" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Subscription Required</h2>
+        <div id="subscription-content" class="text-sm text-gray-700 mb-4"></div>
+        <div class="flex gap-2">
+          <button id="subscribe-now-btn" class="bg-golden-yellow text-black px-4 py-2 rounded-lg hover:bg-golden-yellow/90">Subscribe Now</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+    <div id="health-tips-popup" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Health Tips</h2>
+        <p class="text-sm text-gray-700 mb-4">Subscribe to receive daily health tips tailored to your needs.</p>
+        <div class="flex gap-2">
+          <button id="health-tips-subscribe-btn" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Subscribe</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API Configuration
+    const DATABASE_URL = 'https://app.presibo.com/database.json';
+
+    // Mock Data for non-user-specific elements
+    const healthTipData = {
+      tip: 'Try replacing white rice with brown rice or yam for better blood sugar control. Nigerian foods like plantain and sweet potato are excellent alternatives!'
+    };
+    const foodRecommendations = [
+      {
+        name: 'Egusi Soup',
+        description: 'Rich in protein and healthy fats, great for diabetes management.',
+        healthScore: 8.5,
+        benefits: ['High in protein', 'Low glycemic index']
+      },
+      {
+        name: 'Grilled Plantain',
+        description: 'A low-calorie, fiber-rich option for hypertension.',
+        healthScore: 7.8,
+        benefits: ['High fiber', 'Heart-healthy']
+      }
+    ];
+    const rotationFoods = [
+      {
+        name: 'Jollof Rice',
+        description: 'A flavorful rice dish cooked with tomatoes and spices.',
+        category: 'Main Dish',
+        healthRating: 7
+      },
+      {
+        name: 'Vegetable Soup',
+        description: 'Nutrient-rich soup made with spinach and local spices.',
+        category: 'Soup',
+        healthRating: 8
+      },
+      {
+        name: 'Pounded Yam',
+        description: 'Traditional yam dish, best paired with healthy soups.',
+        category: 'Staple',
+        healthRating: 6
+      }
+    ];
+    const mealTypes = [
+      { type: 'breakfast', icon: 'fas fa-sun', color: 'golden-yellow', label: 'Breakfast' },
+      { type: 'lunch', icon: 'fas fa-sun', color: 'warm-orange', label: 'Lunch' },
+      { type: 'dinner', icon: 'fas fa-moon', color: 'royal-purple', label: 'Dinner' }
+    ];
+    let todayMeals = [];
+    let notifications = [
+      { id: 1, title: 'New health tip available', message: 'Check out today\'s tip on blood sugar management', time: '2 min ago', unread: true },
+      { id: 2, title: 'Meal analysis complete', message: 'Your lunch photo has been analyzed', time: '1 hour ago', unread: true },
+      { id: 3, title: 'Subscription reminder', message: 'Your free trial ends in 3 days', time: '1 day ago', unread: false }
+    ];
+
+    // DOM Elements
+    const loadingDiv = document.getElementById('loading');
+    const dashboardDiv = document.getElementById('dashboard');
+    const greeting = document.getElementById('greeting');
+    const currentDate = document.getElementById('current-date');
+    const healthScore = document.getElementById('health-score');
+    const mealsToday = document.getElementById('meals-today');
+    const mealsStatus = document.getElementById('meals-status');
+    const bloodPressure = document.getElementById('blood-pressure');
+    const bloodPressureStatus = document.getElementById('blood-pressure-status');
+    const bloodSugar = document.getElementById('blood-sugar');
+    const bloodSugarStatus = document.getElementById('blood-sugar-status');
+    const healthTip = document.getElementById('health-tip');
+    const mealTracking = document.getElementById('meal-tracking');
+    const foodRecommendationsList = document.getElementById('food-recommendations-list');
+    const rotationFoodsList = document.getElementById('rotation-foods-list');
+    const rotationUpdateTime = document.getElementById('rotation-update-time');
+    const subscribeBtn = document.getElementById('subscribe-btn');
+    const uploadBtn = document.getElementById('upload-btn');
+    const updateBpBtn = document.getElementById('update-bp-btn');
+    const updateBsBtn = document.getElementById('update-bs-btn');
+    const foodFeedBtn = document.getElementById('food-feed-btn');
+    const fileUploadModal = document.getElementById('file-upload-modal');
+    const analysisModal = document.getElementById('analysis-modal');
+    const subscriptionPopup = document.getElementById('subscription-popup');
+    const healthTipsPopup = document.getElementById('health-tips-popup');
+    const photoInput = document.getElementById('photo-input');
+    const uploadPhotoBtn = document.getElementById('upload-photo-btn');
+    const analysisContent = document.getElementById('analysis-content');
+    const subscriptionContent = document.getElementById('subscription-content');
+    const subscribeNowBtn = document.getElementById('subscribe-now-btn');
+    const healthTipsSubscribeBtn = document.getElementById('health-tips-subscribe-btn');
+    // Header elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    // Utility Functions
+    function getCurrentGreeting() {
+      const hour = new Date().getHours();
+      if (hour < 12) return 'Good morning';
+      if (hour < 17) return 'Good afternoon';
+      return 'Good evening';
+    }
+
+    function getCurrentDate() {
+      return new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    async function fetchUserData() {
+      try {
+        const response = await fetch(DATABASE_URL);
+        if (!response.ok) throw new Error('Failed to fetch database');
+        const users = await response.json();
+        const user = users.find(u => u.email === 'jerry@presibo.com');
+        if (!user) throw new Error('User not found');
+        return user;
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        window.location.href = '/'; // Redirect on error
+        return null;
+      }
+    }
+
+    function getBloodPressureStatus(bpReading) {
+      if (!bpReading || bpReading === '--/--') {
+        return { label: 'No Data', color: 'text-gray-500' };
+      }
+      const [systolic, diastolic] = bpReading.split('/').map(Number);
+      if (isNaN(systolic) || isNaN(diastolic)) {
+        return { label: 'Invalid', color: 'text-gray-500' };
+      }
+      if (systolic < 120 && diastolic < 80) {
+        return { label: 'Normal', color: 'text-naija-green' };
+      }
+      if (systolic < 140 || diastolic < 90) {
+        return { label: 'Elevated', color: 'text-warm-orange' };
+      }
+      return { label: 'High', color: 'text-red-500' };
+    }
+
+    function getBloodSugarStatus(bsReading) {
+      if (!bsReading || bsReading === '-- mg/dL' || bsReading === 'null mg/dL') {
+        return { label: 'No Data', color: 'text-gray-500' };
+      }
+      const value = parseFloat(bsReading.replace(' mg/dL', '').replace('null', ''));
+      if (isNaN(value)) {
+        return { label: 'Invalid', color: 'text-gray-500' };
+      }
+      if (value < 100) {
+        return { label: 'Normal', color: 'text-naija-green' };
+      }
+      if (value < 126) {
+        return { label: 'Prediabetes', color: 'text-warm-orange' };
+      }
+      return { label: 'Diabetes Range', color: 'text-red-500' };
+    }
+
+    // Render Functions
+    function renderDashboard(userData) {
+      loadingDiv.classList.add('hidden');
+      dashboardDiv.classList.remove('hidden');
+
+      const firstName = userData.first_name || userData.FirstName || 'User'; // Fallback, handle possible casing
+      greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
+      currentDate.textContent = getCurrentDate();
+      healthScore.textContent = userData.health_score || 8.2;
+      mealsToday.textContent = `${userData.meals_today || 0}/${userData.total_meals_expected || 3}`;
+      mealsStatus.textContent = (userData.meals_today || 0) < (userData.total_meals_expected || 3) ? 'More meals needed' : 'All meals complete';
+      bloodPressure.textContent = userData.recent_blood_pressure || '--/--';
+      bloodPressureStatus.textContent = getBloodPressureStatus(userData.recent_blood_pressure || '--/--').label;
+      bloodPressureStatus.className = `text-xs mt-1 ${getBloodPressureStatus(userData.recent_blood_pressure || '--/--').color}`;
+      bloodSugar.textContent = userData.recent_blood_sugar || '-- mg/dL';
+      bloodSugarStatus.textContent = getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').label;
+      bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').color}`;
+      healthTip.textContent = userData.health_tip || healthTipData.tip;
+    }
+
+    function renderNotifications() {
+      notificationList.innerHTML = '';
+      notifications.forEach(notif => {
+        const div = document.createElement('div');
+        div.className = `notification-item ${notif.unread ? 'unread' : ''}`;
+        div.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-info-circle text-blue-500 text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">${notif.title}</p>
+              <p class="text-sm text-gray-500 truncate">${notif.message}</p>
+            </div>
+            <div class="text-right text-xs text-gray-500 flex-shrink-0">
+              ${notif.time}
+            </div>
+          </div>
+        `;
+        div.addEventListener('click', () => {
+          if (notif.unread) {
+            notif.unread = false;
+            div.classList.remove('unread');
+            updateNotificationCount();
+          }
+        });
+        notificationList.appendChild(div);
+      });
+    }
+
+    function updateNotificationCount() {
+      const unreadCount = notifications.filter(n => n.unread).length;
+      notificationCount.textContent = unreadCount;
+      notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+    }
+
+    function renderMealTracking() {
+      mealTracking.innerHTML = '';
+      mealTypes.forEach(meal => {
+        const completedMeal = todayMeals.find(m => m.type === meal.type && m.completed);
+        const div = document.createElement('div');
+        div.className = `flex items-center justify-between p-4 rounded-xl ${completedMeal ? 'border border-gray-100' : 'border-2 border-dashed border-gray-200'}`;
+        div.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center ${completedMeal ? `bg-${meal.color}` : 'bg-gray-200'}">
+              <i class="${meal.icon} ${completedMeal ? 'text-white' : 'text-gray-400'}"></i>
+            </div>
+            <div>
+              <div class="font-semibold">${meal.label}</div>
+              <div class="text-sm ${completedMeal ? 'text-naija-green' : 'text-gray-400'}">${completedMeal ? 'Completed' : 'Pending'}</div>
+            </div>
+          </div>
+          ${completedMeal ? `
+            <i class="fas fa-check text-naija-green text-xl"></i>
+          ` : `
+            <button class="mark-meal-btn bg-naija-green hover:bg-naija-green/90 text-white px-4 py-2 rounded-lg text-sm" data-type="${meal.type}">Mark Complete</button>
+          `}
+        `;
+        mealTracking.appendChild(div);
+      });
+    }
+
+    function renderFoodRecommendations() {
+      foodRecommendationsList.innerHTML = '';
+      foodRecommendations.slice(0, 2).forEach(food => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center space-x-3 p-3 border border-gray-100 rounded-lg';
+        div.innerHTML = `
+          <div class="w-12 h-12 bg-gradient-to-br from-naija-green to-trust-blue rounded-lg flex items-center justify-center">
+            <i class="fas fa-leaf text-white"></i>
+          </div>
+          <div class="flex-1">
+            <div class="font-medium text-sm">${food.name}</div>
+            <div class="text-xs text-gray-600">${food.description}</div>
+          </div>
+          <div class="flex items-center space-x-1">
+            <i class="fas fa-star text-golden-yellow text-xs"></i>
+            <span class="text-xs font-medium">${food.healthScore}</span>
+          </div>
+        `;
+        foodRecommendationsList.appendChild(div);
+      });
+    }
+
+    function renderRotationFoods() {
+      rotationFoodsList.innerHTML = '';
+      rotationFoods.slice(0, 3).forEach(food => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg';
+        div.innerHTML = `
+          <div class="w-10 h-10 bg-naija-green rounded-full flex items-center justify-center">
+            <i class="fas fa-drumstick-bite text-white text-sm"></i>
+          </div>
+          <div class="flex-1">
+            <div class="font-medium text-sm">${food.name}</div>
+            <div class="text-xs text-gray-600">${food.description}</div>
+            <div class="text-xs text-naija-green font-medium">${food.category}</div>
+          </div>
+          <div class="text-right">
+            <div class="flex items-center space-x-1">
+              <i class="fas fa-heart text-red-500 text-xs"></i>
+              <span class="text-xs font-medium">${food.healthRating}/10</span>
+            </div>
+          </div>
+        `;
+        rotationFoodsList.appendChild(div);
+      });
+      rotationUpdateTime.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    // Event Handlers
+    function handleMarkMealComplete(mealType) {
+      alert('Meal tracking is disabled in this demo.');
+      todayMeals.push({ type: mealType, completed: true });
+      renderMealTracking();
+      mealsToday.textContent = `${todayMeals.length}/${3}`;
+      mealsStatus.textContent = todayMeals.length < 3 ? 'More meals needed' : 'All meals complete';
+    }
+
+    function handlePhotoCapture() {
+      const file = photoInput.files[0];
+      if (!file) {
+        alert('Please select a photo.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const photoData = reader.result;
+        fileUploadModal.classList.remove('active');
+        analysisContent.innerHTML = 'AI is analyzing your food image...';
+        analysisModal.classList.add('active');
+        setTimeout(() => {
+          alert('Food analysis is disabled in this demo.');
+          analysisContent.innerHTML = 'Analysis Disabled';
+        }, 1000);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleHealthReadingUpdate(type) {
+      alert(`Health reading updates for ${type} are disabled in this demo.`);
+    }
+
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
+    // Initialize
+    async function init() {
+      loadingDiv.classList.remove('hidden');
+      dashboardDiv.classList.add('hidden');
+
+      // Fetch user data for first_name and session validation
+      const userData = await fetchUserData();
+      if (!userData) return;
+
+      renderDashboard(userData);
+      renderMealTracking();
+      renderFoodRecommendations();
+      renderRotationFoods();
+      renderNotifications();
+      updateNotificationCount();
+
+      // Event Listeners
+      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+      notificationBtn.addEventListener('click', toggleNotificationDropdown);
+      profileBtn.addEventListener('click', toggleProfileDropdown);
+      document.addEventListener('click', (e) => {
+        if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+        if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+      });
+
+      subscribeBtn.addEventListener('click', () => {
+        subscriptionContent.textContent = 'Subscribe to unlock premium features like food analysis and health tips.';
+        subscriptionPopup.classList.add('active');
+      });
+      uploadBtn.addEventListener('click', () => fileUploadModal.classList.add('active'));
+      updateBpBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_pressure'));
+      updateBsBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_sugar'));
+      foodFeedBtn.addEventListener('click', () => {
+        alert('Community food feeds are disabled in this demo.');
+        window.location.href = '/food';
+      });
+      uploadPhotoBtn.addEventListener('click', handlePhotoCapture);
+      subscribeNowBtn.addEventListener('click', () => {
+        alert('Subscription is disabled in this demo.');
+        window.location.href = '/subscribe';
+      });
+      healthTipsSubscribeBtn.addEventListener('click', () => {
+        alert('Health tips subscription is disabled in this demo.');
+        healthTipsPopup.classList.remove('active');
+      });
+      document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+          fileUploadModal.classList.remove('active');
+          analysisModal.classList.remove('active');
+          subscriptionPopup.classList.remove('active');
+          healthTipsPopup.classList.remove('active');
+        });
+      });
+      mealTracking.addEventListener('click', e => {
+        if (e.target.classList.contains('mark-meal-btn')) {
+          handleMarkMealComplete(e.target.dataset.type);
+        }
+      });
+    }
+
+    // Run Initialization
+    init();
+  </script>
+</body>
+</html>
