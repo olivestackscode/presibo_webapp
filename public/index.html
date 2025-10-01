@@ -402,7 +402,7 @@
       if (data.message === 'Password verified successfully.') {
         sessionStorage.setItem('email', data.email);
         sessionStorage.setItem('userId', data.user_id);
-        showToast('Login Successful', `Welcome back! Redirecting to dashboard...`, 'success');
+        showToast('Login Successful', 'success');
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 2000);
