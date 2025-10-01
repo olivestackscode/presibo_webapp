@@ -108,10 +108,116 @@
     .camera-preview {
       background: linear-gradient(to bottom, #3B82F6, #10B981);
     }
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-gray-50 p-4 font-sans">
-  <div id="dashboard" class="max-w-7xl mx-auto space-y-6">
+<body class="min-h-screen bg-gray-50 font-sans">
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+          <span class="sr-only">Open main menu</span>
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8">
+          <a href="/dashboard" class="menu-link active">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/meals" class="menu-link">Meals</a>
+          <a href="/reports" class="menu-link">Reports</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand Logo and Name (Top Right, but since menu is left, place after menu for desktop) -->
+        <div class="hidden md:flex items-center space-x-2 ml-auto">
+          <img src="assets/img/new_presibo_icon.png" alt="Presibo Logo" class="h-8 w-8">
+          <span class="font-bold text-naija-green">Presibo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link active block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/reports" class="menu-link block">Reports</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="dashboard" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6">
     <!-- Loading State -->
     <div id="loading" class="hidden animate-pulse space-y-6">
       <div class="bg-white rounded-2xl p-6 h-32"></div>
@@ -119,6 +225,29 @@
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-white rounded-2xl p-4 h-32"></div>
         <div class="bg-white rounded-2xl p-4 h-32"></div>
+      </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="/track-vitals" class="bg-health-gradient rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
+          <i class="fas fa-chart-line text-xl mb-2 block"></i>
+          <span class="text-sm font-medium">Track Vitals</span>
+        </a>
+        <a href="/ai-doc" class="bg-trust-blue rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
+          <i class="fas fa-robot text-xl mb-2 block"></i>
+          <span class="text-sm font-medium">AI Doc</span>
+        </a>
+        <a href="/fitness" class="bg-warm-orange rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
+          <i class="fas fa-dumbbell text-xl mb-2 block"></i>
+          <span class="text-sm font-medium">Fitness</span>
+        </a>
+        <a href="/pulse-fitness-videos" class="bg-health-pink rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
+          <i class="fas fa-video text-xl mb-2 block"></i>
+          <span class="text-sm font-medium">Pulse Fitness Videos</span>
+        </a>
       </div>
     </div>
 
@@ -354,6 +483,11 @@
       { type: 'dinner', icon: 'fas fa-moon', color: 'royal-purple', label: 'Dinner' }
     ];
     let todayMeals = [];
+    let notifications = [
+      { id: 1, title: 'New health tip available', message: 'Check out today\'s tip on blood sugar management', time: '2 min ago', unread: true },
+      { id: 2, title: 'Meal analysis complete', message: 'Your lunch photo has been analyzed', time: '1 hour ago', unread: true },
+      { id: 3, title: 'Subscription reminder', message: 'Your free trial ends in 3 days', time: '1 day ago', unread: false }
+    ];
 
     // DOM Elements
     const loadingDiv = document.getElementById('loading');
@@ -387,6 +521,15 @@
     const subscriptionContent = document.getElementById('subscription-content');
     const subscribeNowBtn = document.getElementById('subscribe-now-btn');
     const healthTipsSubscribeBtn = document.getElementById('health-tips-subscribe-btn');
+    // Header elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
 
     // Utility Functions
     function getCurrentGreeting() {
@@ -402,6 +545,27 @@
         day: 'numeric',
         year: 'numeric'
       });
+    }
+
+    async function fetchUserData() {
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) {
+        window.location.href = '/'; // Redirect if not logged in
+        return null;
+      }
+      try {
+        const response = await fetch(`${API_URL}?action=get_session_user`, {
+          method: 'GET',
+          credentials: 'include' // Include cookies for session
+        });
+        if (!response.ok) throw new Error('Session invalid');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        window.location.href = '/'; // Redirect on error
+        return null;
+      }
     }
 
     function getBloodPressureStatus(bpReading) {
@@ -439,11 +603,12 @@
     }
 
     // Render Functions
-    function renderDashboard() {
+    function renderDashboard(userData) {
       loadingDiv.classList.add('hidden');
       dashboardDiv.classList.remove('hidden');
 
-      greeting.textContent = `${getCurrentGreeting()}, User!`;
+      const firstName = userData.first_name || 'User'; // Fallback
+      greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
       currentDate.textContent = getCurrentDate();
       healthScore.textContent = dashboardData.healthScore;
       mealsToday.textContent = `${dashboardData.mealsToday}/${dashboardData.totalMealsExpected}`;
@@ -455,6 +620,42 @@
       bloodSugarStatus.textContent = getBloodSugarStatus(dashboardData.recentBloodSugar).label;
       bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(dashboardData.recentBloodSugar).color}`;
       healthTip.textContent = healthTipData.tip;
+    }
+
+    function renderNotifications() {
+      notificationList.innerHTML = '';
+      notifications.forEach(notif => {
+        const div = document.createElement('div');
+        div.className = `notification-item ${notif.unread ? 'unread' : ''}`;
+        div.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-info-circle text-blue-500 text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">${notif.title}</p>
+              <p class="text-sm text-gray-500 truncate">${notif.message}</p>
+            </div>
+            <div class="text-right text-xs text-gray-500 flex-shrink-0">
+              ${notif.time}
+            </div>
+          </div>
+        `;
+        div.addEventListener('click', () => {
+          if (notif.unread) {
+            notif.unread = false;
+            div.classList.remove('unread');
+            updateNotificationCount();
+          }
+        });
+        notificationList.appendChild(div);
+      });
+    }
+
+    function updateNotificationCount() {
+      const unreadCount = notifications.filter(n => n.unread).length;
+      notificationCount.textContent = unreadCount;
+      notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
     }
 
     function renderMealTracking() {
@@ -564,20 +765,46 @@
       alert(`Health reading updates for ${type} are disabled in this demo.`);
     }
 
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
     // Initialize
-    function init() {
+    async function init() {
       loadingDiv.classList.remove('hidden');
       dashboardDiv.classList.add('hidden');
 
-      // Mock fetch for Nigerian food recommendations (replace with real endpoint if available)
+      // Fetch user data for first_name and session validation
+      const userData = await fetchUserData();
+      if (!userData) return;
+
+      // Mock fetch for other data
       setTimeout(() => {
-        renderDashboard();
+        renderDashboard(userData);
         renderMealTracking();
         renderFoodRecommendations();
         renderRotationFoods();
+        renderNotifications();
+        updateNotificationCount();
       }, 1000);
 
       // Event Listeners
+      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+      notificationBtn.addEventListener('click', toggleNotificationDropdown);
+      profileBtn.addEventListener('click', toggleProfileDropdown);
+      document.addEventListener('click', (e) => {
+        if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+        if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+      });
+
       subscribeBtn.addEventListener('click', () => {
         subscriptionContent.textContent = 'Subscribe to unlock premium features like food analysis and health tips.';
         subscriptionPopup.classList.add('active');
