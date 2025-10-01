@@ -431,7 +431,7 @@
 
   <script>
     // API Configuration
-    const API_URL = '/api'; // Adjust to your API base URL
+    const DATABASE_URL = 'https://app.presibo.com/database.json';
 
     // Mock Data for non-user-specific elements
     const healthTipData = {
@@ -542,19 +542,13 @@
     }
 
     async function fetchUserData() {
-      const email = sessionStorage.getItem('email');
-      if (!email) {
-        window.location.href = '/'; // Redirect if not logged in
-        return null;
-      }
       try {
-        const response = await fetch(`${API_URL}?action=get_session_user&email=${encodeURIComponent(email)}`, {
-          method: 'GET',
-          credentials: 'include' // Include cookies for session
-        });
-        if (!response.ok) throw new Error('Session invalid');
-        const data = await response.json();
-        return data;
+        const response = await fetch(DATABASE_URL);
+        if (!response.ok) throw new Error('Failed to fetch database');
+        const users = await response.json();
+        const user = users.find(u => u.email === 'jerry@presibo.com');
+        if (!user) throw new Error('User not found');
+        return user;
       } catch (error) {
         console.error('Failed to fetch user data:', error);
         window.location.href = '/'; // Redirect on error
@@ -601,7 +595,7 @@
       loadingDiv.classList.add('hidden');
       dashboardDiv.classList.remove('hidden');
 
-      const firstName = userData.first_name || 'User'; // Fallback
+      const firstName = userData.first_name || userData.FirstName || 'User'; // Fallback, handle possible casing
       greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
       currentDate.textContent = getCurrentDate();
       healthScore.textContent = userData.health_score || 8.2;
