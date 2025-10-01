@@ -9,7 +9,7 @@
   <meta name="keywords" content="Presibo, health dashboard, AI healthcare, meal tracking, blood pressure, blood sugar, Nigerian foods, telemedicine">
   <meta name="author" content="Presibo Team">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://presibo--web.vercel.app/dashboard.html">
+  <link rel="canonical" href="https://app.presibo.com/dashboard">
 
   <!-- Favicon Meta Tags -->
   <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
@@ -430,16 +430,10 @@
   </div>
 
   <script>
-    // Mock Data
-    const dashboardData = {
-      healthScore: 8.2,
-      mealsToday: 0,
-      totalMealsExpected: 3,
-      recentBloodPressure: '120/80',
-      recentBloodSugar: '90 mg/dL',
-      healthRisks: [],
-      recentAnalyses: []
-    };
+    // API Configuration
+    const API_URL = '/api'; // Adjust to your API base URL
+
+    // Mock Data for non-user-specific elements
     const healthTipData = {
       tip: 'Try replacing white rice with brown rice or yam for better blood sugar control. Nigerian foods like plantain and sweet potato are excellent alternatives!'
     };
@@ -548,13 +542,13 @@
     }
 
     async function fetchUserData() {
-      const userId = sessionStorage.getItem('userId');
-      if (!userId) {
+      const email = sessionStorage.getItem('email');
+      if (!email) {
         window.location.href = '/'; // Redirect if not logged in
         return null;
       }
       try {
-        const response = await fetch(`${API_URL}?action=get_session_user`, {
+        const response = await fetch(`${API_URL}?action=get_session_user&email=${encodeURIComponent(email)}`, {
           method: 'GET',
           credentials: 'include' // Include cookies for session
         });
@@ -610,16 +604,16 @@
       const firstName = userData.first_name || 'User'; // Fallback
       greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
       currentDate.textContent = getCurrentDate();
-      healthScore.textContent = dashboardData.healthScore;
-      mealsToday.textContent = `${dashboardData.mealsToday}/${dashboardData.totalMealsExpected}`;
-      mealsStatus.textContent = dashboardData.mealsToday < dashboardData.totalMealsExpected ? 'More meals needed' : 'All meals complete';
-      bloodPressure.textContent = dashboardData.recentBloodPressure || '--/--';
-      bloodPressureStatus.textContent = getBloodPressureStatus(dashboardData.recentBloodPressure).label;
-      bloodPressureStatus.className = `text-xs mt-1 ${getBloodPressureStatus(dashboardData.recentBloodPressure).color}`;
-      bloodSugar.textContent = dashboardData.recentBloodSugar || '-- mg/dL';
-      bloodSugarStatus.textContent = getBloodSugarStatus(dashboardData.recentBloodSugar).label;
-      bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(dashboardData.recentBloodSugar).color}`;
-      healthTip.textContent = healthTipData.tip;
+      healthScore.textContent = userData.health_score || 8.2;
+      mealsToday.textContent = `${userData.meals_today || 0}/${userData.total_meals_expected || 3}`;
+      mealsStatus.textContent = (userData.meals_today || 0) < (userData.total_meals_expected || 3) ? 'More meals needed' : 'All meals complete';
+      bloodPressure.textContent = userData.recent_blood_pressure || '--/--';
+      bloodPressureStatus.textContent = getBloodPressureStatus(userData.recent_blood_pressure || '--/--').label;
+      bloodPressureStatus.className = `text-xs mt-1 ${getBloodPressureStatus(userData.recent_blood_pressure || '--/--').color}`;
+      bloodSugar.textContent = userData.recent_blood_sugar || '-- mg/dL';
+      bloodSugarStatus.textContent = getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').label;
+      bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').color}`;
+      healthTip.textContent = userData.health_tip || healthTipData.tip;
     }
 
     function renderNotifications() {
@@ -737,8 +731,8 @@
       alert('Meal tracking is disabled in this demo.');
       todayMeals.push({ type: mealType, completed: true });
       renderMealTracking();
-      mealsToday.textContent = `${todayMeals.length}/${dashboardData.totalMealsExpected}`;
-      mealsStatus.textContent = todayMeals.length < dashboardData.totalMealsExpected ? 'More meals needed' : 'All meals complete';
+      mealsToday.textContent = `${todayMeals.length}/${3}`;
+      mealsStatus.textContent = todayMeals.length < 3 ? 'More meals needed' : 'All meals complete';
     }
 
     function handlePhotoCapture() {
@@ -786,15 +780,12 @@
       const userData = await fetchUserData();
       if (!userData) return;
 
-      // Mock fetch for other data
-      setTimeout(() => {
-        renderDashboard(userData);
-        renderMealTracking();
-        renderFoodRecommendations();
-        renderRotationFoods();
-        renderNotifications();
-        updateNotificationCount();
-      }, 1000);
+      renderDashboard(userData);
+      renderMealTracking();
+      renderFoodRecommendations();
+      renderRotationFoods();
+      renderNotifications();
+      updateNotificationCount();
 
       // Event Listeners
       mobileMenuBtn.addEventListener('click', toggleMobileMenu);
