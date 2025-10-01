@@ -399,15 +399,17 @@
       }
       console.log('Parsed data:', data);
 
-      if (data.message === 'Password verified successfully.') {
+      if (data.message === 'Password verified successfully.' && data.session_created) {
+        // Server session created; browser handles cookie
+        console.log('Server session created for:', data.email);
         sessionStorage.setItem('email', data.email);
         sessionStorage.setItem('userId', data.user_id);
-        showToast('Login Successful');
+        showToast('Login Successful', `Welcome back! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 2000);
       } else {
-        throw new Error('Invalid response from API');
+        throw new Error('Session creation failed');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -449,7 +451,7 @@
       errorDiv.classList.remove('hidden');
       return;
     }
-    if (!signupData.first_name || !signupData.last_name || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.blood_group) {
+    if (!signupData.first_name || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.blood_group) {
       errorDiv.textContent = 'Please fill in all required fields';
       errorDiv.classList.remove('hidden');
       return;
