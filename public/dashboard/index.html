@@ -11,16 +11,15 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://app.presibo.com/dashboard">
 
-  <!-- Favicon Meta Tags -->
-  <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
-  <link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
-  <meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
-  <link rel="preload" href="assets/img/new_presibo_icon.png" as="image" importance="high">
+  <!-- Favicon Meta Tags - Using online placeholder -->
+  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
+  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
 
   <!-- Open Graph (Facebook, LinkedIn, etc.) -->
   <meta property="og:title" content="Presibo - Your Health Dashboard">
   <meta property="og:description" content="Monitor your health with Presibo’s AI-driven dashboard. Track meals, blood pressure, blood sugar, and discover Nigerian food recommendations.">
-  <meta property="og:image" content="https://app.presibo.com/assets/img/new_presibo_icon.png">
+  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
   <meta property="og:image:width" content="192">
   <meta property="og:image:height" content="192">
   <meta property="og:image:alt" content="Presibo Logo">
@@ -32,25 +31,25 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Presibo - Your Health Dashboard">
   <meta name="twitter:description" content="Presibo’s AI dashboard helps you track meals, health metrics, and Nigerian food recommendations for better health.">
-  <meta name="twitter:image" content="https://app.presibo.com/assets/img/new_presibo_icon.png">
+  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
   <meta name="twitter:image:alt" content="Presibo Logo">
   <meta name="twitter:site" content="@PresiboHealth">
 
-  <!-- Web App Manifest (PWA) -->
-  <link rel="manifest" href="assets/manifest.json">
+  <!-- Web App Manifest (PWA) - Commented out to avoid errors; add a valid manifest later -->
+  <!-- <link rel="manifest" href="assets/manifest.json"> -->
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -198,7 +197,7 @@
 
         <!-- Brand Logo and Name (Top Right, but since menu is left, place after menu for desktop) -->
         <div class="hidden md:flex items-center space-x-2 ml-auto">
-          <img src="assets/img/new_presibo_icon.png" alt="Presibo Logo" class="h-8 w-8">
+          <i class="fas fa-heartbeat text-naija-green text-2xl"></i>
           <span class="font-bold text-naija-green">Presibo</span>
         </div>
       </div>
@@ -545,14 +544,21 @@
       try {
         const response = await fetch(DATABASE_URL);
         if (!response.ok) throw new Error('Failed to fetch database');
-        const users = await response.json();
+        const data = await response.json();
+        let users = data;
+        if (!Array.isArray(users)) {
+          // Try common wrappers
+          users = data.data || data.users || data.usersData || [];
+          if (!Array.isArray(users)) {
+            throw new Error('Invalid data structure: users is not an array');
+          }
+        }
         const user = users.find(u => u.email === 'jerry@presibo.com');
         if (!user) throw new Error('User not found');
         return user;
       } catch (error) {
         console.error('Failed to fetch user data:', error);
-        //window.location.href = '/'; // Redirect on error
-        return null;
+        return null;  // Return null instead of redirecting
       }
     }
 
@@ -595,7 +601,7 @@
       loadingDiv.classList.add('hidden');
       dashboardDiv.classList.remove('hidden');
 
-      const firstName = userData.first_name || userData.FirstName || 'User'; // Fallback, handle possible casing
+      const firstName = userData.FirstName || userData.first_name || 'User'; // Handle casing
       greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
       currentDate.textContent = getCurrentDate();
       healthScore.textContent = userData.health_score || 8.2;
@@ -772,9 +778,8 @@
 
       // Fetch user data for first_name and session validation
       const userData = await fetchUserData();
-      if (!userData) return;
-
-      renderDashboard(userData);
+      // Even if userData is null, proceed with defaults
+      renderDashboard(userData || {});
       renderMealTracking();
       renderFoodRecommendations();
       renderRotationFoods();
