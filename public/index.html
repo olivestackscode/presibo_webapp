@@ -347,7 +347,7 @@
   // Login form submission
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase(); // Normalize case
     const password = document.getElementById('password').value;
     const errorDiv = document.getElementById('login-error');
     const loginButton = document.getElementById('login-button');
@@ -370,54 +370,57 @@
     loginButton.disabled = true;
 
     try {
-      const response = await fetch(API_URL);
-      console.log('Response status:', response.status, response.ok); // Debug: Check fetch success
+      const response = await fetch(`${API_URL}?action=verify_password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password }) // Matches PHP expectation
+      });
+      console.log('Response status:', response.status, response.ok); // Debug
       if (!response.ok) {
-        throw new Error(`Failed to load database: ${response.status} ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Parsed data:', data, typeof data, Array.isArray(data)); // Debug: Inspect structure
-      const users = Array.isArray(data) ? data : (data.users || []); // Extract array safely
-      console.log('Extracted users array:', users.length, 'items'); // Debug: Confirm array
+      console.log('Response data:', data); // Debug: Should show {message: "Password verified successfully.", ...}
 
-      // Find matching user (case-sensitive; adjust if needed, e.g., .toLowerCase() for emails)
-      const user = users.find(u => u.email === email && u.password === password);
-
-      if (user) {
-        // Store email in sessionStorage
-        sessionStorage.setItem('email', email);
-        showToast('Login Successful', `Welcome back, ${user.FirstName || email}! Redirecting to dashboard...`, 'success');
+      if (data.message === 'Password verified successfully.') {
+        // Store in sessionStorage
+        sessionStorage.setItem('email', data.email);
+        sessionStorage.setItem('userId', data.user_id);
+        showToast('Login Successful', `Welcome back! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 2000);
       } else {
-        throw new Error('Invalid email or password');
+        throw new Error('Invalid response from server');
       }
     } catch (error) {
-      console.error('Login error:', error); // For debugging
+      console.error('Login error:', error); // Check for CORS/Network details
       showToast('Login Failed', error.message || 'Something went wrong. Please try again.', 'error');
       loginButton.textContent = 'Sign In';
       loginButton.disabled = false;
     }
   });
 
-  // Signup form submission (unchanged, mocked)
+  // Signup form submission (mocked - add real POST to ?action=create_user later)
   document.getElementById('signup-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const signupData = {
-      firstname: document.getElementById('firstname').value,
-      lastname: document.getElementById('lastname').value,
+      first_name: document.getElementById('firstname').value, // Map to PHP fields
+      last_name: document.getElementById('lastname').value,
       email: document.getElementById('signup-email').value,
       tel: document.getElementById('tel').value,
-      whatsappNumber: document.getElementById('whatsappNumber').value,
+      whatsapp_number: document.getElementById('whatsappNumber').value,
       sex: document.getElementById('sex').value,
       birth: document.getElementById('birth').value,
       city: document.getElementById('city').value,
       country: document.getElementById('country').value,
-      bloodGroup: document.getElementById('bloodGroup').value,
+      blood_group: document.getElementById('bloodGroup').value,
       address: document.getElementById('address').value,
-      referralCode: document.getElementById('referralCode').value.toUpperCase(),
-      password: document.getElementById('signup-password').value,
+      referral_code: document.getElementById('referralCode').value.toUpperCase(),
+      password: password_hash(document.getElementById('signup-password').value, PASSWORD_DEFAULT), // Hash client-side (or server-side)
     };
     const errorDiv = document.getElementById('signup-error');
     errorDiv.classList.add('hidden');
@@ -428,12 +431,12 @@
       errorDiv.classList.remove('hidden');
       return;
     }
-    if (signupData.password.length < 6) {
+    if (signupData.password.length < 6) { // Note: This checks plain password length
       errorDiv.textContent = 'Password must be at least 6 characters';
       errorDiv.classList.remove('hidden');
       return;
     }
-    if (!signupData.firstname || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.bloodGroup) {
+    if (!signupData.first_name || !signupData.last_name || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.blood_group) {
       errorDiv.textContent = 'Please fill in all required fields';
       errorDiv.classList.remove('hidden');
       return;
