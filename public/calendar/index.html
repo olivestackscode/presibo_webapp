@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Standard Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Calendar</title>
+  <meta name="description" content="View and manage your appointments and health reminders on Presibo Calendar.">
+  <meta name="keywords" content="Presibo, calendar, appointments, health schedule, reminders">
+  <meta name="author" content="Presibo Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://app.presibo.com/calendar">
+
+  <!-- Favicon Meta Tags - Using online placeholder -->
+  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
+  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Presibo - Calendar">
+  <meta property="og:description" content="Schedule and track your health appointments and reminders.">
+  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://app.presibo.com/calendar">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Calendar">
+  <meta name="twitter:description" content="Manage your health schedule with Presibo Calendar.">
+  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'health-gradient': '#F97316',
+            'info-gradient': '#FBBF24',
+            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.active {
+      display: flex;
+    }
+    .dialog-content {
+      background: white;
+      border-radius: 0.5rem;
+      max-width: 28rem;
+      width: 100%;
+      padding: 1.5rem;
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }
+    .text-purple{
+      color: #300b5b;
+    }
+    .calendar-day {
+      position: relative;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      min-height: 80px;
+      transition: background-color 0.2s;
+    }
+    .calendar-day:hover {
+      background-color: #f3f4f6;
+    }
+    .calendar-day.other-month {
+      color: #9ca3af;
+    }
+    .calendar-day.today {
+      background-color: #dbeafe;
+      border-color: #3b82f6;
+    }
+    .calendar-day.has-event {
+      background-color: #fef3c7;
+    }
+    .event-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: #ef4444;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans">
+  <!-- Session Check -->
+  <script>
+    if (!sessionStorage.getItem('email')) {
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left side: Brand and Mobile Menu -->
+        <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <span class="sr-only">Open main menu</span>
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/meals" class="menu-link">Meals</a>
+          <a href="/insights-hub" class="menu-link">Insights Hub</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link">Challenges</a>
+          <a href="/book" class="menu-link">Book</a>
+          <a href="/wallet" class="menu-link">Wallet</a>
+          <a href="/food" class="menu-link">Food</a>
+          <a href="/doctors" class="menu-link">Doctors</a>
+          <a href="/calendar" class="menu-link active">Calendar</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/insights-hub" class="menu-link block">Insights Hub</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/challenges" class="menu-link block">Challenges</a>
+        <a href="/book" class="menu-link block">Book</a>
+        <a href="/wallet" class="menu-link block">Wallet</a>
+        <a href="/food" class="menu-link block">Food</a>
+        <a href="/doctors" class="menu-link block">Doctors</a>
+        <a href="/calendar" class="menu-link active block">Calendar</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="calendar" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6">
+    <!-- Loading State -->
+    <div id="loading" class="hidden animate-pulse space-y-6">
+      <div class="bg-white rounded-2xl p-6 h-32"></div>
+      <div class="bg-white rounded-2xl p-6 h-64"></div>
+      <div class="grid grid-cols-7 gap-1">
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+        <div class="bg-white rounded p-2 h-16"></div>
+      </div>
+    </div>
+
+    <!-- Calendar Header -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-4">
+          <button id="prev-month" class="text-naija-green">
+            <i class="fas fa-chevron-left text-xl"></i>
+          </button>
+          <h2 id="month-year" class="text-2xl font-bold text-gray-800">October 2025</h2>
+          <button id="next-month" class="text-naija-green">
+            <i class="fas fa-chevron-right text-xl"></i>
+          </button>
+        </div>
+        <div class="flex space-x-2">
+          <button id="today-btn" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">
+            Today
+          </button>
+          <button id="add-event-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>Add Event
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center font-semibold text-gray-600 mb-2">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+      <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+        <!-- Dynamic calendar days -->
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Upcoming Events</h3>
+      <div id="events-list" class="space-y-3">
+        <!-- Dynamic events -->
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="add-event-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Add New Event</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="event-title" class="input" placeholder="e.g., Doctor Appointment">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <input type="date" id="event-date" class="input">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+            <input type="time" id="event-time" class="input">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea id="event-desc" class="input" rows="3" placeholder="Additional details..."></textarea>
+          </div>
+        </div>
+        <div class="flex gap-2 justify-end mt-6">
+          <button id="save-event" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Save</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="event-detail-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Event Details</h2>
+        <div id="event-detail-content" class="text-sm text-gray-700 mb-4 space-y-2"></div>
+        <div class="flex gap-2 justify-end">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Edit</button>
+          <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock Events Data
+    let events = [
+      { id: 1, title: 'Doctor Appointment - Dr. Bello', date: '2025-10-15', time: '10:00 AM', desc: 'Cardiology check-up', color: 'red' },
+      { id: 2, title: 'Vital Check Reminder', date: '2025-10-10', time: '8:00 AM', desc: 'Log blood pressure and sugar', color: 'blue' },
+      { id: 3, title: 'Meal Plan Review', date: '2025-10-05', time: '2:00 PM', desc: 'Review weekly nutrition plan', color: 'green' }
+    ];
+
+    let currentDate = new Date(2025, 9, 2); // October 2, 2025
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+
+    // DOM Elements
+    const loadingDiv = document.getElementById('loading');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthYear = document.getElementById('month-year');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    const todayBtn = document.getElementById('today-btn');
+    const addEventBtn = document.getElementById('add-event-btn');
+    const eventsList = document.getElementById('events-list');
+    const addEventModal = document.getElementById('add-event-modal');
+    const eventDetailModal = document.getElementById('event-detail-modal');
+    const saveEventBtn = document.getElementById('save-event');
+    const eventTitle = document.getElementById('event-title');
+    const eventDate = document.getElementById('event-date');
+    const eventTime = document.getElementById('event-time');
+    const eventDesc = document.getElementById('event-desc');
+    const eventDetailContent = document.getElementById('event-detail-content');
+
+    // Header elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    // Generate Calendar
+    function generateCalendar() {
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+      monthYear.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      let gridHTML = '';
+      let date = 1 - firstDay;
+
+      for (let i = 0; i < 42; i++) { // 6 weeks
+        const day = new Date(currentYear, currentMonth, date);
+        const isCurrentMonth = date >= 1 && date <= daysInMonth;
+        const isToday = day.toDateString() === new Date().toDateString();
+
+        let className = 'calendar-day';
+        if (!isCurrentMonth) className += ' other-month';
+        if (isToday) className += ' today';
+
+        // Check for events
+        const dayEvents = events.filter(ev => {
+          const evDate = new Date(ev.date);
+          return evDate.getFullYear() === day.getFullYear() &&
+                 evDate.getMonth() === day.getMonth() &&
+                 evDate.getDate() === day.getDate();
+        });
+        let hasEvent = dayEvents.length > 0;
+        if (hasEvent) className += ' has-event';
+
+        gridHTML += `
+          <div class="${className}" data-date="${day.toISOString().split('T')[0]}" onclick="showDayEvents(this)">
+            <div class="text-center font-medium ${!isCurrentMonth ? 'text-gray-400' : ''}">${isCurrentMonth ? date : date + (daysInPrevMonth - firstDay + 1)}</div>
+            ${hasEvent ? '<div class="event-dot"></div>' : ''}
+            <div class="text-xs text-gray-500 mt-1">${dayEvents.map(ev => ev.title.substring(0, 10) + '...').join('<br>')}</div>
+          </div>
+        `;
+        date++;
+      }
+
+      calendarGrid.innerHTML = gridHTML;
+    }
+
+    // Show Day Events
+    function showDayEvents(dayEl) {
+      const date = dayEl.dataset.date;
+      const dayEvents = events.filter(ev => ev.date === date);
+      if (dayEvents.length === 0) {
+        alert('No events for this day. Add one?');
+        return;
+      }
+
+      // Show in upcoming list or modal
+      renderUpcomingEvents();
+    }
+
+    // Render Upcoming Events
+    function renderUpcomingEvents() {
+      const upcoming = events.filter(ev => new Date(ev.date) >= new Date()).slice(0, 5);
+      eventsList.innerHTML = '';
+      if (upcoming.length === 0) {
+        eventsList.innerHTML = '<p class="text-gray-500 text-center py-4">No upcoming events</p>';
+        return;
+      }
+
+      upcoming.forEach(ev => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100';
+        div.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-naija-green rounded-full flex items-center justify-center text-white font-semibold">
+              ${ev.time.substring(0, 2)}
+            </div>
+            <div>
+              <div class="font-medium">${ev.title}</div>
+              <div class="text-sm text-gray-500">${ev.date} at ${ev.time}</div>
+            </div>
+          </div>
+          <button onclick="showEventDetail(${ev.id})" class="text-naija-green hover:underline">View</button>
+        `;
+        eventsList.appendChild(div);
+      });
+    }
+
+    // Show Event Detail
+    function showEventDetail(id) {
+      const ev = events.find(e => e.id === id);
+      if (!ev) return;
+
+      eventDetailContent.innerHTML = `
+        <h3 class="font-bold text-lg">${ev.title}</h3>
+        <p class="text-sm text-gray-600">${ev.date} at ${ev.time}</p>
+        <p class="text-sm">${ev.desc}</p>
+      `;
+      eventDetailModal.classList.add('active');
+    }
+
+    // Navigation
+    prevMonthBtn.addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      currentDate.setMonth(currentMonth);
+      currentDate.setFullYear(currentYear);
+      generateCalendar();
+      renderUpcomingEvents();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      currentDate.setMonth(currentMonth);
+      currentDate.setFullYear(currentYear);
+      generateCalendar();
+      renderUpcomingEvents();
+    });
+
+    todayBtn.addEventListener('click', () => {
+      currentDate = new Date();
+      currentMonth = currentDate.getMonth();
+      currentYear = currentDate.getFullYear();
+      generateCalendar();
+      renderUpcomingEvents();
+    });
+
+    addEventBtn.addEventListener('click', () => {
+      eventDate.value = new Date().toISOString().split('T')[0];
+      addEventModal.classList.add('active');
+    });
+
+    saveEventBtn.addEventListener('click', () => {
+      const title = eventTitle.value.trim();
+      const date = eventDate.value;
+      const time = eventTime.value;
+      const desc = eventDesc.value.trim();
+
+      if (!title || !date) {
+        alert('Title and date are required.');
+        return;
+      }
+
+      const newEvent = {
+        id: Date.now(),
+        title,
+        date,
+        time: time || 'All Day',
+        desc: desc || '',
+        color: 'blue'
+      };
+
+      events.push(newEvent);
+      addEventModal.classList.remove('active');
+      eventTitle.value = '';
+      eventDate.value = '';
+      eventTime.value = '';
+      eventDesc.value = '';
+
+      generateCalendar();
+      renderUpcomingEvents();
+      alert('Event added successfully!');
+    });
+
+    // Close modals
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addEventModal.classList.remove('active');
+        eventDetailModal.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target === addEventModal || e.target === eventDetailModal) {
+        addEventModal.classList.remove('active');
+        eventDetailModal.classList.remove('active');
+      }
+    });
+
+    // Header interactions
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    notificationBtn.addEventListener('click', toggleNotificationDropdown);
+    profileBtn.addEventListener('click', toggleProfileDropdown);
+
+    document.addEventListener('click', (e) => {
+      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    // Initialize
+    function init() {
+      loadingDiv.classList.remove('hidden');
+      setTimeout(() => {
+        loadingDiv.classList.add('hidden');
+        generateCalendar();
+        renderUpcomingEvents();
+      }, 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
