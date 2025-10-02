@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Standard Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Wallet</title>
+  <meta name="description" content="Manage your Presibo wallet. View balance, transaction history, and top up for premium features.">
+  <meta name="keywords" content="Presibo, wallet, payments, health subscription, transaction history">
+  <meta name="author" content="Presibo Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://app.presibo.com/wallet">
+
+  <!-- Favicon Meta Tags - Using online placeholder -->
+  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
+  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Presibo - Wallet">
+  <meta property="og:description" content="Securely manage your wallet balance and transactions on Presibo.">
+  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://app.presibo.com/wallet">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Wallet">
+  <meta name="twitter:description" content="Track your wallet and payments in the Presibo app.">
+  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'health-gradient': '#F97316',
+            'info-gradient': '#FBBF24',
+            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.active {
+      display: flex;
+    }
+    .dialog-content {
+      background: white;
+      border-radius: 0.5rem;
+      max-width: 28rem;
+      width: 100%;
+      padding: 1.5rem;
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }
+    .text-purple{
+      color: #300b5b;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans">
+  <!-- Session Check -->
+  <script>
+    if (!sessionStorage.getItem('email')) {
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left side: Brand and Mobile Menu -->
+        <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <span class="sr-only">Open main menu</span>
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/meals" class="menu-link">Meals</a>
+          <a href="/insights-hub" class="menu-link">Insights Hub</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link">Challenges</a>
+          <a href="/book" class="menu-link">Book</a>
+          <a href="/wallet" class="menu-link active">Wallet</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/insights-hub" class="menu-link block">Insights Hub</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/challenges" class="menu-link block">Challenges</a>
+        <a href="/book" class="menu-link block">Book</a>
+        <a href="/wallet" class="menu-link active block">Wallet</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="wallet" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6">
+    <!-- Loading State -->
+    <div id="loading" class="hidden animate-pulse space-y-6">
+      <div class="bg-white rounded-2xl p-6 h-32"></div>
+      <div class="bg-white rounded-2xl p-6 h-48"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl p-4 h-32"></div>
+        <div class="bg-white rounded-2xl p-4 h-32"></div>
+      </div>
+    </div>
+
+    <!-- Wallet Balance Section -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Your Wallet</h2>
+          <p class="text-gray-600">Manage your balance for premium features</p>
+        </div>
+        <div class="text-right">
+          <button id="topup-btn" class="bg-golden-yellow hover:bg-golden-yellow/90 text-black px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>Top Up
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="text-center bg-naija-green text-white rounded-xl p-4">
+          <div class="text-3xl font-bold mb-1">₦5,250</div>
+          <div class="text-sm opacity-90">Available Balance</div>
+        </div>
+        <div class="text-center bg-trust-blue text-white rounded-xl p-4">
+          <div class="text-3xl font-bold mb-1">150</div>
+          <div class="text-sm opacity-90">Points Earned</div>
+        </div>
+        <div class="text-center bg-health-pink text-white rounded-xl p-4">
+          <div class="text-3xl font-bold mb-1">₦0</div>
+          <div class="text-sm opacity-90">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4 flex items-center">
+        <i class="fas fa-history mr-2 text-naija-green"></i>Transaction History
+      </h3>
+      <div id="transactions-list" class="space-y-3">
+        <!-- Dynamic transactions -->
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="topup-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Top Up Wallet</h2>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Amount (₦)</label>
+          <input type="number" id="topup-amount" min="100" placeholder="Enter amount" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button id="confirm-topup" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Top Up</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock Transaction Data
+    const transactions = [
+      { id: 1, type: 'Top Up', amount: '+₦1,000', date: '2025-10-01', status: 'Completed' },
+      { id: 2, type: 'Subscription', amount: '-₦500', date: '2025-09-30', status: 'Completed' },
+      { id: 3, type: 'Points Earned', amount: '+50 pts', date: '2025-09-28', status: 'Completed' },
+      { id: 4, type: 'Consultation', amount: '-₦2,000', date: '2025-09-25', status: 'Completed' }
+    ];
+
+    // DOM Elements
+    const loadingDiv = document.getElementById('loading');
+    const transactionsList = document.getElementById('transactions-list');
+    const topupBtn = document.getElementById('topup-btn');
+    const topupModal = document.getElementById('topup-modal');
+    const confirmTopup = document.getElementById('confirm-topup');
+    const topupAmount = document.getElementById('topup-amount');
+
+    // Header elements
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    // Render Transactions
+    function renderTransactions() {
+      transactionsList.innerHTML = '';
+      transactions.forEach(tx => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+        div.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-naija-green rounded-full flex items-center justify-center text-white text-sm font-medium">
+              ${tx.type.startsWith('Top Up') ? '+' : tx.type.startsWith('Points') ? '+' : '-'}
+            </div>
+            <div>
+              <div class="font-medium text-sm">${tx.type}</div>
+              <div class="text-xs text-gray-500">${tx.date}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-semibold text-sm ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-red-600'}">${tx.amount}</div>
+            <div class="text-xs text-gray-500">${tx.status}</div>
+          </div>
+        `;
+        transactionsList.appendChild(div);
+      });
+    }
+
+    // Modal Handlers
+    topupBtn.addEventListener('click', () => topupModal.classList.add('active'));
+    confirmTopup.addEventListener('click', () => {
+      const amount = topupAmount.value;
+      if (amount >= 100) {
+        alert(`Topped up ₦${amount}! Balance updated.`);
+        topupModal.classList.remove('active');
+        topupAmount.value = '';
+        // Update balance mock
+        const balanceEl = document.querySelector('.text-3xl.font-bold');
+        const currentBalance = parseFloat(balanceEl.textContent.replace(/[^0-9.]/g, ''));
+        balanceEl.textContent = `₦${currentBalance + parseFloat(amount)}`;
+        // Add to transactions
+        transactions.unshift({ id: Date.now(), type: 'Top Up', amount: `+₦${amount}`, date: new Date().toISOString().split('T')[0], status: 'Completed' });
+        renderTransactions();
+      } else {
+        alert('Minimum top-up is ₦100');
+      }
+    });
+
+    // Close modal
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => topupModal.classList.remove('active'));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target === topupModal) topupModal.classList.remove('active');
+    });
+
+    // Header Event Listeners
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    notificationBtn.addEventListener('click', toggleNotificationDropdown);
+    profileBtn.addEventListener('click', toggleProfileDropdown);
+
+    document.addEventListener('click', (e) => {
+      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    // Initialize
+    function init() {
+      loadingDiv.classList.remove('hidden');
+      setTimeout(() => {
+        loadingDiv.classList.add('hidden');
+        renderTransactions();
+      }, 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
