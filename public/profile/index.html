@@ -136,15 +136,11 @@
         <nav class="hidden md:flex space-x-8 mx-auto">
           <a href="/dashboard" class="menu-link">Dashboard</a>
           <a href="/vitals" class="menu-link">Vitals</a>
-          <a href="/meals" class="menu-link">Meals</a>
-          <a href="/insights-hub" class="menu-link">Insights Hub</a>
+          <a href="/insights" class="menu-link">Insights Hub</a>
           <a href="/community" class="menu-link">Community</a>
           <a href="/challenges" class="menu-link">Challenges</a>
-          <a href="/book" class="menu-link">Book</a>
-          <a href="/wallet" class="menu-link">Wallet</a>
           <a href="/food" class="menu-link">Food</a>
           <a href="/doctors" class="menu-link">Doctors</a>
-          <a href="/profile" class="menu-link active">Profile</a>
           <a href="/support" class="menu-link">Support</a>
         </nav>
 
@@ -184,18 +180,14 @@
     <!-- Mobile Menu Dropdown -->
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
-        <a href="/dashboard" class="menu-link block">Dashboard</a>
-        <a href="/vitals" class="menu-link block">Vitals</a>
-        <a href="/meals" class="menu-link block">Meals</a>
-        <a href="/insights-hub" class="menu-link block">Insights Hub</a>
-        <a href="/community" class="menu-link block">Community</a>
-        <a href="/challenges" class="menu-link block">Challenges</a>
-        <a href="/book" class="menu-link block">Book</a>
-        <a href="/wallet" class="menu-link block">Wallet</a>
-        <a href="/food" class="menu-link block">Food</a>
-        <a href="/doctors" class="menu-link block">Doctors</a>
-        <a href="/profile" class="menu-link active block">Profile</a>
-        <a href="/support" class="menu-link block">Support</a>
+          <a href="/dashboard" class="menu-link block">Dashboard</a>
+          <a href="/vitals" class="menu-link block">Vitals</a>
+          <a href="/insights" class="menu-link block">Insights Hub</a>
+          <a href="/community" class="menu-link block">Community</a>
+          <a href="/challenges" class="menu-link block">Challenges</a>
+          <a href="/food" class="menu-link block">Food</a>
+          <a href="/doctors" class="menu-link block">Doctors</a>
+          <a href="/support" class="menu-link block">Support</a>
       </nav>
     </div>
   </header>
@@ -212,7 +204,6 @@
     <!-- Header -->
     <div class="text-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800 mb-2">My Profile</h1>
-      <p class="text-gray-600">Manage your personal information</p>
     </div>
 
     <!-- Profile Photo & Basic Info -->
@@ -477,6 +468,9 @@
     // Fetch User Data
     async function fetchUserData() {
       const email = sessionStorage.getItem('email');
+      const element = document.getElementById('test-email');
+      element.append(email);
+      
       if (!email) {
         window.location.href = '/';
         return;
@@ -513,7 +507,7 @@
         renderReferral();
       } catch (error) {
         console.error('Error fetching user:', error);
-        alert('Failed to load profile. Please try again.');
+        //alert('Failed to load profile. Please try again.');
       } finally {
         loadingDiv.classList.add('hidden');
       }
@@ -537,7 +531,7 @@
     function renderPersonalInfo() {
       profileInfo.innerHTML = `
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700">First Name</label>
+          <label class="block text-sm font-medium text-gray-700" id = "test-email">First Name</label>
           <div class="p-2 bg-gray-50 rounded-md">${formatName(user.FirstName) || 'Not provided'}</div>
         </div>
         <div class="space-y-2">
