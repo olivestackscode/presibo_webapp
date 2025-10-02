@@ -1,685 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Standard Meta Tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Presibo - Pulse Workouts</title>
-  <meta name="description" content="Discover endless fitness content and workouts on Presibo Pulse. Swipe through videos and images with trainers.">
-  <meta name="keywords" content="Presibo, pulse workouts, fitness videos, health exercises, trainer content">
-  <meta name="author" content="Presibo Team">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://app.presibo.com/pulse">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse Feed – Presibo</title>
+  <meta name="description" content="Explore Pulse workouts, fitness inspiration, and trainer-led sessions on Presibo." />
+  <meta property="og:title" content="Pulse Feed – Presibo" />
+  <meta property="og:description" content="Stay healthy with Pulse workouts. Swipe through fitness videos and connect with trainers." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://presibo.com/cover.jpg" />
+  <meta property="og:url" content="https://presibo.com/pulse" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Favicon Meta Tags - Using online placeholder -->
-  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
-  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
-
-  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
-  <meta property="og:title" content="Presibo - Pulse Workouts">
-  <meta property="og:description" content="Endless fitness inspiration: Swipe through workout videos and trainer tips.">
-  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
-  <meta property="og:image:width" content="192">
-  <meta property="og:image:height" content="192">
-  <meta property="og:image:alt" content="Presibo Logo">
-  <meta property="og:url" content="https://app.presibo.com/pulse">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Presibo">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Presibo - Pulse Workouts">
-  <meta name="twitter:description" content="Infinite scroll of fitness content on Presibo Pulse.">
-  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
-  <meta name="twitter:image:alt" content="Presibo Logo">
-  <meta name="twitter:site" content="@PresiboHealth">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-
-  <!-- Vendor CSS Files via CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-  <!-- Tailwind CSS -->
+  <!-- Tailwind + Bootstrap -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'naija-green': '#008753',
-            'golden-yellow': '#FFC107',
-            'warm-orange': '#F97316',
-            'royal-purple': '#6B21A8',
-            'health-pink': '#EC4899',
-            'trust-blue': '#3B82F6',
-            'health-gradient': '#F97316',
-            'info-gradient': '#FBBF24',
-            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
-          }
-        }
-      }
-    }
-  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Custom Styles -->
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+
   <style>
-    .dialog-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .dialog-overlay.active {
-      display: flex;
-    }
-    .dialog-content {
-      background: white;
-      border-radius: 0.5rem;
-      max-width: 28rem;
-      width: 100%;
-      padding: 1.5rem;
-    }
-    .animate-pulse {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .notification-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      min-width: 300px;
-      max-height: 400px;
-      overflow-y: auto;
-      z-index: 50;
-      display: none;
-    }
-    .notification-dropdown.active {
-      display: block;
-    }
-    .notification-item {
-      padding: 1rem;
-      border-bottom: 1px solid #f3f4f6;
-      cursor: pointer;
-    }
-    .notification-item:last-child {
-      border-bottom: none;
-    }
-    .notification-item.unread {
-      background-color: #f9fafb;
-    }
-    .menu-link {
-      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
-    }
-    .menu-link.active {
-      @apply bg-naija-green text-white;
-    }
-    .text-purple{
-      color: #300b5b;
-    }
-    .pulse-swiper {
-      height: 100vh;
-      overflow: hidden;
-    }
-    .pulse-slide {
-      height: 100vh;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .pulse-media {
-      flex: 1;
-      position: relative;
-      background-size: cover;
-      background-position: center;
-    }
-    .pulse-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .pulse-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.8));
-      color: white;
-      padding: 2rem 1rem 1rem;
-    }
-    .pulse-controls {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10;
-    }
-    .control-btn {
-      background: rgba(0,0,0,0.5);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      margin: 0 10px;
-    }
-    .like-btn {
-      position: absolute;
-      bottom: 100px;
-      right: 20px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-    }
-    .liked {
-      background: #ef4444;
-    }
+    body { font-family: "Inter", sans-serif; background: #fff; }
+    .pulse-card { max-width: 420px; margin: 0 auto; }
+    .loading-screen { display:flex; align-items:center; justify-content:center; height:100vh; }
+    .dropdown-menu.show { display:block; }
+    .swiper { height:100vh; }
+    .pulse-video { width:100%; height:auto; border-radius:12px; }
   </style>
 </head>
-<body class="min-h-screen font-sans">
-  <!-- Session Check -->
-  <script>
-    if (!sessionStorage.getItem('email')) {
-      window.location.href = '/';
-    }
-  </script>
-
-  <!-- Header with Menu Bar -->
-  <header class="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Left side: Brand and Mobile Menu -->
-        <div class="flex items-center">
-          <!-- Mobile menu button -->
-          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
-            <span class="sr-only">Open main menu</span>
-            <i class="fas fa-bars text-xl"></i>
-          </button>
-          <!-- Mobile Brand: Logo + Title on left after menu -->
-          <div class="md:hidden flex items-center space-x-2">
-            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-            <span class="font-bold text-purple">Presibo</span>
-          </div>
-          <!-- Desktop Brand: Logo + Title on left -->
-          <div class="hidden md:flex items-center space-x-2">
-            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-            <span class="font-bold text-purple">Presibo</span>
-          </div>
+<body>
+  <!-- Header -->
+  <header class="sticky-top bg-white shadow-sm border-b">
+    <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+      <div class="flex items-center">
+        <img src="https://presibo.com/logo.png" alt="Presibo Logo" class="h-8 w-auto me-2">
+        <span class="fw-bold text-lg">Pulse</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <!-- Notifications -->
+        <button id="notificationBtn" class="btn btn-link text-dark">
+          <i class="bi bi-bell"></i>
+        </button>
+        <div id="notificationDropdown" class="dropdown-menu dropdown-menu-end p-2">
+          <span class="dropdown-item-text">No new notifications</span>
         </div>
-
-        <!-- Desktop Menu Links -->
-        <nav class="hidden md:flex space-x-8 mx-auto">
-          <a href="/dashboard" class="menu-link">Dashboard</a>
-          <a href="/vitals" class="menu-link">Vitals</a>
-          <a href="/meals" class="menu-link">Meals</a>
-          <a href="/insights-hub" class="menu-link">Insights Hub</a>
-          <a href="/community" class="menu-link">Community</a>
-          <a href="/challenges" class="menu-link">Challenges</a>
-          <a href="/book" class="menu-link">Book</a>
-          <a href="/wallet" class="menu-link">Wallet</a>
-          <a href="/food" class="menu-link">Food</a>
-          <a href="/doctors" class="menu-link">Doctors</a>
-          <a href="/pulse" class="menu-link active">Pulse</a>
-          <a href="/support" class="menu-link">Support</a>
-        </nav>
-
-        <!-- Right Side: Notifications, Profile -->
-        <div class="flex items-center space-x-4">
-          <!-- Notification Bell -->
-          <div class="relative">
-            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
-              <i class="fas fa-bell text-xl"></i>
-              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-            </button>
-            <div id="notification-dropdown" class="notification-dropdown">
-              <div class="p-4 border-b">
-                <h4 class="font-semibold text-sm">Notifications</h4>
-              </div>
-              <div id="notification-list">
-                <!-- Dynamic notifications will be populated here -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Profile Icon -->
-          <div class="relative">
-            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
-              <i class="fas fa-user-circle text-2xl"></i>
-            </button>
-            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
-              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
-            </div>
-          </div>
+        <!-- Profile -->
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
+            <img src="https://via.placeholder.com/30" class="rounded-circle" alt="Profile">
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Logout</a></li>
+          </ul>
         </div>
       </div>
-    </div>
-
-    <!-- Mobile Menu Dropdown -->
-    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
-      <nav class="px-2 pt-2 pb-3 space-y-1">
-        <a href="/dashboard" class="menu-link block">Dashboard</a>
-        <a href="/vitals" class="menu-link block">Vitals</a>
-        <a href="/meals" class="menu-link block">Meals</a>
-        <a href="/insights-hub" class="menu-link block">Insights Hub</a>
-        <a href="/community" class="menu-link block">Community</a>
-        <a href="/challenges" class="menu-link block">Challenges</a>
-        <a href="/book" class="menu-link block">Book</a>
-        <a href="/wallet" class="menu-link block">Wallet</a>
-        <a href="/food" class="menu-link block">Food</a>
-        <a href="/doctors" class="menu-link block">Doctors</a>
-        <a href="/pulse" class="menu-link active block">Pulse</a>
-        <a href="/support" class="menu-link block">Support</a>
-      </nav>
     </div>
   </header>
 
-  <div id="pulse" class="pulse-swiper">
-    <!-- Loading State -->
-    <div id="loading" class="fixed inset-0 bg-white flex items-center justify-center z-40 animate-pulse">
-      <div class="text-center">
-        <div class="w-16 h-16 border-4 border-naija-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p class="text-gray-600">Loading workouts...</p>
-      </div>
-    </div>
-
-    <!-- Swiper Container -->
-    <div class="swiper-container" id="pulse-swiper">
-      <div class="swiper-wrapper" id="pulse-slides">
-        <!-- Dynamic slides -->
-      </div>
-      <div class="pulse-controls">
-        <button id="prev-post" class="control-btn">
-          <i class="fas fa-chevron-left text-xl"></i>
-        </button>
-        <button id="next-post" class="control-btn">
-          <i class="fas fa-chevron-right text-xl"></i>
-        </button>
-      </div>
+  <!-- Loading -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="text-center">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p>Loading Pulse feed...</p>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Feed -->
+  <div id="pulseFeed" class="hidden">
+    <div class="swiper">
+      <div class="swiper-wrapper" id="swiperWrapper"></div>
+    </div>
+  </div>
+
+  <!-- Swiper + Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    // Mock Pulse Posts Data (simulate API response)
-    const pulsePosts = [
+    // Fake posts (normally from API)
+    const samplePosts = [
       {
-        id: 100,
-        type: 'video',
-        url: 'https://example.com/video1.mp4',
-        thumbnail: 'https://via.placeholder.com/400x700?text=Workout+1',
-        title: 'Full Body HIIT Workout',
-        description: '20-minute high-intensity workout to burn fat and build strength. No equipment needed!',
-        hashtags: ['#HIIT', '#FullBody', '#HomeWorkout', '#Fitness'],
-        time: '2 hours ago',
-        likes: 1245,
-        comments: 89,
-        shares: 234,
-        trainer: { name: 'Aisha Fitness', username: '@aishafit', avatar: 'https://via.placeholder.com/50?text=A' }
+        id: 1,
+        trainer: "Coach Ada",
+        avatar: "https://via.placeholder.com/40",
+        content: "Start your day with a 5-min stretch!",
+        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+        hashtags: ["#stretch", "#morning"],
+        likes: 120
       },
       {
-        id: 99,
-        type: 'image',
-        url: 'https://via.placeholder.com/400x700?text=Stretch+Session',
-        thumbnail: 'https://via.placeholder.com/400x700?text=Stretch+Session',
-        title: 'Daily Stretch Routine',
-        description: 'Improve flexibility with this 10-minute morning stretch. Perfect for beginners.',
-        hashtags: ['#Yoga', '#Stretch', '#MorningRoutine', '#Wellness'],
-        time: '5 hours ago',
-        likes: 856,
-        comments: 45,
-        shares: 112,
-        trainer: { name: 'Yoga Guru', username: '@yogaguru', avatar: 'https://via.placeholder.com/50?text=Y' }
-      },
-      {
-        id: 98,
-        type: 'video',
-        url: 'https://example.com/video2.mp4',
-        thumbnail: 'https://via.placeholder.com/400x700?text=Cardio+Blast',
-        title: 'Cardio Blast Challenge',
-        description: 'Jump rope and burpees for maximum calorie burn. Join the 30-day challenge!',
-        hashtags: ['#Cardio', '#Challenge', '#JumpRope', '#FitnessMotivation'],
-        time: '1 day ago',
-        likes: 2034,
-        comments: 156,
-        shares: 345,
-        trainer: { name: 'Cardio King', username: '@cardioking', avatar: 'https://via.placeholder.com/50?text=C' }
-      },
-      // Add more posts to simulate total of 100
-      ...Array.from({ length: 97 }, (_, i) => ({
-        id: i + 1,
-        type: Math.random() > 0.5 ? 'video' : 'image',
-        url: `https://via.placeholder.com/400x700?text=Workout+${i + 1}`,
-        thumbnail: `https://via.placeholder.com/400x700?text=Workout+${i + 1}`,
-        title: `Workout Session ${i + 1}`,
-        description: `Description for workout ${i + 1}. Great for health and fitness.`,
-        hashtags: ['#Fitness', '#Workout', '#Health'],
-        time: `${Math.floor(Math.random() * 24)} hours ago`,
-        likes: Math.floor(Math.random() * 2000) + 100,
-        comments: Math.floor(Math.random() * 200) + 10,
-        shares: Math.floor(Math.random() * 500) + 50,
-        trainer: { name: `Trainer ${i + 1}`, username: `@trainer${i + 1}`, avatar: `https://via.placeholder.com/50?text=T${i + 1}` }
-      }))
+        id: 2,
+        trainer: "Coach Bayo",
+        avatar: "https://via.placeholder.com/40",
+        content: "Full body HIIT workout 🔥",
+        videoUrl: "https://www.w3schools.com/html/movie.mp4",
+        hashtags: ["#HIIT", "#fitness"],
+        likes: 200
+      }
     ];
 
-    let uiState = {
-      posts: [],
-      isLoading: true,
-      error: null,
-      currentIndex: 0,
-      likedPosts: new Set()
-    };
-
-    let originalPosts = [];
-    let arrangedPosts = [];
     let endlessPosts = [];
+    let uiState = { liked: new Set() };
+    let swiper;
 
-    // DOM Elements
-    const loadingDiv = document.getElementById('loading');
-    const swiperWrapper = document.getElementById('pulse-slides');
-    const prevPostBtn = document.getElementById('prev-post');
-    const nextPostBtn = document.getElementById('next-post');
-    const likeBtn = document.querySelector('.like-btn');
-
-    // Header elements
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const notificationBtn = document.getElementById('notification-btn');
-    const notificationDropdown = document.getElementById('notification-dropdown');
-    const profileBtn = document.getElementById('profile-btn');
-    const profileDropdown = document.getElementById('profile-dropdown');
-
-    // Load Posts (simulate API)
-    async function loadPulsePosts() {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      originalPosts = pulsePosts.sort((a, b) => b.id - a.id); // Newest first
-      arrangedPosts = rearrangePosts(originalPosts);
-      endlessPosts = createEndlessScroll(arrangedPosts);
-      
-      uiState = {
-        ...uiState,
-        posts: endlessPosts,
-        isLoading: false,
-        error: null
-      };
-      
-      renderSlides();
-      initSwiper();
-      updateCurrentPost();
+    // Rearrange posts (shuffle groups of 3)
+    function rearrangePosts(posts) {
+      const arr = [...posts];
+      const groups = [];
+      for (let i = 0; i < arr.length; i += 3) {
+        groups.push(arr.slice(i, i + 3));
+      }
+      for (let i = groups.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [groups[i], groups[j]] = [groups[j], groups[i]];
+      }
+      return groups.flat();
     }
 
-    // Rearrange Posts Algorithm
-    function rearrangePosts(originalPosts) {
-      if (originalPosts.length === 0) return [];
-      
-      const total = originalPosts.length;
-      const arranged = [];
-      const used = new Set();
-      
-      // Sort by ID descending (newest first)
-      const sortedPosts = [...originalPosts].sort((a, b) => b.id - a.id);
-      
-      function addSequential(start, count, descending = true) {
-        for (let i = 0; i < count; i++) {
-          if (arranged.length >= total) break;
-          
-          let index = descending ? start + i : start - i;
-          if (index >= 0 && index < total && !used.has(index)) {
-            arranged.push(sortedPosts[index]);
-            used.add(index);
-          }
-        }
-      }
-      
-      // Pattern from code
-      addSequential(0, 3); // Newest 3
-      const middlePoint = Math.floor(total / 2);
-      addSequential(middlePoint, 3); // Middle 3
-      addSequential(3, 3); // Next newest 3
-      addSequential(middlePoint + 3, 8); // Middle 8
-      addSequential(6, Math.min(35, total - 6)); // Remaining newest up to 35
-      addSequential(middlePoint + 11, total - (middlePoint + 11)); // Remaining middle
-      
-      // Fill gaps in middle range
-      for (let i = Math.max(0, middlePoint - 10); i < middlePoint; i++) {
-        if (arranged.length >= total) break;
-        if (!used.has(i)) {
-          arranged.push(sortedPosts[i]);
-          used.add(i);
-        }
-      }
-      
-      // Final fill
-      for (let i = 0; i < total; i++) {
-        if (arranged.length >= total) break;
-        if (!used.has(i)) {
-          arranged.push(sortedPosts[i]);
-          used.add(i);
-        }
-      }
-      
-      return arranged;
+    function createEndlessScroll(posts) {
+      return Array(10).fill().flatMap(() => rearrangePosts(posts));
     }
 
-    // Create Endless Scroll
-    function createEndlessScroll(arrangedPosts) {
-      if (arrangedPosts.length === 0) return [];
-      return Array.from({ length: arrangedPosts.length * 10 }, (_, i) => arrangedPosts[i % arrangedPosts.length]);
-    }
-
-    // Render Slides
     function renderSlides() {
-      swiperWrapper.innerHTML = '';
-      uiState.posts.forEach((post, index) => {
-        const slide = document.createElement('div');
-        slide.className = 'swiper-slide pulse-slide';
+      const wrapper = document.getElementById("swiperWrapper");
+      wrapper.innerHTML = "";
+      endlessPosts.forEach(post => {
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide flex items-center justify-center";
+
+        const liked = uiState.liked.has(post.id);
+
         slide.innerHTML = `
-          <div class="pulse-media" style="background-image: url('${post.thumbnail}');">
-            ${post.type === 'video' ? `<video class="pulse-video" src="${post.url}" muted loop playsinline></video>` : ''}
-          </div>
-          <div class="pulse-overlay">
-            <div class="text-white">
-              <h3 class="text-xl font-bold mb-2">${post.title}</h3>
-              <p class="text-sm mb-3 opacity-90">${post.description}</p>
-              <div class="flex flex-wrap gap-1 mb-3">
-                ${post.hashtags.map(tag => `<span class="bg-naija-green text-white px-2 py-1 rounded-full text-xs">#${tag}</span>`).join('')}
-              </div>
-              <div class="flex items-center justify-between text-sm">
-                <div class="flex items-center gap-4">
-                  <span>${post.time}</span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-heart ${uiState.likedPosts.has(post.id) ? 'text-red-500' : 'text-white'}"></i>
-                    ${formatNumber(post.likes)}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-comment text-white"></i>
-                    ${formatNumber(post.comments)}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <i class="fas fa-share text-white"></i>
-                    ${formatNumber(post.shares)}
-                  </span>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 mt-3">
-                <img src="${post.trainer.avatar}" alt="${post.trainer.name}" class="w-8 h-8 rounded-full">
-                <div>
-                  <div class="font-semibold">${post.trainer.name}</div>
-                  <div class="text-xs opacity-75">@${post.trainer.username}</div>
-                </div>
-              </div>
+          <div class="pulse-card p-4">
+            <div class="flex items-center mb-3">
+              <img src="${post.avatar}" alt="${post.trainer}" class="rounded-circle w-10 h-10 me-2">
+              <strong>${post.trainer}</strong>
+            </div>
+            <video class="pulse-video" src="${post.videoUrl}" loop muted playsinline></video>
+            <p class="mt-2">${post.content}</p>
+            <div class="flex space-x-3 mt-2">
+              <button class="like-btn text-sm" onclick="toggleLike(${post.id})">
+                ${liked ? "❤️" : "🤍"} ${post.likes + (liked ? 1 : 0)}
+              </button>
+            </div>
+            <div class="mt-1 text-muted">
+              ${post.hashtags.join(" ")}
             </div>
           </div>
-          <button class="like-btn ${uiState.likedPosts.has(post.id) ? 'liked' : ''}" onclick="toggleLike(${post.id})">
-            <i class="fas fa-heart text-xl"></i>
-          </button>
         `;
-        swiperWrapper.appendChild(slide);
+        wrapper.appendChild(slide);
       });
     }
 
-    // Update Current Post
-    function updateCurrentPost() {
-      const swiper = document.querySelector('.swiper-container').swiper;
-      if (swiper) {
-        swiper.slideTo(uiState.currentIndex, 0);
-      }
-      // Update like button for current post
-      const currentPost = getCurrentPost();
-      if (currentPost && likeBtn) {
-        likeBtn.classList.toggle('liked', uiState.likedPosts.has(currentPost.id));
-      }
-    }
-
-    // Format Number
-    function formatNumber(num) {
-      if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-      if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-      return num.toString();
-    }
-
-    // Toggle Like
     function toggleLike(postId) {
-      const currentLiked = new Set(uiState.likedPosts);
-      if (currentLiked.has(postId)) {
-        currentLiked.delete(postId);
+      if (uiState.liked.has(postId)) {
+        uiState.liked.delete(postId);
       } else {
-        currentLiked.add(postId);
+        uiState.liked.add(postId);
       }
-      uiState.likedPosts = currentLiked;
-      // Re-render slides to update hearts
       renderSlides();
-      updateCurrentPost();
+      swiper.update();
     }
 
-    // Get Current Post
-    function getCurrentPost() {
-      return uiState.posts[uiState.currentIndex] || null;
+    function handleVideoPlayback(swiper) {
+      document.querySelectorAll('.pulse-video').forEach(v => v.pause());
+      const active = swiper.slides[swiper.activeIndex];
+      const vid = active?.querySelector(".pulse-video");
+      if (vid) vid.play();
     }
 
-    // Next/Previous Post
-    function nextPost() {
-      uiState.currentIndex = (uiState.currentIndex + 1) % uiState.posts.length;
-      updateCurrentPost();
-    }
+    window.addEventListener("DOMContentLoaded", () => {
+      endlessPosts = createEndlessScroll(samplePosts);
+      renderSlides();
 
-    function previousPost() {
-      uiState.currentIndex = uiState.currentIndex > 0 ? uiState.currentIndex - 1 : uiState.posts.length - 1;
-      updateCurrentPost();
-    }
+      document.getElementById("loadingScreen").classList.add("hidden");
+      document.getElementById("pulseFeed").classList.remove("hidden");
 
-    // Init Swiper
-    function initSwiper() {
-      const swiper = new Swiper('#pulse-swiper', {
-        direction: 'vertical',
-        slidesPerView: 1,
-        spaceBetween: 0,
-        mousewheel: true,
+      swiper = new Swiper(".swiper", {
+        direction: "vertical",
         loop: true,
-        on: {
-          slideChange: function () {
-            uiState.currentIndex = this.realIndex;
-            const currentPost = getCurrentPost();
-            if (currentPost && currentPost.type === 'video') {
-              const video = this.slides[this.realIndex].querySelector('.pulse-video');
-              if (video) {
-                video.play();
-              }
-            }
-          }
-        }
+        on: { slideChange: () => handleVideoPlayback(swiper) }
       });
 
-      // Touch controls
-      let startY = 0;
-      let startTime = 0;
-      swiper.el.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].clientY;
-        startTime = Date.now();
+      handleVideoPlayback(swiper);
+
+      document.getElementById("notificationBtn").addEventListener("click", () => {
+        document.getElementById("notificationDropdown").classList.toggle("show");
       });
-      swiper.el.addEventListener('touchend', (e) => {
-        const endY = e.changedTouches[0].clientY;
-        const deltaY = startY - endY;
-        const deltaTime = Date.now() - startTime;
-
-        if (deltaTime < 300 && Math.abs(deltaY) > 50) {
-          if (deltaY > 0) nextPost();
-          else previousPost();
-        }
-      });
-    }
-
-    // Header interactions
-    function toggleMobileMenu() {
-      mobileMenu.classList.toggle('hidden');
-    }
-
-    function toggleNotificationDropdown() {
-      notificationDropdown.classList.toggle('active');
-    }
-
-    function toggleProfileDropdown() {
-      profileDropdown.classList.toggle('hidden');
-    }
-
-    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-    notificationBtn.addEventListener('click', toggleNotificationDropdown);
-    profileBtn.addEventListener('click', toggleProfileDropdown);
-
-    document.addEventListener('click', (e) => {
-      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
-      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
     });
-
-    prevPostBtn.addEventListener('click', previousPost);
-    nextPostBtn.addEventListener('click', nextPost);
-
-    // Initialize
-    function init() {
-      loadingDiv.classList.remove('hidden');
-      loadPulsePosts().then(() => {
-        loadingDiv.classList.add('hidden');
-      });
-    }
-
-    init();
   </script>
 </body>
 </html>
