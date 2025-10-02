@@ -151,18 +151,23 @@
   <header class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <!-- Left side: Brand on desktop, mobile menu on mobile -->
+        <!-- Left side: Brand and Mobile Menu -->
         <div class="flex items-center">
-          <!-- Desktop Brand: Logo + Title on left -->
-          <div class="hidden md:flex items-center space-x-2">
-            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-            <span class="font-bold text-purple">Presibo</span>
-          </div>
           <!-- Mobile menu button -->
           <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
             <span class="sr-only">Open main menu</span>
             <i class="fas fa-bars text-xl"></i>
           </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
         </div>
 
         <!-- Desktop Menu Links -->
@@ -175,14 +180,8 @@
           <a href="/support" class="menu-link">Support</a>
         </nav>
 
-        <!-- Right Side: Notifications, Profile, and Mobile Brand -->
+        <!-- Right Side: Notifications, Profile -->
         <div class="flex items-center space-x-4">
-          <!-- Mobile Brand: Logo + Title on right -->
-          <div class="md:hidden flex items-center space-x-2">
-            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-            <span class="font-bold text-purple">Presibo</span>
-          </div>
-
           <!-- Notification Bell -->
           <div class="relative">
             <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
