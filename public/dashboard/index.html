@@ -583,10 +583,11 @@
         }
         const user = users.find(u => u.email === userEmail);
         if (!user) throw new Error('User not found');
-        return user;
+        window.location.href = '/';
+        //return user;
       } catch (error) {
         console.error('Failed to fetch user data:', error);
-        window.location.href = '/';
+       
        // return null;  // Return null instead of redirecting (UNDONE)
       }
     }
