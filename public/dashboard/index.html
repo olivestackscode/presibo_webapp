@@ -457,6 +457,8 @@
   <script>
     // API Configuration
     const DATABASE_URL = 'https://app.presibo.com/database.json';
+    const userEmail = sessionStorage.getItem('email');
+
 
     // Mock Data for non-user-specific elements
     const healthTipData = {
@@ -579,7 +581,7 @@
             throw new Error('Invalid data structure: users is not an array');
           }
         }
-        const user = users.find(u => u.email === 'lilian.omar@gmail.com');
+        const user = users.find(u => u.email === userEmail);
         if (!user) throw new Error('User not found');
         return user;
       } catch (error) {
