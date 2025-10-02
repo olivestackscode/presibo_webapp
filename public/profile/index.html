@@ -465,7 +465,14 @@
     async function fetchUserData() {
       const email = sessionStorage.getItem('email');
       const element = document.getElementById('test-email');
-      element.append(email);
+
+      if (element) {
+          if (email) {
+              element.textContent = email; 
+          } else {
+              element.textContent = "No session stored";
+          }
+      }
       
       if (!email) {
         window.location.href = '/';
