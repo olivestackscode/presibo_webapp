@@ -113,7 +113,7 @@
         <!-- Left side: Brand and Mobile Menu -->
         <div class="flex items-center">
           <!-- Mobile menu button -->
-          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-500 hover:bg-gray-100">
             <span class="sr-only">Open main menu</span>
             <i class="fas fa-bars text-xl"></i>
           </button>
@@ -145,7 +145,7 @@
         <div class="flex items-center space-x-4">
           <!-- Notification Bell -->
           <div class="relative">
-            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+            <button id="notification-btn" class="p-2 text-gray-600 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
               <i class="fas fa-bell text-xl"></i>
               <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
             </button>
@@ -161,7 +161,7 @@
 
           <!-- Profile Icon -->
           <div class="relative">
-            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+            <button id="profile-btn" class="p-2 text-gray-600 hover:text-gray-500 hover:bg-gray-100 rounded-full">
               <i class="fas fa-user-circle text-2xl"></i>
             </button>
             <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
@@ -174,6 +174,242 @@
       </div>
     </div>
 
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/insights-hub" class="menu-link block">Insights Hub</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/challenges" class="menu-link block">Challenges</a>
+        <a href="/book" class="menu-link block">Book</a>
+        <a href="/wallet" class="menu-link block">Wallet</a>
+        <a href="/food" class="menu-link block">Food</a>
+        <a href="/doctors" class="menu-link active block">Doctors</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto space-y-6 p-6">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <h1 class="text-xl font-bold text-gray-900">Doctors Connect</h1>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white shadow rounded-lg p-6">
+      <!-- Search and Filter -->
+      <div class="mb-6">
+        <div class="relative mb-4">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-144.8sincompleteThought for 12shtml<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Find Your Doctor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'health-gradient': '#F97316',
+            'info-gradient': '#FBBF24',
+            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      outline: none;
+    }
+    .input:focus {
+      ring: 2px;
+      ring-color: #3b82f6;
+      border-color: transparent;
+    }
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.active {
+      display: flex;
+    }
+    .dialog-content {
+      background: white;
+      border-radius: 0.5rem;
+      max-width: 28rem;
+      width: 100%;
+      padding: 1.5rem;
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }
+    .text-purple{
+      color: #300b5b;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 font-sans">
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left side: Brand and Mobile Menu -->
+        <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <span class="sr-only">Open main menu</span>
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+        </div>
+        
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/insights" class="menu-link">Insights Hub</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link">Challenges</a>
+          <a href="/wallet" class="menu-link">Wallet</a>
+          <a href="/food" class="menu-link">Food</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/insights" class="menu-link">Insights Hub</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link">Challenges</a>
+          <a href="/wallet" class="menu-link">Wallet</a>
+          <a href="/food" class="menu-link">Food</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-600 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-600 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Mobile Menu Dropdown -->
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
