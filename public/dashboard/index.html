@@ -458,6 +458,9 @@
     // API Configuration
     const DATABASE_URL = 'https://api.presibo.com/users.php';
     const userEmail = sessionStorage.getItem('email');
+    if (!sessionStorage.getItem('email')) {
+      window.location.href = '/';
+    }
 
 
     // Mock Data for non-user-specific elements
