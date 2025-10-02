@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Standard Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Challenges</title>
+  <meta name="description" content="Join gamified health challenges on Presibo. Track meal streaks, vital logging, and fitness goals with rewards and community sharing.">
+  <meta name="keywords" content="Presibo, health challenges, gamified wellness, meal streaks, vital tracking, fitness goals, Nigerian health">
+  <meta name="author" content="Presibo Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://app.presibo.com/challenges">
+
+  <!-- Favicon Meta Tags - Using online placeholder -->
+  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
+  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Presibo - Challenges">
+  <meta property="og:description" content="Engage in fun health challenges tailored to your goals. Earn rewards, track progress, and share with the community.">
+  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://app.presibo.com/challenges">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Challenges">
+  <meta name="twitter:description" content="Gamified challenges for better health: meal streaks, vital logging, and more on Presibo.">
+  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'health-gradient': '#F97316',
+            'info-gradient': '#FBBF24',
+            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.active {
+      display: flex;
+    }
+    .dialog-content {
+      background: white;
+      border-radius: 0.5rem;
+      max-width: 28rem;
+      width: 100%;
+      padding: 1.5rem;
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }
+    .text-purple{
+      color: #300b5b;
+    }
+    .progress-bar {
+      background: linear-gradient(to right, #10B981, #059669);
+      height: 8px;
+      border-radius: 4px;
+    }
+    .challenge-card {
+      transition: transform 0.2s ease-in-out;
+    }
+    .challenge-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans">
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left side: Brand and Mobile Menu -->
+        <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <span class="sr-only">Open main menu</span>
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="https://assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/vitals" class="menu-link">Vitals</a>
+          <a href="/meals" class="menu-link">Meals</a>
+          <a href="/reports" class="menu-link">Reports</a>
+          <a href="/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link active">Challenges</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/reports" class="menu-link block">Reports</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/challenges" class="menu-link active block">Challenges</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="challenges" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-6">
+    <!-- Loading State -->
+    <div id="loading" class="hidden animate-pulse space-y-6">
+      <div class="bg-white rounded-2xl p-6 h-32"></div>
+      <div class="bg-white rounded-2xl p-6 h-48"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl p-4 h-64"></div>
+        <div class="bg-white rounded-2xl p-4 h-64"></div>
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Health Challenges</h2>
+          <p class="text-gray-600 text-sm">Join fun challenges to build better habits and earn rewards!</p>
+        </div>
+        <div class="text-right">
+          <button id="create-challenge-btn" class="bg-naija-green hover:bg-naija-green/90 text-white px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>Create Challenge
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Challenge Cards will be populated here -->
+      </div>
+    </div>
+
+    <!-- Active Challenges Section -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Your Active Challenges</h3>
+      <div id="active-challenges" class="space-y-4">
+        <!-- Dynamic active challenges -->
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="challenge-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 id="modal-title" class="text-lg font-semibold mb-4">Join Challenge</h2>
+        <div id="modal-content" class="text-sm text-gray-700 mb-4">
+          <!-- Dynamic content -->
+        </div>
+        <div class="flex gap-2 justify-end">
+          <button id="join-challenge-btn" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Join Now</button>
+          <button class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="create-challenge-modal" class="dialog-overlay">
+      <div class="dialog-content">
+        <h2 class="text-lg font-semibold mb-4">Create New Challenge</h2>
+        <form id="challenge-form">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Challenge Name</label>
+            <input type="text" id="challenge-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="e.g., 7-Day Low-GI Meal Streak">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea id="challenge-desc" class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3" placeholder="Describe the challenge..."></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
+            <input type="number" id="challenge-duration" class="w-full px-3 py-2 border border-gray-300 rounded-lg" min="1" max="30" value="7">
+          </div>
+          <div class="flex gap-2 justify-end">
+            <button type="submit" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90">Create</button>
+            <button type="button" class="modal-close border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock Data for Challenges
+    const challengesData = [
+      {
+        id: 1,
+        name: '7-Day Low-GI Meal Streak',
+        description: 'Log low-glycemic index meals daily to stabilize blood sugar. Perfect for diabetes management.',
+        progress: 4,
+        total: 7,
+        reward: 'Unlock Nigerian recipe ebook',
+        icon: 'fas fa-utensils',
+        color: 'bg-info-gradient',
+        participants: 245
+      },
+      {
+        id: 2,
+        name: 'Daily Vital Logging',
+        description: 'Track BP and sugar every day for a week. Get AI insights on trends.',
+        progress: 2,
+        total: 7,
+        reward: 'Earn 50 Presibo points',
+        icon: 'fas fa-heartbeat',
+        color: 'bg-trust-blue',
+        participants: 156
+      },
+      {
+        id: 3,
+        name: 'Hydration Hero',
+        description: 'Log 8 glasses of water daily. Track with reminders for better hydration.',
+        progress: 6,
+        total: 7,
+        reward: 'Shareable badge for community',
+        icon: 'fas fa-tint',
+        color: 'bg-health-pink',
+        participants: 89
+      },
+      {
+        id: 4,
+        name: 'Walk 10K Steps',
+        description: 'Hit 10,000 steps daily for 5 days. Integrate with your phone tracker.',
+        progress: 1,
+        total: 5,
+        reward: 'Fitness tip video series',
+        icon: 'fas fa-walking',
+        color: 'bg-warm-orange',
+        participants: 312
+      }
+    ];
+
+    let activeChallenges = challengesData.slice(0, 2); // Mock active ones
+
+    // DOM Elements
+    const loadingDiv = document.getElementById('loading');
+    const challengesContainer = document.querySelector('#challenges .grid');
+    const activeChallengesDiv = document.getElementById('active-challenges');
+    const challengeModal = document.getElementById('challenge-modal');
+    const createChallengeModal = document.getElementById('create-challenge-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+    const createChallengeBtn = document.getElementById('create-challenge-btn');
+    const challengeForm = document.getElementById('challenge-form');
+
+    // Header elements (same as dashboard)
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    // Render Functions
+    function renderChallenges() {
+      challengesContainer.innerHTML = '';
+      challengesData.forEach(challenge => {
+        const card = document.createElement('div');
+        card.className = 'challenge-card bg-white rounded-xl shadow p-6';
+        card.innerHTML = `
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-12 h-12 ${challenge.color} rounded-full flex items-center justify-center text-white">
+              <i class="${challenge.icon} text-xl"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-semibold text-gray-800">${challenge.name}</h4>
+              <p class="text-sm text-gray-600">${challenge.description}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Progress</span>
+              <span>${challenge.progress}/${challenge.total} days</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="progress-bar" style="width: ${(challenge.progress / challenge.total) * 100}%"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-green-600 font-medium">Reward: ${challenge.reward}</span>
+            <span class="text-gray-500">${challenge.participants} joined</span>
+          </div>
+          <button class="w-full mt-4 bg-naija-green text-white py-2 rounded-lg hover:bg-naija-green/90" onclick="openChallengeModal(${challenge.id})">
+            ${challenge.progress > 0 ? 'Continue' : 'Join Challenge'}
+          </button>
+        `;
+        challengesContainer.appendChild(card);
+      });
+    }
+
+    function renderActiveChallenges() {
+      activeChallengesDiv.innerHTML = '';
+      activeChallenges.forEach(challenge => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg';
+        div.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 ${challenge.color} rounded-full flex items-center justify-center text-white">
+              <i class="${challenge.icon} text-lg"></i>
+            </div>
+            <div>
+              <div class="font-medium">${challenge.name}</div>
+              <div class="text-sm text-gray-600">Day ${challenge.progress} of ${challenge.total}</div>
+            </div>
+          </div>
+          <button class="bg-naija-green text-white px-4 py-2 rounded-lg text-sm">Log Today</button>
+        `;
+        activeChallengesDiv.appendChild(div);
+      });
+    }
+
+    function openChallengeModal(id) {
+      const challenge = challengesData.find(c => c.id === id);
+      if (challenge) {
+        modalTitle.textContent = challenge.progress > 0 ? 'Continue Challenge' : 'Join Challenge';
+        modalContent.innerHTML = `
+          <p>${challenge.description}</p>
+          <p class="mt-2 text-sm text-gray-500">Reward: ${challenge.reward}</p>
+          <p class="mt-2 text-sm text-gray-500">${challenge.participants} participants</p>
+        `;
+        document.getElementById('join-challenge-btn').onclick = () => joinChallenge(id);
+        challengeModal.classList.add('active');
+      }
+    }
+
+    function joinChallenge(id) {
+      alert(`Joined/Continued challenge ${id}! Progress will update soon.`);
+      challengeModal.classList.remove('active');
+      // Update progress mock
+      const challenge = challengesData.find(c => c.id === id);
+      if (challenge && challenge.progress < challenge.total) {
+        challenge.progress++;
+        renderChallenges();
+        renderActiveChallenges();
+      }
+    }
+
+    // Event Handlers
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
+    createChallengeBtn.addEventListener('click', () => createChallengeModal.classList.add('active'));
+
+    challengeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('challenge-name').value;
+      const desc = document.getElementById('challenge-desc').value;
+      const duration = document.getElementById('challenge-duration').value;
+      if (name && desc && duration) {
+        alert(`New challenge "${name}" created!`);
+        createChallengeModal.classList.remove('active');
+        // Reset form
+        challengeForm.reset();
+      }
+    });
+
+    // Close modals
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        challengeModal.classList.remove('active');
+        createChallengeModal.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target === challengeModal || e.target === createChallengeModal) {
+        challengeModal.classList.remove('active');
+        createChallengeModal.classList.remove('active');
+      }
+      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    // Header listeners
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    notificationBtn.addEventListener('click', toggleNotificationDropdown);
+    profileBtn.addEventListener('click', toggleProfileDropdown);
+
+    // Initialize
+    function init() {
+      loadingDiv.classList.remove('hidden');
+      setTimeout(() => {
+        loadingDiv.classList.add('hidden');
+        renderChallenges();
+        renderActiveChallenges();
+      }, 1000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
