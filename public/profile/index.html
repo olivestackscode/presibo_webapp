@@ -427,12 +427,12 @@
 
     // DOM Elements
     const loadingDiv = document.getElementById('loading');
-    const profileImg = document.getElementById('profile-img');
-    const userName = document.getElementById('user-name');
-    const userEmail = document.getElementById('user-email');
+    //const profileImg = document.getElementById('profile-img');
+    //const userName = document.getElementById('user-name');
+    //const userEmail = document.getElementById('user-email');
     const editProfileBtn = document.getElementById('edit-profile-btn');
     const saveCancelButtons = document.getElementById('save-cancel-buttons');
-    const profileInfo = document.getElementById('profile-info');
+    //const profileInfo = document.getElementById('profile-info');
     const editProfileForm = document.getElementById('edit-profile-form');
     const appointmentSection = document.getElementById('appointment-section');
     const subscriptionSection = document.getElementById('subscription-section');
@@ -462,34 +462,42 @@
     const profileDropdown = document.getElementById('profile-dropdown');
 
     // Fetch User Data
-    async function fetchUserData() {
-      const email = sessionStorage.getItem('email');
-      const element = document.getElementById('test-email');
+     async function fetchUserData() {
+            const email = sessionStorage.getItem("email");
+           // document.getElementById('NewEmail').textContent = email;
+                  
+            if (!email) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-      if (element) {
-          if (email) {
-              element.textContent = email; 
-          } else {
-              element.textContent = "No session stored";
-          }
-      }
-      
-      if (!email) {
-        window.location.href = '/';
-        return;
-      }
+            try {
+                //document.querySelector('.container').style.display = 'block';
+                
+                const response = await fetch('https://api.presibo.com/users/index.php');
+                const data = await response.json();
 
-      try {
-        loadingDiv.classList.remove('hidden');
-        const response = await fetch('https://api.presibo.com/users/index.php');
-        if (!response.ok) throw new Error('Failed to fetch users');
-        const users = await response.json();
-        user = users.find(u => u.email === email);
-        if (!user) {
-          alert('User not found');
-          window.location.href = '/';
-          return;
+                const user = data.users.find(user => user.email === email);
+                
+                if (user) {
+                    document.getElementById('profile-photo').src = "https://presibo-wl.vercel.app/photos/" + user.uploads;
+                    document.getElementById('FirstName').textContent = user.FirstName;
+                    document.getElementById('LastName').textContent = user.LastName;
+                    document.getElementById('NewEmail').textContent = user.email;
+                    document.getElementById('userphone').textContent = user.mobile;
+                    document.getElementById('userage').textContent = user.age;
+                    document.getElementById('usersex').textContent = user.sex;
+                    document.getElementById('userbloodgroup').textContent = user.blood_group;
+                    document.getElementById('appointmentDate').textContent = user.appointment.date;
+                    document.getElementById('appointmentTime').textContent = user.appointment.time;
+                } else {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
         }
+
 
         // Set defaults for missing fields
         user.FirstName = user.FirstName || '';
