@@ -473,7 +473,7 @@ async function fetchUserData() {
   try {
     loadingDiv.classList.remove('hidden');
 
-    const response = await fetch('https://app.presibo.com/database.json');
+    const response = await fetch('https://api.presibo.com/users.php');
     if (!response.ok) {
       throw new Error(`HTTP error ${response.status}`);
     }
@@ -685,7 +685,7 @@ async function fetchUserData() {
       };
 
       try {
-        const response = await fetch('https://app.presibo.com/database.json', {
+        const response = await fetch('https://api.presibo.com/user/index.php', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
