@@ -404,7 +404,7 @@
         console.log('Server session created for:', data.email);
         sessionStorage.setItem('email', data.email);
         sessionStorage.setItem('userId', data.user_id);
-        showToast('Login Successful', `Welcome back!);
+        showToast('Login Successful', `Welcome back!`);
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 2000);
