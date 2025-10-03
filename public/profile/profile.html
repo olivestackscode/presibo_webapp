@@ -501,7 +501,7 @@
         renderReferral();
       } catch (error) {
         console.error('Error fetching user:', error);
-        alert(email, 'Failed to load profile. Please try again.');
+        alert(`Failed to load profile for ${email}. Please try again.`);
       } finally {
         loadingDiv.classList.add('hidden');
       }
