@@ -413,7 +413,7 @@
 
         if (data.message === 'Password verified successfully.') {
           sessionStorage.setItem('email', data.email);
-          showToast('Login Successful', `Welcome, ${data.email}! Redirecting to dashboard...`, 'success');
+          showToast('Login Successful', `Welcome, ${data.email}!);
           setTimeout(() => {
             window.location.href = '/dashboard.html';
           }, 2000);
