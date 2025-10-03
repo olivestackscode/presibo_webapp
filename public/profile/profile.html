@@ -662,7 +662,7 @@
       };
 
       try {
-        const response = await fetch('/api/user/profile', {
+        const response = await fetch('https://api.presibo.com/users.index.php', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
