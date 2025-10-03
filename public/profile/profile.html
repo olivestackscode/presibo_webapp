@@ -462,50 +462,75 @@
     const profileDropdown = document.getElementById('profile-dropdown');
 
     // Fetch User Data
-    async function fetchUserData() {
-      //const email = sessionStorage.getItem('email');
-      const email = 'mvpadmin@presibo.com';
-      if (!email) {
-        window.location.href = '/';
-        return;
-      }
+async function fetchUserData() {
+  const email = sessionStorage.getItem('email') || 'mvpadmin@presibo.com';
+  if (!email) {
+    console.error('No email found in session');
+    window.location.href = '/';
+    return;
+  }
 
-      try {
-        loadingDiv.classList.remove('hidden');
-        const response = await fetch('https://app.presibo.com/database.json');
-        if (!response.ok) throw new Error('Failed to fetch users');
-        const users = await response.json();
-        user = users.find(u => u.email === email);
-        if (!user) {
-          alert('User not found');
-          window.location.href = '/';
-          return;
-        }
+  try {
+    loadingDiv.classList.remove('hidden');
 
-        // Set defaults for missing fields
-        user.FirstName = user.FirstName || '';
-        user.LastName = user.LastName || '';
-        user.age = user.age || '';
-        user.sex = user.sex || '';
-        user.blood_group = user.blood_group || '';
-        user.tel = user.tel || user.mobile || '';
-        user.whatsappNumber = user.whatsappNumber || user.whatsapp_number || user.whatsapp || '';
-        user.address = user.address || '';
-
-        renderProfile();
-        renderPersonalInfo();
-        renderAppointment();
-        renderSubscriptions();
-        renderTestResults();
-        renderWallet();
-        renderReferral();
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        alert(`Failed to load profile for ${email}. Please try again.`);
-      } finally {
-        loadingDiv.classList.add('hidden');
-      }
+    const response = await fetch('https://app.presibo.com/database.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
     }
+
+    const data = await response.json();
+    console.log("Fetched JSON:", data);
+
+    // Ensure users array exists
+    const users = Array.isArray(data.users) ? data.users : [];
+    if (users.length === 0) {
+      console.error("No users in database.json");
+      return;
+    }
+
+    // Find user by email (case-insensitive)
+    user = users.find(u => 
+      u.email && u.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (!user) {
+      console.error(`User with email ${email} not found`);
+      alert(`Profile not found for ${email}`);
+      return;
+    }
+
+    // Normalize optional fields
+    user.FirstName = user.FirstName || '';
+    user.LastName = user.LastName || '';
+    user.age = user.age || '';
+    user.sex = user.sex || '';
+    user.blood_group = user.blood_group || '';
+    user.tel = user.tel || user.mobile || user.phone || '';
+    user.whatsappNumber = user.whatsappNumber || user.whatsapp || '';
+    user.address = user.address || '';
+    user.uploads = user.uploads || 'default.png';
+    user.wallet = user.wallet || 0;
+    user.subscriptions = user.subscriptions || [];
+    user.testResults = user.testResults || [];
+    user.appointment = user.appointment || { date: '-', time: '-' };
+
+    // Render profile sections
+    renderProfile();
+    renderPersonalInfo();
+    renderAppointment();
+    renderSubscriptions();
+    renderTestResults();
+    renderWallet();
+    renderReferral();
+
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    alert(`Failed to load profile for ${email}`);
+  } finally {
+    loadingDiv.classList.add('hidden');
+  }
+}
+
 
     // Format Name
     function formatName(name) {
