@@ -671,10 +671,10 @@
         const updatedUser = await response.json();
         user = { ...user, ...updatedUser };
         isEditing = false;
-        editProfileBtn.classList.remove('hidden');
-        saveCancelButtons.classList.add('hidden');
-        profileInfo.classList.remove('hidden');
-        editProfileForm.classList.add('hidden');
+        editProfileBtn.classList.remove('block');
+        saveCancelButtons.classList.add('block');
+        profileInfo.classList.remove('block');
+        editProfileForm.classList.add('block');
         renderPersonalInfo();
         alert('Profile updated successfully!');
       } catch (error) {
@@ -685,10 +685,10 @@
 
     document.getElementById('cancel-edit-btn').addEventListener('click', () => {
       isEditing = false;
-      editProfileBtn.classList.remove('hidden');
-      saveCancelButtons.classList.add('hidden');
-      profileInfo.classList.remove('hidden');
-      editProfileForm.classList.add('hidden');
+      editProfileBtn.classList.remove('block');
+      saveCancelButtons.classList.add('block');
+      profileInfo.classList.remove('block');
+      editProfileForm.classList.add('block');
     });
 
     // Image Upload
