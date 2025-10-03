@@ -440,19 +440,19 @@
 
                 const user = data.users.find(user => user.email === email);
                 
-                if (user) {
+                if (!user) {
                     document.getElementById('profile-photo').src = "https://presibo-wl.vercel.app/photos/" + user.uploads;
-                    document.getElementById('first-name').textContent = user.first_name;
-                    document.getElementById('last-name').textContent = user.last_name;
-                    document.getElementById('NewEmail').textContent = user.email;
-                    document.getElementById('userphone').textContent = user.mobile;
-                    document.getElementById('userage').textContent = user.age;
-                    document.getElementById('usersex').textContent = user.sex;
-                    document.getElementById('userbloodgroup').textContent = user.blood_group;
-                    document.getElementById('appointmentDate').textContent = user.appointment.date;
-                    document.getElementById('appointmentTime').textContent = user.appointment.time;
+                    document.getElementById('first-name').textContent = user.first_name || "Jery King";
+                    document.getElementById('last-name').textContent = user.last_name  || "Jery King";
+                    document.getElementById('NewEmail').textContent = user.email || "Jery King";
+                    document.getElementById('userphone').textContent = user.mobile || "Jery King";
+                    document.getElementById('userage').textContent = user.age || "Jery King";
+                    document.getElementById('usersex').textContent = user.sex || "Jery King";
+                    document.getElementById('userbloodgroup').textContent = user.blood_group || "Jery King";
+                    document.getElementById('appointmentDate').textContent = user.appointment.date || "Jery King";
+                    document.getElementById('appointmentTime').textContent = user.appointment.time || "Jery King";
                 } else {
-                    window.location.href = 'login.html';
+                    //window.location.href = 'login.html';
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
