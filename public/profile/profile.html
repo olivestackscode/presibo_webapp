@@ -542,7 +542,7 @@ async function fetchUserData() {
     function renderProfile() {
       const imgSrc = user.uploads ? `https://presibo-wl.vercel.app/photos/${user.uploads}` : 'https://via.placeholder.com/96?text=' + (formatName(user.FirstName).charAt(0) || user.email.charAt(0).toUpperCase());
       profileImg.src = imgSrc;
-      userName.textContent = `${formatName(user.FirstName)} ${formatName(user.LastName)}`.trim() || 'User';
+      userName.textContent = `${formatName(user.first_name)} ${formatName(user.last_name)}`.trim() || 'User';
       userEmail.textContent = user.email;
     }
 
@@ -551,11 +551,11 @@ async function fetchUserData() {
   profileInfo.innerHTML = `
     <div class="space-y-2">
       <label class="block text-sm font-medium text-gray-700">First Name</label>
-      <div class="p-2 bg-gray-50 rounded-md">${formatName(user.FirstName) || 'Not provided'}</div>
+      <div class="p-2 bg-gray-50 rounded-md">${formatName(user.first_name) || 'Not provided'}</div>
     </div>
     <div class="space-y-2">
       <label class="block text-sm font-medium text-gray-700">Last Name</label>
-      <div class="p-2 bg-gray-50 rounded-md">${formatName(user.LastName) || 'Not provided'}</div>
+      <div class="p-2 bg-gray-50 rounded-md">${formatName(user.last_name) || 'Not provided'}</div>
     </div>
     <div class="space-y-2">
       <label class="block text-sm font-medium text-gray-700">Age</label>
