@@ -484,7 +484,7 @@ async function fetchUserData() {
     // Ensure users array exists
     const users = Array.isArray(data.users) ? data.users : [];
     if (users.length === 0) {
-      console.error("No users in database.json");
+      console.error("No users in database");
       return;
     }
 
