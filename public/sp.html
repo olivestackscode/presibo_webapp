@@ -420,46 +420,52 @@
   });
 
 
-  // Signup form submission (mocked)
-  document.getElementById('signup-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const signupData = {
-      first_name: document.getElementById('firstname').value,
-      last_name: document.getElementById('lastname').value,
-      email: document.getElementById('signup-email').value,
-      tel: document.getElementById('tel').value,
-      whatsapp_number: document.getElementById('whatsappNumber').value,
-      sex: document.getElementById('sex').value,
-      birth: document.getElementById('birth').value,
-      city: document.getElementById('city').value,
-      country: document.getElementById('country').value,
-      blood_group: document.getElementById('bloodGroup').value,
-      address: document.getElementById('address').value,
-      referral_code: document.getElementById('referralCode').value.toUpperCase(),
-      password: document.getElementById('signup-password').value,
-    };
-    const errorDiv = document.getElementById('signup-error');
-    errorDiv.classList.add('hidden');
-    errorDiv.textContent = '';
+ // Signup form submission
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const signupData = {
+    first_name: document.getElementById('firstname').value,
+    last_name: document.getElementById('lastname').value,
+    email: document.getElementById('signup-email').value,
+    tel: document.getElementById('tel').value,
+    whatsapp_number: document.getElementById('whatsappNumber').value,
+    sex: document.getElementById('sex').value,
+    birth: document.getElementById('birth').value,
+    city: document.getElementById('city').value,
+    country: document.getElementById('country').value,
+    blood_group: document.getElementById('bloodGroup').value,
+    address: document.getElementById('address').value,
+    referral_code: document.getElementById('referralCode').value.toUpperCase(),
+    password: document.getElementById('signup-password').value,
+  };
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
-      errorDiv.textContent = 'Please enter a valid email';
-      errorDiv.classList.remove('hidden');
-      return;
-    }
-    if (signupData.password.length < 6) {
-      errorDiv.textContent = 'Password must be at least 6 characters';
-      errorDiv.classList.remove('hidden');
-      return;
-    }
-    if (!signupData.first_name || !signupData.lastname || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.blood_group) {
-      errorDiv.textContent = 'Please fill in all required fields';
-      errorDiv.classList.remove('hidden');
-      return;
-    }
-//API ACTIONS
+  const errorDiv = document.getElementById('signup-error');
+  const signupButton = document.getElementById('signup-button');
+  errorDiv.classList.add('hidden');
+  errorDiv.textContent = '';
 
-    try {
+  // Validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+    errorDiv.textContent = 'Please enter a valid email';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  if (signupData.password.length < 6) {
+    errorDiv.textContent = 'Password must be at least 6 characters';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+  if (!signupData.first_name || !signupData.last_name || !signupData.tel || !signupData.city || !signupData.country || !signupData.birth || !signupData.sex || !signupData.blood_group) {
+    errorDiv.textContent = 'Please fill in all required fields';
+    errorDiv.classList.remove('hidden');
+    return;
+  }
+
+  // Update button state
+  signupButton.textContent = 'Creating Account...';
+  signupButton.disabled = true;
+
+  try {
     const response = await fetch('https://api.presibo.com/post?action=signup', {
       method: 'POST',
       headers: {
@@ -471,34 +477,27 @@
     const result = await response.json();
 
     if (response.ok) {
-      // On success, you might want to redirect to a dashboard or show a success message
-      //alert('Account created successfully!'); // Replace with actual success handling
-      
+      // Success: Redirect (setTimeout not needed here)
+      console.log('Signup successful:', result);
+      sessionStorage.setItem('email', signupData.email); // Store for session
       window.location.href = '/dashboard';
     } else {
+      // API error
       errorDiv.textContent = result.error || 'Signup failed. Please try again.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
-      errorDiv.textContent = 'Please enter a valid email';
       errorDiv.classList.remove('hidden');
-      return;
     }
+  } catch (error) {
+    // Network/Parse error
+    console.error('Signup error:', error);
+    errorDiv.textContent = 'An error occurred. Please try again later.';
+    errorDiv.classList.remove('hidden');
+  } finally {
+    // Always reset button
+    signupButton.textContent = 'Create Account';
+    signupButton.disabled = false;
   }
-    } catch (error) {
-
-        errorDiv.textContent = 'An error occurred. Please try again later.';
-    }
-// CONTINUATION OF REGULAR
-    
-    document.getElementById('signup-button').textContent = 'Creating Account...';
-    document.getElementById('signup-button').disabled = true;
-
-    setTimeout(() => {
-      console.log('Signup attempted with:', signupData);
-      showToast('Signup Successful', 'Account created! Check console for details.', 'success');
-      document.getElementById('signup-button').textContent = 'Create Account';
-      document.getElementById('signup-button').disabled = false;
-    }, 1000);
-  });
+});
+  
 </script>
 </body>
 </html>
