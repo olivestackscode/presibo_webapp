@@ -457,7 +457,38 @@
       errorDiv.classList.remove('hidden');
       return;
     }
+//API ACTIONS
 
+    try {
+    const response = await fetch('https://api.presibo.com/post?action=signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(signupData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      // On success, you might want to redirect to a dashboard or show a success message
+      //alert('Account created successfully!'); // Replace with actual success handling
+      
+      window.location.href = '/dashboard';
+    } else {
+      errorDiv.textContent = result.error || 'Signup failed. Please try again.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email)) {
+      errorDiv.textContent = 'Please enter a valid email';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+  }
+    } catch (error) {
+
+        errorDiv.textContent = 'An error occurred. Please try again later.';
+    }
+// CONTINUATION OF REGULAR
+    
     document.getElementById('signup-button').textContent = 'Creating Account...';
     document.getElementById('signup-button').disabled = true;
 
