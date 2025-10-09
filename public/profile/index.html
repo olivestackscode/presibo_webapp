@@ -473,7 +473,7 @@ async function fetchUserData() {
   try {
     loadingDiv.classList.remove('hidden');
 
-    const response = await fetch('https://api.presibo.com/db/index.php?action=get_user&email=jerry@presibo.com');
+    const response = await fetch('https://api.presibo.com/users/index.php?action=get_user&email=jerry@presibo.com');
     if (!response.ok) {
       throw new Error(`HTTP error ${response.status}`);
     }
@@ -685,7 +685,7 @@ async function fetchUserData() {
       };
 
       try {
-        const response = await fetch('https://api.presibo.com/db/index.php?action=get_user&email=jerry@presibo.com', {
+        const response = await fetch('https://api.presibo.com/users/index.php?action=get_user&email=jerry@presibo.com', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
