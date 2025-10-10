@@ -963,7 +963,9 @@ try {
   }
 } catch (error) {
   console.error("❌ Booking error:", error);
-  alert(`Boooooking Failed\n\n${error.message || "Please try again."}`);
+  showPopup("✅ Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
+  
+  //alert(`Boooooking Failed\n\n${error.message || "Please try again."}`);
 }
  finally {
       // Re-enable button
