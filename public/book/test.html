@@ -956,7 +956,7 @@ try {
   console.log("🟦 Parsed result:", result);
 
   if (result.status === "success") {
-    showPopup("✅ Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
+    showPopup("Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
     form.reset();
   } else {
     throw new Error(result.message || "Unknown server error");
@@ -994,6 +994,9 @@ try {
     modal.classList.add('hidden');
     closeBtn.removeEventListener('click', closeModal);
     okBtn.removeEventListener('click', closeModal);
+    if (redirect) {
+      window.location = redirect;
+    }
   }
 
   closeBtn.addEventListener('click', closeModal);
