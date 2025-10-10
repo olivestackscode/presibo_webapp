@@ -158,6 +158,9 @@ e
       opacity: 0.6;
       pointer-events: none;
     }
+
+    .hidden { display: none; }
+
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 font-sans">
@@ -430,6 +433,20 @@ e
     </div>
   </div>
 
+
+  <!-- Success popup -->
+  
+<div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
+    <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
+    <h2 id="popupTitle" class="text-lg font-semibold mb-2"></h2>
+    <p id="popupMessage" class="text-sm"></p>
+    <button id="popupBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">OK</button>
+  </div>
+</div>
+
+
+  
  <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -939,7 +956,7 @@ try {
   console.log("🟦 Parsed result:", result);
 
   if (result.status === "success") {
-    alert("✅ Booking Submitted Successfully!\n\nOur team will contact you soon to confirm your appointment.");
+    showPopup("✅ Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
     form.reset();
   } else {
     throw new Error(result.message || "Unknown server error");
@@ -959,6 +976,28 @@ try {
       submitBtn.disabled = false;
     }
   });
+
+  function showPopup(title, message) {
+  const modal = document.getElementById('popupModal');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupMessage = document.getElementById('popupMessage');
+  const closeBtn = document.getElementById('popupClose');
+  const okBtn = document.getElementById('popupBtn');
+
+  popupTitle.textContent = title;
+  popupMessage.textContent = message;
+  modal.classList.remove('hidden');
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    closeBtn.removeEventListener('click', closeModal);
+    okBtn.removeEventListener('click', closeModal);
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  okBtn.addEventListener('click', closeModal);
+}
+
 </script>
 
 </body>
