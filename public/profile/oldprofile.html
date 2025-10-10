@@ -731,51 +731,58 @@ async function fetchUserData() {
       topUpModal.classList.add('active');
     });
 
-    function setAmount(amount) {
-      topUpAmountInput.value = amount;
-      topUpAmount = amount;
+  function setAmount(amount) {
+    topUpAmountInput.value = amount;
+    topUpAmount = amount;
+  }
+
+  confirmTopUp.addEventListener('click', () => {
+    const amount = parseFloat(topUpAmountInput.value);
+    if (isNaN(amount) || amount < 100) {
+      alert('Minimum top-up amount is ₦100');
+      return;
+    }
+    if (amount > 1000000) {
+      alert('Maximum top-up amount is ₦1,000,000');
+      return;
     }
 
-    confirmTopUp.addEventListener('click', async () => {
-      const amount = parseFloat(topUpAmountInput.value);
-      if (amount < 100) {
-        alert('Minimum top-up amount is ₦100');
-        return;
-      }
-      if (amount > 1000000) {
-        alert('Maximum top-up amount is ₦1,000,000');
-        return;
-      }
+    // Ensure user email exists
+    if (!user || !user.email) {
+      alert('User email not found. Please log in again.');
+      return;
+    }
 
-      try {
-        const response = await fetch('/api/wallet/top-up', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, description: `Wallet top-up of ₦${amount.toLocaleString()}` })
-        });
-        if (!response.ok) throw new Error('Failed to initiate top-up');
-        const data = await response.json();
+    // Create unique reference for Paystack
+    const paymentRef = 'PSB-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
-        // Paystack integration
-        const handler = PaystackPop.setup({
-          key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
-          email: user.email,
-          amount: Math.round(amount * 100),
-          ref: data.paymentReference,
-          onClose: () => {
-            alert('Payment cancelled.');
-          },
-          callback: (response) => {
-            alert('Payment successful! Wallet topped up.');
-            location.reload();
+    // Initialize Paystack directly
+    const handler = PaystackPop.setup({
+      key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // Live key
+      email: user.email,
+      amount: Math.round(amount * 100), // Convert Naira to Kobo
+      ref: paymentRef,
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Description",
+            variable_name: "topup_description",
+            value: `Wallet top-up of ₦${amount.toLocaleString()}`
           }
-        });
-        handler.openIframe();
-      } catch (error) {
-        console.error('Top-up error:', error);
-        alert('Failed to top-up. Please try again.');
+        ]
+      },
+      onClose: () => {
+        alert('Payment cancelled.');
+      },
+      callback: (response) => {
+        alert(`Payment successful! Reference: ${response.reference}`);
+        // Optionally update wallet UI or send to backend to confirm payment
+        location.reload();
       }
     });
+
+    handler.openIframe();
+  })
 
     // Referral Share
     document.getElementById('invite-btn').addEventListener('click', () => {
