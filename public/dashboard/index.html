@@ -633,7 +633,7 @@
       dashboardDiv.classList.remove('hidden');
 
       const firstName = userData.FirstName || userData.first_name || 'User'; // Handle casing
-      greeting.textContent = `${getCurrentGreeting()}, ${firstName}!`;
+      greeting.textContent = `${getCurrentGreeting()}, ${firstName}`;
       currentDate.textContent = getCurrentDate();
       healthScore.textContent = userData.health_score || 8.2;
       mealsToday.textContent = `${userData.meals_today || 0}/${userData.total_meals_expected || 3}`;
