@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings - Presibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="logo.png">
+  <style>
+    :root {
+      --theme-blue: #6495ed;
+      --sidebar-bg: #f8faff;
+    }
+    body {
+      background-color: #f5f8ff;
+      font-family: 'Inter', sans-serif;
+    }
+    .active {
+      background-color: var(--theme-blue);
+      color: white !important;
+    }
+    .sidebar {
+      min-height: 100vh;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body class="flex text-gray-800">
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 bg-white shadow-md flex flex-col">
+    <div class="p-6 border-b border-gray-200 flex items-center gap-2">
+      <img src="logo.png" alt="Presibo Logo" class="w-8 h-8">
+      <h1 class="text-xl font-semibold text-theme">Presibo</h1>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2">
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-blue-50">🏠 Dashboard</a>
+      <a href="wallet.html" class="block px-4 py-2 rounded hover:bg-blue-50">💳 Wallet</a>
+      <a href="appointments.html" class="block px-4 py-2 rounded hover:bg-blue-50">📅 Appointments</a>
+      <a href="settings.html" class="block px-4 py-2 rounded active">⚙️ Settings</a>
+      <a href="logout.html" class="block px-4 py-2 rounded hover:bg-blue-50 text-red-500">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col">
+    <!-- Topbar -->
+    <header class="flex items-center justify-between bg-white px-8 py-4 shadow-sm">
+      <h2 class="text-2xl font-semibold text-gray-700">Settings</h2>
+      <div class="flex items-center space-x-3">
+        <span id="username" class="font-medium">User</span>
+        <img src="avatar.png" alt="User Avatar" class="w-10 h-10 rounded-full border">
+      </div>
+    </header>
+
+    <!-- Settings Body -->
+    <section class="flex-1 p-8">
+      <div class="flex border-b border-gray-200 mb-6 space-x-6">
+        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="profile">Profile Info</button>
+        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="notifications">Notifications</button>
+        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="privacy">Privacy</button>
+        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="appearance">Appearance</button>
+        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="password">Change Password</button>
+      </div>
+
+      <!-- Profile Info -->
+      <div id="profile" class="tab-content active">
+        <h3 class="text-lg font-semibold mb-4">Profile Information</h3>
+        <form class="space-y-4 max-w-lg">
+          <input type="text" placeholder="Full Name" class="w-full p-3 border rounded">
+          <input type="email" placeholder="Email Address" class="w-full p-3 border rounded">
+          <input type="tel" placeholder="Phone Number" class="w-full p-3 border rounded">
+          <button class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Notifications -->
+      <div id="notifications" class="tab-content">
+        <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
+        <div class="space-y-3">
+          <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>Email Alerts</span></label>
+          <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>SMS Notifications</span></label>
+          <label class="flex items-center space-x-3"><input type="checkbox"> <span>Push Notifications</span></label>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <div id="privacy" class="tab-content">
+        <h3 class="text-lg font-semibold mb-4">Privacy Settings</h3>
+        <p class="text-sm text-gray-600 mb-3">Manage how your information is shared.</p>
+        <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>Allow profile visibility</span></label>
+        <label class="flex items-center space-x-3"><input type="checkbox"> <span>Share data with third parties</span></label>
+      </div>
+
+      <!-- Appearance -->
+      <div id="appearance" class="tab-content">
+        <h3 class="text-lg font-semibold mb-4">Appearance</h3>
+        <div class="space-x-4">
+          <button id="lightMode" class="px-4 py-2 bg-gray-100 rounded">Light Mode</button>
+          <button id="darkMode" class="px-4 py-2 bg-gray-900 text-white rounded">Dark Mode</button>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div id="password" class="tab-content">
+        <h3 class="text-lg font-semibold mb-4">Change Password</h3>
+        <form class="space-y-4 max-w-md">
+          <input type="password" placeholder="Current Password" class="w-full p-3 border rounded">
+          <input type="password" placeholder="New Password" class="w-full p-3 border rounded">
+          <input type="password" placeholder="Confirm New Password" class="w-full p-3 border rounded">
+          <button class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">Update Password</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    // Sidebar username
+    document.getElementById('username').textContent = sessionStorage.getItem('username') || 'User';
+
+    // Tabs
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('border-blue-500', 'text-blue-600'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('border-blue-500', 'text-blue-600');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Appearance Mode
+    const body = document.body;
+    document.getElementById('darkMode').addEventListener('click', () => {
+      body.classList.add('bg-gray-900', 'text-white');
+    });
+    document.getElementById('lightMode').addEventListener('click', () => {
+      body.classList.remove('bg-gray-900', 'text-white');
+    });
+  </script>
+</body>
+</html>
