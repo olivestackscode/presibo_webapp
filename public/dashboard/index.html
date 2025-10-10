@@ -456,8 +456,8 @@
 
   <script>
     // API Configuration
-    const DATABASE_URL = 'https://api.presibo.com/users/index.php';
     const userEmail = sessionStorage.getItem('email');
+    const DATABASE_URL = 'https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(userEmail)}';
     if (!sessionStorage.getItem('email')) {
       window.location.href = '/';
     }
