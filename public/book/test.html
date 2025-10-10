@@ -904,7 +904,7 @@ e
       phone: formData.get("phone"),
       date: formData.get("dateOfBirth"), // renamed from dateOfBirth → date
       doctor: document.querySelector("#doctor option:checked").textContent, // doctor name
-      description: `Appointment with ${document.querySelector("#doctor option:checked").textContent}`,
+      description: formData.get("message") || `Appointment with ${document.querySelector("#doctor option:checked").textContent}`,
     };
 
     console.log("🟦 Submitting appointment data:", data);
