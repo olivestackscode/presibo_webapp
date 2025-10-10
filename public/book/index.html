@@ -518,7 +518,7 @@
       form.classList.add('loading');
 
       try {
-        const response = await fetch('https://.presibo.com/appointments/new.php', {
+        const response = await fetch('https://api.presibo.com/appointments/new.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
