@@ -127,7 +127,8 @@
 
     async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
-      if (!email) return alert('No session stored');
+      //if (!email) //return alert('No session stored') 
+       if (!email) return showPopup("Not Logged in", "`<a href = "/">Log in<a/>`");
 
       try {
         const doctor = doctors.find(d => d.id == doctorId);
