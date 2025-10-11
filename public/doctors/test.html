@@ -102,11 +102,9 @@
   </div>
 
   <script>
-    // DOM Elements
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
     const specialtyFilters = document.querySelectorAll('#specialtyFilters button');
-
     let doctors = [];
     let selectedSpecialty = 'All';
 
@@ -118,14 +116,10 @@
 
     async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
-      if (!email) {
-        alert('No session stored');
-        return;
-      }
+      if (!email) return alert('No session stored');
 
       try {
-        const doctors = await fetchJSON('https://presibo-wl.vercel.app/doctors.json');
-        const doctor = doctors.find(doc => doc.id == doctorId);
+        const doctor = doctors.find(d => d.id == doctorId);
 
         const userRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
         const userData = await userRes.json();
@@ -144,7 +138,7 @@
         document.getElementById('booking-modal').classList.add('active');
 
         document.getElementById('booking-modal-action').onclick = () => {
-          alert(`Appointment booked with ${doctor?.name || 'Doctor'} by ${fullName} on ${date} at ${time}.`);
+          alert(`Appointment booked with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
           closeBookingModal();
         };
 
@@ -162,7 +156,16 @@
       btn.addEventListener('click', closeBookingModal)
     );
 
-    // Fetch and Render Doctors
+    // Profile dropdown & mobile menu
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    // Fetch and render doctors
     async function fetchDoctors() {
       doctorsList.innerHTML = `<div class="text-center py-8 text-gray-500">Loading doctors...</div>`;
       try {
