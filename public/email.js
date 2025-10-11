@@ -1,0 +1,13 @@
+fetch("https://api.presibo.com/email.php", {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: new URLSearchParams({
+    action: "send",
+    type: "welcome",
+    email: 'info@presibo.com',
+    name: 'Mark'
+  }),
+})
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
