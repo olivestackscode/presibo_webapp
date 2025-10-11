@@ -166,7 +166,7 @@
       let sent = 0;
       for (const email of emailList) {
         try {
-          const res = await fetch("https://api.presibo.com/email/email.php", {
+          const res = await fetch("https://api.presibo.com/email/index.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
