@@ -3,17 +3,17 @@
 
 fetch("https://api.presibo.com/email/index.php", {
   method: "POST",
-  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  body: new URLSearchParams({
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
     action: "send",
     type: "welcome",
-    email: 'info@presibo.com',
-    name: 'Mark'
-  }),
+    email: "info@presibo.com"
+  })
 })
   .then(res => res.json())
   .then(data => console.log(data))
   .catch(err => console.error(err));
+
 
 </script>
   </html>
