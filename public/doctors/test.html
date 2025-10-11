@@ -126,7 +126,7 @@
         //const user = userData[0] || {};
         const user = userData.users?.[0] || {};
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown User';
-        const userPhone = `${user.tel || 'No Number'};
+        const userPhone = `${user.tel}` || 'No Number';
         
 
         const modalContent = document.getElementById('booking-modal-content');
