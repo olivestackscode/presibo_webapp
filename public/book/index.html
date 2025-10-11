@@ -590,6 +590,35 @@
     closeBtn.addEventListener('click', closeModal);
     okBtn.addEventListener('click', closeModal);
   }
+
+   // Header interactions
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+
+    function toggleMobileMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    function toggleNotificationDropdown() {
+      notificationDropdown.classList.toggle('active');
+    }
+
+    function toggleProfileDropdown() {
+      profileDropdown.classList.toggle('hidden');
+    }
+
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    notificationBtn.addEventListener('click', toggleNotificationDropdown);
+    profileBtn.addEventListener('click', toggleProfileDropdown);
+
+    document.addEventListener('click', (e) => {
+      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
 </script>
 
 
