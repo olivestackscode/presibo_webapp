@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presibo Email Broadcast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            presiboPurple: '#8b5cf6',
+            presiboBlue: '#3b82f6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen p-6">
+  <div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-2">📧 Broadcast Email</h1>
+      <p class="text-gray-600">Send emails to Presibo users, doctors, or external recipients</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+      <div class="bg-gradient-to-r from-presiboPurple to-presiboBlue text-white px-6 py-4">
+        <h2 class="text-xl font-semibold flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 12H8m8 0a4 4 0 10-8 0 4 4 0 008 0zm2 0a6 6 0 11-12 0 6 6 0 0112 0z" />
+          </svg>
+          Compose Broadcast Message
+        </h2>
+      </div>
+
+      <form id="broadcastForm" class="p-6 space-y-6">
+        <!-- Recipient Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select Recipients *</label>
+          <select id="recipientType"
+                  class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-presiboPurple focus:outline-none">
+            <option value="">Choose recipient group...</option>
+            <option value="users">All Presibo Users</option>
+            <option value="doctors">All Doctors</option>
+            <option value="external">External Emails</option>
+          </select>
+        </div>
+
+        <!-- External Emails -->
+        <div id="externalEmailsContainer" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Addresses *</label>
+          <textarea id="externalEmails"
+                    class="w-full border border-gray-300 rounded-lg p-2 min-h-[80px] focus:ring-2 focus:ring-presiboPurple focus:outline-none"
+                    placeholder="Enter comma-separated emails (e.g. user1@example.com, user2@example.com)"></textarea>
+          <p class="text-xs text-gray-500 mt-1">
+            Separate multiple email addresses with commas
+          </p>
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+          <input id="subject" type="text"
+                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-presiboPurple focus:outline-none"
+                 placeholder="Enter email subject..." />
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type your Message *</label>
+          <textarea id="message"
+                    class="w-full border border-gray-300 rounded-lg p-3 min-h-[200px] focus:ring-2 focus:ring-presiboPurple focus:outline-none"
+                    placeholder="Type your message here... It will be formatted with the Presibo email template."></textarea>
+          <p class="text-xs text-gray-500 mt-1">
+            Your message will be formatted with Presibo's professional email template and purple branding
+          </p>
+        </div>
+
+        <!-- Submit -->
+        <div>
+          <button type="submit"
+                  class="w-full bg-gradient-to-r from-presiboPurple to-presiboBlue hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-lg font-medium flex justify-center items-center gap-2">
+            <span id="sendText">Send Broadcast Email</span>
+            <svg id="loaderIcon" xmlns="http://www.w3.org/2000/svg"
+                 class="hidden h-5 w-5 animate-spin" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="4" stroke="currentColor" class="opacity-25"></circle>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                    d="M4 12a8 8 0 018-8"></path>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Info Card -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-6 text-blue-800 text-sm">
+      <p class="font-medium mb-1">Email Template Information:</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>All emails use Presibo's professional purple branding</li>
+        <li>Emails are sent from <b>support@presibo.com</b></li>
+        <li>Automatic BCC to support@presibo.com and presibohealth@gmail.com</li>
+        <li>Messages are formatted with footer & layout automatically</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("broadcastForm");
+    const recipientType = document.getElementById("recipientType");
+    const externalEmailsContainer = document.getElementById("externalEmailsContainer");
+    const loaderIcon = document.getElementById("loaderIcon");
+    const sendText = document.getElementById("sendText");
+
+    recipientType.addEventListener("change", () => {
+      if (recipientType.value === "external") {
+        externalEmailsContainer.classList.remove("hidden");
+      } else {
+        externalEmailsContainer.classList.add("hidden");
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const type = recipientType.value;
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const externalEmails = document.getElementById("externalEmails").value.trim();
+
+      if (!type || !subject || !message) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      let emails = [];
+      if (type === "external") {
+        if (!externalEmails) {
+          alert("Please enter at least one email address.");
+          return;
+        }
+        emails = externalEmails.split(",").map(e => e.trim()).filter(e => e.includes("@"));
+        if (emails.length === 0) {
+          alert("Please enter valid email addresses.");
+          return;
+        }
+      }
+
+      // Disable button during sending
+      sendText.textContent = "Sending...";
+      loaderIcon.classList.remove("hidden");
+
+      for (const email of (emails.length ? emails : ["user@presibo.com"])) {
+        try {
+          const res = await fetch("https://api.presibo.com/email/email.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "send",
+              type: "custom",
+              email,
+              message: message
+            })
+          });
+          const data = await res.json();
+          console.log("Sent:", email, data);
+        } catch (err) {
+          console.error("Failed:", email, err);
+        }
+      }
+
+      loaderIcon.classList.add("hidden");
+      sendText.textContent = "Send Broadcast Email";
+      alert("✅ Broadcast complete! Check console for details.");
+      form.reset();
+      externalEmailsContainer.classList.add("hidden");
+    });
+  </script>
+</body>
+</html>
