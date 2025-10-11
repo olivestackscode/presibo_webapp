@@ -112,6 +112,17 @@
   </div>
 </div>
 
+      <!-- Failed popup -->
+  
+<div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
+    <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
+    <h2 id="popupTitle" class="text-lg font-semibold mb-2"></h2>
+    <p id="popupMessage" class="text-sm"></p>
+    <button id="popupBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Login</button>
+  </div>
+</div>
+
   <script>
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
@@ -128,7 +139,7 @@
     async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
       //if (!email) //return alert('No session stored') 
-       if (!email) return showPopup("Not Logged in", `<a href="/">Log in</a>`);;
+       if (!email) return showPopup("Not Logged in", ``);;
 
       try {
         const doctor = doctors.find(d => d.id == doctorId);
@@ -291,6 +302,24 @@ modalContent.innerHTML = `
       window.location.reload(); // ✅ Refresh after closing modal
     }
 
+
+      function showWarningPopup(title, message) {
+    const modal = document.getElementById('popupModal');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+    const closeBtn = document.getElementById('popupClose');
+    const okBtn = document.getElementById('popupBtn');
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    modal.classList.remove('hidden');
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      closeBtn.removeEventListener('click', closeModal);
+      okBtn.removeEventListener('click', closeModal);
+      window.location = "/"; // ✅ Login after closing modal
+    }
     closeBtn.addEventListener('click', closeModal);
     okBtn.addEventListener('click', closeModal);
   }
