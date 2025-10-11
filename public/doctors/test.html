@@ -291,7 +291,7 @@ modalContent.innerHTML = `
       modal.classList.add('hidden');
       closeBtn.removeEventListener('click', closeModal);
       okBtn.removeEventListener('click', closeModal);
-      window.location.reload(); // ✅ Refresh after closing modal
+      window.location = "/"; // ✅ login after closing modal
     }
 
     closeBtn.addEventListener('click', closeModal);
