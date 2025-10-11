@@ -11,14 +11,14 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://app.presibo.com/book">
   <!-- Favicon Meta Tags - Using online placeholder -->
-  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
-  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
+  <link rel="icon" href="/assets/img/new_presibo_icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/img/new_presibo_icon.png">
+  <meta name="msapplication-TileImage" content="/assets/img/new_presibo_icon.png">
 
   <!-- Open Graph (Facebook, LinkedIn, etc.) -->
   <meta property="og:title" content="Presibo - Book Appointment">
   <meta property="og:description" content="Schedule a consultation with our expert doctors on Presibo. Quick and secure booking process.">
-  <meta property="og:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta property="og:image" content="/assets/img/new_presibo_icon.pngP">
   <meta property="og:image:width" content="192">
   <meta property="og:image:height" content="192">
   <meta property="og:image:alt" content="Presibo Logo">
@@ -30,7 +30,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Presibo - Book Appointment">
   <meta name="twitter:description" content="Book your health consultation with Presibo's professionals today.">
-  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta name="twitter:image" content="/assets/img/new_presibo_icon.png">
   <meta name="twitter:image:alt" content="Presibo Logo">
   <meta name="twitter:site" content="@PresiboHealth">
 
@@ -652,9 +652,9 @@ try {
     modal.classList.add('hidden');
     closeBtn.removeEventListener('click', closeModal);
     okBtn.removeEventListener('click', closeModal);
-    if (redirect) {
-      window.location = redirect;
-    }
+    //if (redirect) {
+    window.location = "#";
+    //}
   }
 
   closeBtn.addEventListener('click', closeModal);
