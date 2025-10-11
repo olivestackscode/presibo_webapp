@@ -114,12 +114,12 @@
 
       <!-- Failed popup -->
   
-<div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div id="popupModalF" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
-    <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
-    <h2 id="popupTitle" class="text-lg font-semibold mb-2"></h2>
-    <p id="popupMessage" class="text-sm"></p>
-    <button id="popupBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Login</button>
+    <span id="popupCloseF" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
+    <h2 id="popupTitleF" class="text-lg font-semibold mb-2"></h2>
+    <p id="popupMessageF" class="text-sm"></p>
+    <button id="popupBtnF" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Login</button>
   </div>
 </div>
 
@@ -304,24 +304,24 @@ modalContent.innerHTML = `
 
 
       function showWarningPopup(title, message) {
-    const modal = document.getElementById('popupModal');
-    const popupTitle = document.getElementById('popupTitle');
-    const popupMessage = document.getElementById('popupMessage');
-    const closeBtn = document.getElementById('popupClose');
-    const okBtn = document.getElementById('popupBtn');
+    const modal = document.getElementById('popupModalF');
+    const popupTitle = document.getElementById('popupTitleF');
+    const popupMessage = document.getElementById('popupMessageF');
+    const closeBtn = document.getElementById('popupCloseF');
+    const okBtn = document.getElementById('popupBtnF');
 
     popupTitle.textContent = title;
     popupMessage.textContent = message;
     modal.classList.remove('hidden');
 
-    function closeModal() {
+    function closeModalFailed() {
       modal.classList.add('hidden');
-      closeBtn.removeEventListener('click', closeModal);
-      okBtn.removeEventListener('click', closeModal);
+      closeBtn.removeEventListener('click', closeModalFailed);
+      okBtn.removeEventListener('click', closeModalFailed);
       window.location = "/"; // ✅ Login after closing modal
     }
-    closeBtn.addEventListener('click', closeModal);
-    okBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModalFailed);
+    okBtn.addEventListener('click', closeModalFailed);
   }
 
     fetchDoctors();
