@@ -1,3 +1,4 @@
+<html>
 <script>
 
 fetch("https://api.presibo.com/email.php", {
@@ -15,3 +16,4 @@ fetch("https://api.presibo.com/email.php", {
   .catch(err => console.error(err));
 
 </script>
+  </html>
