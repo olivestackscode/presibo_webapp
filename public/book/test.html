@@ -944,8 +944,8 @@ e
       time: formData.get("appointmentTime"), //  appointment time
       doctor_id: selectedDoctor.value,
       doctor: selectedDoctor.dataset.doctorName, // readable name
-      doctor_specialty: selectedDoctor.dataset.specialty, // ✅ include specialty
-      location: selectedDoctor.dataset.location, // ✅ include location
+      specialty: selectedDoctor.dataset.specialty, // ✅ include specialty
+      location: formData.get("appointmentTime"), // ✅ include location
       description: formData.get("message"),
     };
 
