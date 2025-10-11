@@ -165,6 +165,94 @@
     document.addEventListener('click', (e) => {
       if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
     });
+
+    // Fetch doctors from API
+async function fetchDoctors() {
+  doctorsList.innerHTML = `
+    <div class="animate-pulse">
+      <div class="bg-gray-200 rounded-xl p-4 h-32 mb-4"></div>
+      <div class="bg-gray-200 rounded-xl p-4 h-32 mb-4"></div>
+      <div class="bg-gray-200 rounded-xl p-4 h-32"></div>
+    </div>
+  `;
+  try {
+    const response = await fetch('https://presibo-wl.vercel.app/doctors.json');
+    if (!response.ok) throw new Error('Failed to fetch doctors');
+    const data = await response.json();
+    doctors = data.users.map(user => ({
+      id: user.id,
+      name: user.fullname || `${user.firstname} ${user.lastname}`,
+      firstname: user.firstname,
+      midname: user.midname,
+      lastname: user.lastname,
+      specialization: user.specialization || 'General Practitioner',
+      location: user.location || 'Nigeria',
+      years: user.years || Math.floor(Math.random() * 10) + 1,
+      phone: user.phone,
+      thumbnail: user.thumbnail,
+      rating: user.rating || (Math.random() * 1 + 4).toFixed(1),
+      cases: user.cases || Math.floor(Math.random() * 120) + 10,
+      distance: user.distance || `${Math.floor(Math.random() * 10) + 1} km away`
+    }));
+    renderDoctors(doctors);
+  } catch (error) {
+    doctorsList.innerHTML = `
+      <div class="text-center py-8 text-gray-500">
+        <p>Unable to load doctors. Please try again later.</p>
+      </div>
+    `;
+    console.error(error);
+  }
+}
+
+// Event listeners
+searchInput.addEventListener('input', filterDoctors);
+specialtyFilters.forEach(btn => {
+  btn.addEventListener('click', () => {
+    specialtyFilters.forEach(b => b.classList.remove('bg-green-600', 'text-white'));
+    btn.classList.add('bg-green-600', 'text-white');
+    selectedSpecialty = btn.dataset.value;
+    filterDoctors();
+  });
+});
+
+// Handle modals
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-close')) {
+    e.target.closest('.dialog-overlay').classList.remove('active');
+  }
+});
+
+// Booking button handler
+document.addEventListener('click', e => {
+  if (e.target.closest('.book-appointment')) {
+    const doctorId = e.target.closest('.book-appointment').dataset.id;
+    window.location.href = `/booker-new.html?doctor=${doctorId}`;
+  }
+});
+
+// Message and call button handlers
+document.addEventListener('click', e => {
+  const msgBtn = e.target.closest('.message-doctor');
+  const callBtn = e.target.closest('.call-doctor');
+  if (msgBtn) {
+    const doctorId = msgBtn.dataset.id;
+    const doctor = doctors.find(d => d.id == doctorId);
+    messageModalContent.innerHTML = `<p>Message <strong>${doctor.name}</strong></p>`;
+    messageModal.classList.add('active');
+  }
+  if (callBtn) {
+    const doctorId = callBtn.dataset.id;
+    const doctor = doctors.find(d => d.id == doctorId);
+    callModalContent.innerHTML = `<p>Call <strong>${doctor.name}</strong> at ${doctor.phone || 'N/A'}</p>`;
+    callModal.classList.add('active');
+  }
+});
+
+// Fetch initial data
+fetchDoctors();
   </script>
 </body>
 </html>
+
+ 
