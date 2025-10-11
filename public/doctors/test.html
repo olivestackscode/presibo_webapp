@@ -190,7 +190,7 @@ modalContent.innerHTML = `
 
     if (result.status === "success") {
       //alert(`✅ Appointment booked successfully with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
-      
+      showPopup("Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
       closeBookingModal();
     } else {
       throw new Error(result.message || "Unknown server error");
@@ -270,6 +270,29 @@ modalContent.innerHTML = `
         filterDoctors();
       });
     });
+
+    // ✅ Popup logic (refresh after close)
+  function showPopup(title, message) {
+    const modal = document.getElementById('popupModal');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+    const closeBtn = document.getElementById('popupClose');
+    const okBtn = document.getElementById('popupBtn');
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    modal.classList.remove('hidden');
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      closeBtn.removeEventListener('click', closeModal);
+      okBtn.removeEventListener('click', closeModal);
+      window.location.reload(); // ✅ Refresh after closing modal
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    okBtn.addEventListener('click', closeModal);
+  }
 
     fetchDoctors();
   </script>
