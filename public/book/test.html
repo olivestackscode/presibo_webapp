@@ -332,8 +332,20 @@ e
                   required
                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg h-11 focus:outline-none focus:ring-2 focus:ring-naija-green focus:border-transparent"
                 />
-                <p id="dob-error" class="error-message hidden">Date of birth is required</p>
+                <p id="dob-error" class="error-message hidden">Date of consultation is required</p>
               </div>
+
+              <!-- Appointment Time -->
+<div>
+  <label for="appointmentTime" class="block text-sm font-medium text-gray-700">Preferred Appointment Time *</label>
+  <input
+    type="time"
+    id="appointmentTime"
+    name="appointmentTime"
+    required
+    class="w-full px-3 py-2.5 border border-gray-300 rounded-lg h-11 focus:outline-none focus:ring-2 focus:ring-naija-green focus:border-transparent"
+  />
+</div>
 
               <div class="space-y-2">
                 <label for="sex" class="block text-sm font-medium text-gray-700">Gender *</label>
@@ -929,6 +941,7 @@ e
       email: formData.get("email"),
       phone: formData.get("phone"),
       date: formData.get("dateOfBirth"),
+      time: formData.get("appointmentTime"), //  appointment time
       doctor_id: selectedDoctor.value,
       doctor: selectedDoctor.dataset.doctorName, // readable name
       doctor_specialty: selectedDoctor.dataset.specialty, // ✅ include specialty
