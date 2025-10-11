@@ -292,8 +292,8 @@ modalContent.innerHTML = `
       closeBtn.removeEventListener('click', closeModal);
       okBtn.removeEventListener('click', closeModal);
       //window.location = "/"; // ✅ login after closing modal
-      !email && window.location = "/";
-      window.location.reload();
+      !email ? window.location = "/" : window.location.reload();
+
       
     }
 
