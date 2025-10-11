@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Health - Presibo</title>
+  <meta name="description" content="Track your vitals and meals with Presibo. Log blood pressure, blood sugar, and daily meals for personalized health insights.">
+  <meta name="keywords" content="Presibo Track, Health Tracking, Vitals Logging, Meal Tracking, Blood Pressure, Blood Sugar">
+
+  <!-- Favicons - Using online placeholders -->
+  <link href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" rel="icon">
+  <link href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'health-gradient': 'linear-gradient(to right, #10B981, #3B82F6)',
+            'info-gradient': 'linear-gradient(to right, #F97316, #FBBF24)',
+            'warning-gradient': 'linear-gradient(to right, #EF4444, #F97316)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tracking-hero {
+      background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+    .input-card {
+      border: 2px dashed #D1D5DB;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.3s ease;
+      cursor: pointer;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .input-card:hover {
+      border-color: #10B981;
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+    .reading-item {
+      background: #F8FAFC;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid #10B981;
+    }
+    .meal-item {
+      background: #F8FAFC;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 4px solid #F97316;
+    }
+    .modal-content {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-normal { background: #DCFCE7; color: #166534; }
+    .status-elevated { background: #FEF3C7; color: #92400E; }
+    .status-high { background: #FECACA; color: #DC2626; }
+    .status-unknown { background: #F3F4F6; color: #6B7280; }
+    @media (max-width: 768px) {
+      .tracking-hero { padding: 60px 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm fixed-top">
+    <div class="container-xl">
+      <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/"><h1 class="mb-0">Presibo</h1></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link active" href="track.html">Track</a></li>
+            <li class="nav-item"><a class="nav-link" href="community.html">Community</a></li>
+            <li class="nav-item"><a class="nav-link" href="market.html">Market</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Support</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://app.presibo.com/login">Login</a></li>
+            <li class="nav-item"><a class="nav-link btn btn-success ms-2" href="https://app.presibo.com/join">Sign Up</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-5">
+    <!-- Hero Section -->
+    <section class="tracking-hero">
+      <div class="container">
+        <h1 class="display-5 mb-3">Track Your Health Journey</h1>
+        <p class="lead mb-0">Log vitals and meals to unlock personalized insights and stay on top of your wellness.</p>
+      </div>
+    </section>
+
+    <div class="container my-5">
+      <!-- Health Tracking Card -->
+      <div class="card mb-5">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 d-flex align-items-center">
+            <i class="fas fa-heartbeat me-2 text-danger"></i>
+            Track Vitals
+          </h2>
+
+          <!-- Quick Input Cards -->
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <div class="input-card" onclick="openHealthModal('blood_pressure')">
+                <i class="fas fa-heart text-danger text-2xl mb-2"></i>
+                <h5 class="mb-1">Blood Pressure</h5>
+                <p class="text-muted small mb-0">Log systolic/diastolic</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="input-card" onclick="openHealthModal('blood_sugar')">
+                <i class="fas fa-tint text-primary text-2xl mb-2"></i>
+                <h5 class="mb-1">Blood Sugar</h5>
+                <p class="text-muted small mb-0">Log mg/dL reading</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Readings -->
+          <h5 class="mb-3">Recent Readings</h5>
+          <div id="recentReadings">
+            <!-- Mock data - replace with real data -->
+            <div class="reading-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-heart text-danger me-2"></i>
+                  <div>
+                    <strong>Blood Pressure</strong><br>
+                    <small class="text-muted">Oct 10, 2025, 8:30 AM</small>
+                  </div>
+                </div>
+                <div>
+                  <strong class="text-lg">120/80</strong><br>
+                  <span class="status-badge status-normal">Normal</span>
+                </div>
+              </div>
+            </div>
+            <div class="reading-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-tint text-primary me-2"></i>
+                  <div>
+                    <strong>Blood Sugar</strong><br>
+                    <small class="text-muted">Oct 9, 2025, 7:45 AM</small>
+                  </div>
+                </div>
+                <div>
+                  <strong class="text-lg">95 mg/dL</strong><br>
+                  <span class="status-badge status-normal">Normal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meal Tracking Card -->
+      <div class="card">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 d-flex align-items-center">
+            <i class="fas fa-utensils me-2 text-warning"></i>
+            Today's Meals
+          </h2>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="meal-item text-center p-4 border rounded">
+                <i class="fas fa-sun text-warning text-3xl mb-2"></i>
+                <h5 class="mb-1">Breakfast</h5>
+                <p class="text-muted small mb-2">Pending</p>
+                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('breakfast')">
+                  Add Meal
+                </button>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="meal-item text-center p-4 border rounded">
+                <i class="fas fa-sun text-warning text-3xl mb-2"></i>
+                <h5 class="mb-1">Lunch</h5>
+                <p class="text-muted small mb-2">Pending</p>
+                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('lunch')">
+                  Add Meal
+                </button>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="meal-item text-center p-4 border rounded">
+                <i class="fas fa-moon text-purple text-3xl mb-2"></i>
+                <h5 class="mb-1">Dinner</h5>
+                <p class="text-muted small mb-2">Pending</p>
+                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('dinner')">
+                  Add Meal
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Meals -->
+          <h5 class="mb-3 mt-4">Recent Meals</h5>
+          <div id="recentMeals">
+            <!-- Mock data -->
+            <div class="meal-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-utensils text-warning me-2"></i>
+                  <div>
+                    <strong>Breakfast - Oatmeal with Fruits</strong><br>
+                    <small class="text-muted">Oct 10, 2025, 7:30 AM</small>
+                  </div>
+                </div>
+                <span class="badge bg-success">Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Blood Pressure Modal -->
+    <div class="modal fade" id="bpModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Blood Pressure Reading</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="bpForm">
+              <div class="mb-3">
+                <label class="form-label">Systolic (mmHg)</label>
+                <input type="number" class="form-control" id="systolic" placeholder="120" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Diastolic (mmHg)</label>
+                <input type="number" class="form-control" id="diastolic" placeholder="80" required>
+              </div>
+              <button type="submit" class="btn btn-success w-100">Save Reading</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blood Sugar Modal -->
+    <div class="modal fade" id="bsModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Blood Sugar Reading</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="bsForm">
+              <div class="mb-3">
+                <label class="form-label">Blood Sugar (mg/dL)</label>
+                <input type="number" class="form-control" id="bloodSugar" placeholder="95" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Save Reading</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meal Modal -->
+    <div class="modal fade" id="mealModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mealModalTitle">Add Meal</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="mealForm">
+              <div class="mb-3">
+                <label class="form-label">Meal Name</label>
+                <input type="text" class="form-control" id="mealName" placeholder="E.g., Oatmeal with fruits" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description (optional)</label>
+                <textarea class="form-control" id="mealDesc" rows="2" placeholder="Any notes about the meal..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-warning w-100">Mark Complete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <p>&copy; 2025 Presibo. All rights reserved.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <a href="/privacy" class="text-white me-3">Privacy</a>
+          <a href="/terms" class="text-white">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Modal handlers
+    function openHealthModal(type) {
+      if (type === 'blood_pressure') {
+        document.getElementById('bpModal').showModal ? document.getElementById('bpModal').showModal() : new bootstrap.Modal(document.getElementById('bpModal')).show();
+      } else {
+        document.getElementById('bsModal').showModal ? document.getElementById('bsModal').showModal() : new bootstrap.Modal(document.getElementById('bsModal')).show();
+      }
+    }
+
+    function addMeal(type) {
+      document.getElementById('mealModalTitle').textContent = `Add ${type.charAt(0).toUpperCase() + type.slice(1)} Meal`;
+      document.getElementById('mealModal').showModal ? document.getElementById('mealModal').showModal() : new bootstrap.Modal(document.getElementById('mealModal')).show();
+    }
+
+    // Form submissions (simulated)
+    document.getElementById('bpForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Blood pressure reading saved! (Simulated)');
+      bootstrap.Modal.getInstance(document.getElementById('bpModal')).hide();
+    });
+
+    document.getElementById('bsForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Blood sugar reading saved! (Simulated)');
+      bootstrap.Modal.getInstance(document.getElementById('bsModal')).hide();
+    });
+
+    document.getElementById('mealForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Meal logged! (Simulated)');
+      bootstrap.Modal.getInstance(document.getElementById('mealModal')).hide();
+    });
+  </script>
+</body>
+</html>
