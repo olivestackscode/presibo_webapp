@@ -101,6 +101,17 @@
     </div>
   </div>
 
+    <!-- Success popup -->
+  
+<div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
+    <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
+    <h2 id="popupTitle" class="text-lg font-semibold mb-2"></h2>
+    <p id="popupMessage" class="text-sm"></p>
+    <button id="popupBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">OK</button>
+  </div>
+</div>
+
   <script>
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
@@ -178,7 +189,8 @@ modalContent.innerHTML = `
     const result = await response.json();
 
     if (result.status === "success") {
-      alert(`✅ Appointment booked successfully with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
+      //alert(`✅ Appointment booked successfully with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
+      
       closeBookingModal();
     } else {
       throw new Error(result.message || "Unknown server error");
@@ -219,7 +231,7 @@ modalContent.innerHTML = `
         const data = await fetchJSON('https://presibo-wl.vercel.app/doctors.json');
         doctors = data.users.map(user => ({
           id: user.id,
-          name: user.fullname || `${user.firstname} ${user.lastname}`,
+          name: user.fullname || `Dr. ${user.firstname} ${user.lastname}`,
           specialization: user.specialization || 'General Practitioner',
           thumbnail: user.thumbnail || '/assets/img/doctor-default.png'
         }));
