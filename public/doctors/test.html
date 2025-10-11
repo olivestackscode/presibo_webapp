@@ -117,6 +117,7 @@
 
 
 <script>
+    let email = sessionStorage.getItem('email') || null;
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
     const specialtyFilters = document.querySelectorAll('#specialtyFilters button');
