@@ -112,7 +112,12 @@
   </div>
 </div>
 
-  <script>
+      <!-- Failed popup -->
+  
+
+
+<script>
+    let email = sessionStorage.getItem('email') || null;
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
     const specialtyFilters = document.querySelectorAll('#specialtyFilters button');
@@ -127,7 +132,7 @@
 
     async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
-      if (!email) return alert('No session stored');
+      if (!email) return showPopup("Not Logged in", "");
 
       try {
         const doctor = doctors.find(d => d.id == doctorId);
@@ -287,7 +292,10 @@ modalContent.innerHTML = `
       modal.classList.add('hidden');
       closeBtn.removeEventListener('click', closeModal);
       okBtn.removeEventListener('click', closeModal);
-      window.location.reload(); // ✅ Refresh after closing modal
+      //window.location = "/"; // ✅ login after closing modal
+      !email ? window.location = "/" : window.location.reload();
+
+      
     }
 
     closeBtn.addEventListener('click', closeModal);
