@@ -123,7 +123,8 @@
 
         const userRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
         const userData = await userRes.json();
-        const user = userData[0] || {};
+        //const user = userData[0] || {};
+        const user = userData.users?.[0] || {};
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown User';
 
         const modalContent = document.getElementById('booking-modal-content');
