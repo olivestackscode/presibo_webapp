@@ -126,6 +126,8 @@
         //const user = userData[0] || {};
         const user = userData.users?.[0] || {};
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Unknown User';
+        const userPhone = `${user.tel || 'No Number'};
+        
 
         const modalContent = document.getElementById('booking-modal-content');
         modalContent.innerHTML = `
@@ -147,7 +149,8 @@
       name: fullName,
       date: date,
       time: time,
-      email: email
+      email: email,
+      phone: userPhone
     };
 
     const response = await fetch("https://api.presibo.com/appointments/new.php", {
