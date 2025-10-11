@@ -137,10 +137,37 @@
 
         document.getElementById('booking-modal').classList.add('active');
 
-        document.getElementById('booking-modal-action').onclick = () => {
-          alert(`Appointment booked with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
-          closeBookingModal();
-        };
+        document.getElementById('booking-modal-action').onclick = async () => {
+  try {
+    const bookingData = {
+      doctor_id: doctor?.id,
+      doctor_name: doctor?.name,
+      specialization: doctor?.specialization,
+      booker_name: fullName,
+      date: date,
+      time: time,
+      email: email
+    };
+
+    const response = await fetch("https://api.presibo.com/appointments/new.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bookingData),
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      alert(`✅ Appointment booked successfully with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
+      closeBookingModal();
+    } else {
+      throw new Error(result.message || "Unknown server error");
+    }
+  } catch (error) {
+    console.error('❌ Booking error:', error);
+    alert('Failed to book appointment. Please try again later.');
+  }
+};
 
       } catch (error) {
         console.error('Error:', error);
