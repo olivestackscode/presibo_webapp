@@ -116,7 +116,7 @@
   
 
 
-  <script>
+<script>
     const searchInput = document.getElementById('searchInput');
     const doctorsList = document.getElementById('doctorsList');
     const specialtyFilters = document.querySelectorAll('#specialtyFilters button');
@@ -131,8 +131,7 @@
 
     async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
-      //if (!email) //return alert('No session stored') 
-       if (!email) return showPopup("Not Logged in", ``);;
+      if (!email) return showPopup("Not Logged in", "");
 
       try {
         const doctor = doctors.find(d => d.id == doctorId);
@@ -292,11 +291,12 @@ modalContent.innerHTML = `
       modal.classList.add('hidden');
       closeBtn.removeEventListener('click', closeModal);
       okBtn.removeEventListener('click', closeModal);
-      window.location = "/"; //  after closing modal
+      window.location.reload(); // ✅ Refresh after closing modal
     }
 
-
-
+    closeBtn.addEventListener('click', closeModal);
+    okBtn.addEventListener('click', closeModal);
+  }
 
     fetchDoctors();
   </script>
