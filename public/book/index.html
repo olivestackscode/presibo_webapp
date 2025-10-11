@@ -652,9 +652,7 @@ try {
     modal.classList.add('hidden');
     closeBtn.removeEventListener('click', closeModal);
     okBtn.removeEventListener('click', closeModal);
-    //if (redirect) {
-    window.location = "#";
-    //}
+    window.location.reload();
   }
 
   closeBtn.addEventListener('click', closeModal);
