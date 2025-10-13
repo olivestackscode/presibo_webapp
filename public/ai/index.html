@@ -14,6 +14,33 @@
     .input { width:100%; padding:.75rem; border:1px solid #e5e7eb; border-radius:.5rem; outline:none; }
     .animate-bounce { animation: bounce 1s infinite; }
     @keyframes bounce { 0%,100%{ transform:translateY(0);}50%{ transform:translateY(-5px);} }
+
+    .aiLink {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.aiLink:hover {
+  background-color: #3e8e41;
+}
+
+.aiLink:active {
+  background-color: #2e6e31;
+}
+
+.aiLink:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50;
+}
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
