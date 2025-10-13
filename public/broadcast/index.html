@@ -200,6 +200,11 @@ recipientType.addEventListener("change", () => {
           })
         });
 
+
+         .then(res => res.json())
+        .then(data => console.log(data))
+        .catch(err => console.error(err));
+
         const result = await res.json();
         if (result.success) sent++;
       } catch (e) {
