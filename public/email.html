@@ -1,13 +1,15 @@
 <html>
 <script>
+  const first_name = "Daniel";
 
 fetch("https://api.presibo.com/email/index.php", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     action: "send",
-    type: "appointment",
-    email: "info@presibo.com"
+    type: "welcome",
+    email: "info@presibo.com",
+    name: first_name
   })
 })
   .then(res => res.json())
