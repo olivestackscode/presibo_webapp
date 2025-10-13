@@ -106,7 +106,7 @@ async function fetchRecipients() {
     // Doctors could be inside doctorsData.doctors or directly in the array
     const doctorsArray = Array.isArray(doctorsData)
       ? doctorsData
-      : doctorsData.doctors || [];
+      : doctorsData.users || [];
 
     // Extract email addresses
     allUsers = usersArray
