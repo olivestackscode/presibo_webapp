@@ -480,6 +480,22 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
       // Success: Redirect (setTimeout not needed here)
       console.log('Signup successful:', result);
       sessionStorage.setItem('email', signupData.email); // Store for session
+      //prepare and send email to uers
+      UserEmail = sessionStorage.setItem('email', signupData.email);
+      fetch("https://api.presibo.com/email/index.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "send",
+          type: "welcome",
+          email: UserEmail,
+          name: first_name
+        })
+      })
+        .then(res => res.json())
+        .then(data => console.log(data))
+        .catch(err => console.error(err));
+      //end and redirect to dashboard
       window.location.href = '/dashboard';
     } else {
       // API error
