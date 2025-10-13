@@ -84,7 +84,6 @@
 
   <!-- Main Content -->
   <main class="pt-5 mt-5">
-    <!-- Hero Section -->
     <section class="tracking-hero">
       <div class="container">
         <h1 class="display-5 mb-3">Track Your Health Journey</h1>
@@ -96,11 +95,11 @@
       <!-- AI Chat -->
       <div class="chat-area" id="chatArea"></div>
       <div class="d-flex gap-2 mb-5">
-        <input id="chatInput" class="form-control" placeholder="Type your health question..." />
+        <input id="chatInput" class="form-control" placeholder="Ask Presibo AI about your health..." />
         <button id="sendButton" class="btn btn-primary">Send</button>
       </div>
 
-      <!-- Health Tracking Card -->
+      <!-- Track Vitals -->
       <div class="card mb-5">
         <div class="card-body p-4">
           <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-heartbeat me-2 text-danger"></i>Track Vitals</h2>
@@ -125,35 +124,14 @@
         </div>
       </div>
 
-      <!-- Meal Tracking Card -->
+      <!-- Meals -->
       <div class="card mb-5">
         <div class="card-body p-4">
           <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-utensils me-2 text-warning"></i>Today's Meals</h2>
           <div class="row">
-            <div class="col-md-4 mb-3">
-              <div class="meal-item text-center p-4 border rounded">
-                <i class="fas fa-sun text-warning text-3xl mb-2"></i>
-                <h5 class="mb-1">Breakfast</h5>
-                <p class="text-muted small mb-2">Pending</p>
-                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('breakfast')">Add Meal</button>
-              </div>
-            </div>
-            <div class="col-md-4 mb-3">
-              <div class="meal-item text-center p-4 border rounded">
-                <i class="fas fa-sun text-warning text-3xl mb-2"></i>
-                <h5 class="mb-1">Lunch</h5>
-                <p class="text-muted small mb-2">Pending</p>
-                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('lunch')">Add Meal</button>
-              </div>
-            </div>
-            <div class="col-md-4 mb-3">
-              <div class="meal-item text-center p-4 border rounded">
-                <i class="fas fa-moon text-purple text-3xl mb-2"></i>
-                <h5 class="mb-1">Dinner</h5>
-                <p class="text-muted small mb-2">Pending</p>
-                <button class="btn btn-outline-warning btn-sm" onclick="addMeal('dinner')">Add Meal</button>
-              </div>
-            </div>
+            <div class="col-md-4 mb-3"><div class="meal-item text-center p-4 border rounded"><i class="fas fa-sun text-warning text-3xl mb-2"></i><h5>Breakfast</h5><p class="text-muted small mb-2">Pending</p><button class="btn btn-outline-warning btn-sm" onclick="addMeal('Breakfast')">Add Meal</button></div></div>
+            <div class="col-md-4 mb-3"><div class="meal-item text-center p-4 border rounded"><i class="fas fa-cloud-sun text-warning text-3xl mb-2"></i><h5>Lunch</h5><p class="text-muted small mb-2">Pending</p><button class="btn btn-outline-warning btn-sm" onclick="addMeal('Lunch')">Add Meal</button></div></div>
+            <div class="col-md-4 mb-3"><div class="meal-item text-center p-4 border rounded"><i class="fas fa-moon text-purple text-3xl mb-2"></i><h5>Dinner</h5><p class="text-muted small mb-2">Pending</p><button class="btn btn-outline-warning btn-sm" onclick="addMeal('Dinner')">Add Meal</button></div></div>
           </div>
           <h5 class="mb-3 mt-4">Recent Meals</h5>
           <div id="recentMeals"></div>
@@ -166,92 +144,129 @@
     </div>
 
     <!-- Modals -->
-    <!-- BP Modal -->
     <div class="modal fade" id="bpModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Add Blood Pressure Reading</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
+          <div class="modal-header"><h5 class="modal-title">Add Blood Pressure Reading</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
           <div class="modal-body">
             <form id="bpForm">
-              <div class="mb-3"><label>Systolic (mmHg)</label><input type="number" class="form-control" id="systolic" required></div>
-              <div class="mb-3"><label>Diastolic (mmHg)</label><input type="number" class="form-control" id="diastolic" required></div>
-              <button type="submit" class="btn btn-success w-100">Save Reading</button>
+              <div class="mb-3"><label>Systolic (mmHg)</label><input type="number" id="systolic" class="form-control" required></div>
+              <div class="mb-3"><label>Diastolic (mmHg)</label><input type="number" id="diastolic" class="form-control" required></div>
+              <button class="btn btn-success w-100">Save Reading</button>
             </form>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- BS Modal -->
     <div class="modal fade" id="bsModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Add Blood Sugar Reading</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
+          <div class="modal-header"><h5 class="modal-title">Add Blood Sugar Reading</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
           <div class="modal-body">
             <form id="bsForm">
-              <div class="mb-3"><label>Blood Sugar (mg/dL)</label><input type="number" class="form-control" id="bloodSugar" required></div>
-              <button type="submit" class="btn btn-primary w-100">Save Reading</button>
+              <div class="mb-3"><label>Blood Sugar (mg/dL)</label><input type="number" id="bloodSugar" class="form-control" required></div>
+              <button class="btn btn-primary w-100">Save Reading</button>
             </form>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Meal Modal -->
     <div class="modal fade" id="mealModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="mealModalTitle">Add Meal</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
+          <div class="modal-header"><h5 id="mealModalTitle" class="modal-title">Add Meal</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
           <div class="modal-body">
             <form id="mealForm">
-              <div class="mb-3"><label>Meal Name</label><input type="text" class="form-control" id="mealName" required></div>
-              <div class="mb-3"><label>Description</label><textarea class="form-control" id="mealDesc" rows="3"></textarea></div>
-              <button type="submit" class="btn btn-warning w-100">Add Meal</button>
+              <div class="mb-3"><label>Meal Name</label><input id="mealName" type="text" class="form-control" required></div>
+              <div class="mb-3"><label>Description</label><textarea id="mealDesc" rows="3" class="form-control"></textarea></div>
+              <button class="btn btn-warning w-100">Add Meal</button>
             </form>
           </div>
         </div>
       </div>
     </div>
-
   </main>
 
-  <!-- Vendor JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Custom JS -->
   <script>
-    // AI Chat
+    // ✅ Presibo AI Integration
+    async function callPresiboAI(payload) {
+      try {
+        const res = await fetch('https://api.presibo.com/ai/index.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        return data.reply || "No response from AI.";
+      } catch (err) {
+        console.error("AI Error:", err);
+        return "AI connection failed.";
+      }
+    }
+
+    // ✅ Chat
     const chatArea = document.getElementById('chatArea');
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
-    function scrollToBottom(){ chatArea.scrollTop = chatArea.scrollHeight; }
-    function addUserMessage(msg){ const el=document.createElement('div'); el.className='mb-2 p-2 rounded bg-blue-600 text-white text-end'; el.textContent=msg; chatArea.appendChild(el); scrollToBottom(); }
-    function addAIMessage(msg){ const el=document.createElement('div'); el.className='mb-2 p-2 rounded bg-gray-100 text-gray-900'; el.textContent=msg; chatArea.appendChild(el); scrollToBottom(); }
-    sendButton.addEventListener('click',()=>{ const msg=chatInput.value.trim(); if(!msg)return; addUserMessage(msg); chatInput.value=''; addAIMessage("🤖 AI: Based on your input, consult a doctor if symptoms persist."); });
-    chatInput.addEventListener('keypress',e=>{ if(e.key==='Enter') sendButton.click(); });
+    function addMessage(msg, cls){const el=document.createElement('div');el.className='mb-2 p-2 rounded '+cls;el.textContent=msg;chatArea.appendChild(el);chatArea.scrollTop=chatArea.scrollHeight;}
+    sendButton.addEventListener('click',async()=>{const msg=chatInput.value.trim();if(!msg)return;addMessage(msg,'bg-blue-600 text-white text-end');chatInput.value='';const reply=await callPresiboAI({type:'chat',message:msg});addMessage('🤖 '+reply,'bg-gray-100 text-gray-900');});
+    chatInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendButton.click();});
 
-    // Health & Meal
+    // ✅ Modals
     const bpModal=new bootstrap.Modal(document.getElementById('bpModal'));
     const bsModal=new bootstrap.Modal(document.getElementById('bsModal'));
     const mealModal=new bootstrap.Modal(document.getElementById('mealModal'));
     let currentMeal='';
-    function openHealthModal(type){ if(type==='blood_pressure') bpModal.show(); if(type==='blood_sugar') bsModal.show(); }
-    function addMeal(type){ currentMeal=type; document.getElementById('mealModalTitle').textContent=`Add ${type.charAt(0).toUpperCase()+type.slice(1)}`; mealModal.show(); }
 
-    document.getElementById('bpForm').addEventListener('submit', e=>{ e.preventDefault(); const s=document.getElementById('systolic').value; const d=document.getElementById('diastolic').value; const html=`<div class="reading-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-heart text-danger me-2"></i><div><strong>Blood Pressure</strong><br><small class="text-muted">${new Date().toLocaleString()}</small></div></div><div><strong>${s}/${d}</strong><br><span class="status-badge status-normal">Normal</span></div></div>`; document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html); bpModal.hide(); e.target.reset(); });
-    document.getElementById('bsForm').addEventListener('submit', e=>{ e.preventDefault(); const val=document.getElementById('bloodSugar').value; const html=`<div class="reading-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-tint text-primary me-2"></i><div><strong>Blood Sugar</strong><br><small class="text-muted">${new Date().toLocaleString()}</small></div></div><div><strong>${val} mg/dL</strong><br><span class="status-badge status-normal">Normal</span></div></div>`; document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html); bsModal.hide(); e.target.reset(); });
-    document.getElementById('mealForm').addEventListener('submit', e=>{ e.preventDefault(); const name=document.getElementById('mealName').value; const desc=document.getElementById('mealDesc').value; const html=`<div class="meal-item d-flex justify-content-between align-items-center"><div class="d-flex align-items-center"><i class="fas fa-utensils text-warning me-2"></i><div><strong>${currentMeal.charAt(0).toUpperCase()+currentMeal.slice(1)} - ${name}</strong><br><small class="text-muted">${new Date().toLocaleString()}</small></div></div><span class="badge bg-success">Completed</span></div>`; document.getElementById('recentMeals').insertAdjacentHTML('afterbegin',html); mealModal.hide(); e.target.reset(); });
+    function openHealthModal(t){if(t==='blood_pressure')bpModal.show();if(t==='blood_sugar')bsModal.show();}
+    function addMeal(t){currentMeal=t;document.getElementById('mealModalTitle').textContent='Add '+t;mealModal.show();}
 
-    // Load doctors from API
+    // ✅ Handle Blood Pressure
+    document.getElementById('bpForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const s=document.getElementById('systolic').value;
+      const d=document.getElementById('diastolic').value;
+      const reply=await callPresiboAI({type:'blood_pressure',message:`Blood pressure reading: ${s}/${d}`});
+      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Pressure</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${s}/${d}</strong></div></div><div class="mt-2 small text-muted">${reply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('BP ${s}/${d}')">Ask about this</a></div>`;
+      document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
+      bpModal.hide();
+      e.target.reset();
+    });
+
+    // ✅ Handle Blood Sugar
+    document.getElementById('bsForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const val=document.getElementById('bloodSugar').value;
+      const reply=await callPresiboAI({type:'blood_sugar',message:`Blood sugar reading: ${val}`});
+      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Sugar</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${val} mg/dL</strong></div></div><div class="mt-2 small text-muted">${reply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('Blood sugar ${val}')">Ask about this</a></div>`;
+      document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
+      bsModal.hide();
+      e.target.reset();
+    });
+
+    // ✅ Handle Meals
+    document.getElementById('mealForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const meal=document.getElementById('mealName').value;
+      const desc=document.getElementById('mealDesc').value;
+      const reply=await callPresiboAI({type:'meal',message:`Meal: ${currentMeal} - ${meal}. Description: ${desc}`});
+      const html=`<div class="meal-item"><div class="d-flex justify-content-between"><div><strong>${currentMeal} - ${meal}</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-success">Completed</span></div><div class="mt-2 small text-muted">${reply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('${meal}')">Ask about this</a></div>`;
+      document.getElementById('recentMeals').insertAdjacentHTML('afterbegin',html);
+      mealModal.hide();
+      e.target.reset();
+    });
+
+    // ✅ Ask More
+    async function askMore(context){
+      const res=await callPresiboAI({type:'followup',message:`Give more detail about ${context}`});
+      alert("🧠 "+res);
+    }
+
+    // ✅ Load doctors from API
     async function loadDoctors(){
       try{
         const res=await fetch('https://api.presibo.com/doctors/index.php');
@@ -264,7 +279,7 @@
           col.innerHTML=`<div class="p-4 bg-white shadow rounded-lg"><h5>Dr. ${doc.firstname} ${doc.lastname}</h5><p>${doc.specialization} - ${doc.location} (${doc.years} yrs)</p><p>Reason: ${doc.reason}</p><p>Call: <a href="tel:${doc.phone}">${doc.phone}</a></p></div>`;
           container.appendChild(col);
         });
-      }catch(err){ console.error('Failed to load doctors',err); document.getElementById('doctorList').innerHTML='<p class="text-muted">Unable to load doctors at this time.</p>'; }
+      }catch(err){console.error(err);}
     }
     loadDoctors();
   </script>
