@@ -117,7 +117,7 @@
       });
 
       const tokenData = await tokenRes.json();
-      console.log("Token result:", tokenData);
+      //console.log("Token result:", tokenData);
 
       if (!tokenData.success) {
         resultDiv.textContent = "❌ Failed to generate reset link: " + (tokenData.error || "Unknown error");
