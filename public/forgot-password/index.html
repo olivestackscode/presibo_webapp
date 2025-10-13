@@ -15,7 +15,7 @@
       height: 100vh;
       margin: 0;
     }
-      .logo {
+    .logo {
       width: 70px;
       margin-bottom: 15px;
     }
@@ -62,7 +62,7 @@
       transition: 0.2s ease;
     }
     button:hover {
-      background-color: #244fb6;
+      background-color: #1f46a5;
     }
     #result {
       margin-top: 15px;
@@ -97,19 +97,35 @@
     resultDiv.className = "";
 
     try {
-      // Step 1: Check if email exists via GET request
+      // Step 1: Verify user exists
       const checkRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
       const checkData = await checkRes.json();
       console.log("Check result:", checkData);
 
-      // ✅ FIXED condition
       if (!checkData.users || checkData.users.length === 0) {
         resultDiv.textContent = "❌ Email not found. Please check and try again.";
         resultDiv.className = "error";
         return;
       }
 
-      // Step 2: Send reset link if email exists
+      // Step 2: Generate reset token
+      resultDiv.textContent = "Generating reset link...";
+      const tokenRes = await fetch("https://api.presibo.com/tokens/reset-token.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const tokenData = await tokenRes.json();
+      console.log("Token result:", tokenData);
+
+      if (!tokenData.success) {
+        resultDiv.textContent = "❌ Failed to generate reset link: " + (tokenData.error || "Unknown error");
+        resultDiv.className = "error";
+        return;
+      }
+
+      // Step 3: Send reset email
       resultDiv.textContent = "Sending reset link...";
       const res = await fetch("https://api.presibo.com/email/index.php", {
         method: "POST",
@@ -122,7 +138,7 @@
           message: `
             <p>Hello ${checkData.users[0].first_name || ''},</p>
             <p>We received a request to reset your password for your Presibo Health account.</p>
-            <p><a href="https://presibo.com/reset-password?email=${encodeURIComponent(email)}">Click here to reset your password</a></p>
+            <p><a href="${tokenData.link}" style="color:#2a5bd7;">Click here to reset your password</a></p>
             <p>If you didn’t request this, please ignore this message.</p>
           `
         })
@@ -144,8 +160,7 @@
       resultDiv.className = "error";
     }
   });
-</script>
-
+  </script>
 
 </body>
 </html>
