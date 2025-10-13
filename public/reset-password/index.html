@@ -200,7 +200,8 @@
         console.log("Password reset result:", data);
 
         if (data.success) {
-          resultDiv.textContent = "✅ Password reset successful! You can now sign in.";
+          subtitle.textContent = "";
+          resultDiv.textContent = "Password reset successful! You can now sign in.";
           resultDiv.className = "success";
           form.classList.add("hidden");
           backBtn.classList.remove("hidden");
