@@ -77,126 +77,130 @@
     </div>
   </div>
 
-  <script>
-    const recipientType = document.getElementById("recipientType");
-    const externalEmailsContainer = document.getElementById("externalEmailsContainer");
-    const recipientCount = document.getElementById("recipientCount");
-    const sendBtn = document.getElementById("sendBtn");
-    const statusMsg = document.getElementById("statusMsg");
+<script>
+  const recipientType = document.getElementById("recipientType");
+  const externalEmailsContainer = document.getElementById("externalEmailsContainer");
+  const recipientCount = document.getElementById("recipientCount");
+  const sendBtn = document.getElementById("sendBtn");
+  const statusMsg = document.getElementById("statusMsg");
 
-    let allUsers = [];
-    let allDoctors = [];
+  let allUsers = [];
+  let allDoctors = [];
 
-    // Fetch users and doctors on load
-    async function fetchRecipients() {
-      try {
-        const [usersRes, doctorsRes] = await Promise.all([
-          fetch("https://api.presibo.com/users/index.php"),
-          fetch("https://presibo-wl.vercel.app/database.json")
-        ]);
+  // Fetch users and doctors on load
+  async function fetchRecipients() {
+    try {
+      const [usersRes, doctorsRes] = await Promise.all([
+        fetch("https://api.presibo.com/users/index.php"),
+        fetch("https://presibo-wl.vercel.app/database.json")
+      ]);
 
-        const usersData = await usersRes.json();
-        const doctorsData = await doctorsRes.json();
+      const usersData = await usersRes.json();
+      const doctorsData = await doctorsRes.json();
 
-        allUsers = Array.isArray(usersData) ? usersData.map(u => u.email).filter(Boolean) : [];
-        allDoctors = Array.isArray(doctorsData) ? doctorsData.map(d => d.email).filter(Boolean) : [];
-      } catch (err) {
-        console.error("Error fetching recipients:", err);
-      }
+      allUsers = Array.isArray(usersData)
+        ? usersData.map(u => u.email).filter(Boolean)
+        : [];
+
+      allDoctors = Array.isArray(doctorsData)
+        ? doctorsData.map(d => d.email).filter(Boolean)
+        : [];
+
+      console.log(`Loaded ${allUsers.length} users and ${allDoctors.length} doctors`);
+    } catch (err) {
+      console.error("Error fetching recipients:", err);
+    }
+  }
+
+  fetchRecipients();
+
+  recipientType.addEventListener("change", () => {
+    const type = recipientType.value;
+
+    externalEmailsContainer.classList.toggle("hidden", type !== "external");
+
+    let count = 0;
+    if (type === "users") count = allUsers.length;
+    else if (type === "doctors") count = allDoctors.length;
+    else if (type === "external") {
+      const emails = document.getElementById("externalEmails").value
+        .split(",")
+        .filter(e => e.includes("@"));
+      count = emails.length;
     }
 
-    fetchRecipients();
+    recipientCount.textContent = `Recipients: ${count}`;
+  });
 
-    recipientType.addEventListener("change", () => {
-      const type = recipientType.value;
-      if (type === "external") {
-        externalEmailsContainer.classList.remove("hidden");
-      } else {
-        externalEmailsContainer.classList.add("hidden");
-      }
+  document.getElementById("externalEmails").addEventListener("input", () => {
+    if (recipientType.value === "external") {
+      const emails = document.getElementById("externalEmails").value
+        .split(",")
+        .filter(e => e.includes("@"));
+      recipientCount.textContent = `Recipients: ${emails.length}`;
+    }
+  });
 
-      let count = 0;
-      if (type === "users") count = allUsers.length;
-      else if (type === "doctors") count = allDoctors.length;
-      else if (type === "external") {
-        const emails = document.getElementById("externalEmails").value.split(",").filter(e => e.includes("@"));
-        count = emails.length;
-      }
-      recipientCount.textContent = `Recipients: ${count}`;
-    });
+  sendBtn.addEventListener("click", async () => {
+    const type = recipientType.value;
+    const subject = document.getElementById("subject").value.trim();
+    const message = document.getElementById("message").value.trim();
 
-    document.getElementById("externalEmails").addEventListener("input", () => {
-      if (recipientType.value === "external") {
-        const emails = document.getElementById("externalEmails").value.split(",").filter(e => e.includes("@"));
-        recipientCount.textContent = `Recipients: ${emails.length}`;
-      }
-    });
+    if (!type || !subject || !message) {
+      statusMsg.textContent = "⚠️ Please fill in all required fields.";
+      statusMsg.className = "text-red-600 text-center mt-4";
+      return;
+    }
 
-    sendBtn.addEventListener("click", async () => {
-      const type = recipientType.value;
-      const subject = document.getElementById("subject").value.trim();
-      const message = document.getElementById("message").value.trim();
+    let emailList = [];
+    if (type === "users") emailList = allUsers;
+    if (type === "doctors") emailList = allDoctors;
+    if (type === "external") {
+      emailList = document.getElementById("externalEmails").value
+        .split(",")
+        .map(e => e.trim())
+        .filter(e => e.includes("@"));
+    }
 
-      if (!type || !subject || !message) {
-        statusMsg.textContent = "⚠️ Please fill in all required fields.";
-        statusMsg.className = "text-red-600 text-center mt-4";
-        return;
-      }
+    if (emailList.length === 0) {
+      statusMsg.textContent = "⚠️ No valid email addresses found.";
+      statusMsg.className = "text-red-600 text-center mt-4";
+      return;
+    }
 
-      let emailList = [];
-      if (type === "users") emailList = allUsers;
-      if (type === "doctors") emailList = allDoctors;
-      if (type === "external") {
-        emailList = document.getElementById("externalEmails").value
-          .split(",")
-          .map(e => e.trim())
-          .filter(e => e.includes("@"));
-      }
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending...";
+    statusMsg.textContent = "";
 
-      if (emailList.length === 0) {
-        statusMsg.textContent = "⚠️ No valid email addresses found.";
-        statusMsg.className = "text-red-600 text-center mt-4";
-        return;
-      }
+    let sent = 0;
 
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Sending...";
-      statusMsg.textContent = "";
-
-      let sent = 0;
-      
-      for (const email of emailList) {
-        try {
-          console.log("Sending payload:", {
+    for (const email of emailList) {
+      try {
+        const res = await fetch("https://api.presibo.com/email/index.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             action: "send",
             type: "custom",
             email,
             title: subject,
-            message: message
-          });
-          const res = await fetch("https://api.presibo.com/email/index.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "send",
-              type: "custom",
-              email,
-              title: subject,
-              message: message
-            })
-          });
-          const result = await res.json();
-          if (result.success) sent++;
-        } catch (e) {
-          console.error("Failed to send to:", email, e);
-        }
-      }
+            message
+          })
+        });
 
-      sendBtn.disabled = false;
-      sendBtn.textContent = "Send Broadcast Email";
-      statusMsg.textContent = `✅ Successfully sent to ${sent} of ${emailList.length} recipients.`;
-      statusMsg.className = "text-green-600 text-center mt-4";
-    });
-  </script>
+        const result = await res.json();
+        if (result.success) sent++;
+      } catch (e) {
+        console.error("Failed to send to:", email, e);
+      }
+    }
+
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Send Broadcast Email";
+    statusMsg.textContent = `✅ Successfully sent to ${sent} of ${emailList.length} recipients.`;
+    statusMsg.className = "text-green-600 text-center mt-4";
+  });
+</script>
+
 </body>
 </html>
