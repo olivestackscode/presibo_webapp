@@ -182,7 +182,7 @@
       resultDiv.className = "";
 
       try {
-        const res = await fetch("https://api.presibo.com/users/index.php", {
+        const res = await fetch("https://api.presibo.com/tokens/reset-token.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
