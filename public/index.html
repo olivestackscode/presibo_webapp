@@ -492,9 +492,9 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
           name: signupData.first_name
         })
       })
-        //.then(res => res.json())
-       // .then(data => console.log(data))
-        //.catch(err => console.error(err));
+        .then(res => res.json())
+       /.then(data => console.log(data))
+        .catch(err => console.error(err));
       //end and redirect to dashboard
       window.location.href = '/dashboard';
     } else {
