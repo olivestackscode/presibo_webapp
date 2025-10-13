@@ -193,6 +193,7 @@
     function addAIMessage(text) {
       const el = createMessageElement({ type: 'ai', content: text, timestamp: new Date() });
       chatArea.appendChild(el);
+      makeArrayClickable(el);
       scrollToBottom();
     }
 
@@ -449,7 +450,7 @@
 
     //link detection
 
-    function makeArrayClickable(element) {
+  function makeArrayClickable(element) {
   const arrays = element.querySelectorAll('span');
   arrays.forEach(array => {
     const content = array.textContent;
@@ -465,7 +466,6 @@
     }
   });
 }
-
   </script>
 </body>
 </html>
