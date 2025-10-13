@@ -62,7 +62,7 @@
       transition: 0.2s ease;
     }
     button:hover {
-      background-color: #244fb6;
+      background-color: #1e3fa0;
     }
     #result {
       margin-top: 15px;
@@ -110,7 +110,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
 
-    // Verify token immediately
+    // === Verify token immediately ===
     async function verifyToken() {
       if (!token) {
         showInvalidLink("Missing token in the link.");
@@ -121,7 +121,7 @@
         const res = await fetch("https://api.presibo.com/tokens/reset-token.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token })
+          body: JSON.stringify({ action: "verify_token", token: token })
         });
 
         const data = await res.json();
@@ -140,20 +140,23 @@
       }
     }
 
+    // === Show invalid link message ===
     function showInvalidLink(message) {
       title.textContent = "Invalid Reset Link";
       title.style.color = "red";
-      subtitle.textContent = message;
+      subtitle.textContent = message || "This password reset link is invalid or has expired.";
       form.classList.add("hidden");
       const invalidBtn = document.createElement("button");
       invalidBtn.textContent = "Request New Reset Link";
-      invalidBtn.onclick = () => window.location.href = "forgot-password";
+      invalidBtn.onclick = () => window.location.href = "forgot-password.html";
+      invalidBtn.className = "link-btn";
       container.appendChild(invalidBtn);
     }
 
+    // Run verification on load
     verifyToken();
 
-    // Handle password reset
+    // === Handle password reset ===
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -184,13 +187,13 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "reset_password",
-            token,
+            token: token,
             newPassword: password
           }),
         });
 
         const data = await res.json();
-        console.log(data);
+        console.log("Password reset result:", data);
 
         if (data.success) {
           resultDiv.textContent = "✅ Password reset successful! You can now sign in.";
