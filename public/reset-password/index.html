@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reset Password - Presibo Health</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       background: #f5f9ff;
@@ -44,7 +46,6 @@
       border-radius: 6px;
       font-size: 15px;
       outline: none;
-      margin-bottom: 10px;
     }
     input[type="password"]:focus {
       border-color: #1f7a3b;
@@ -63,16 +64,22 @@
       transition: 0.2s ease;
     }
     button:hover {
-      background-color: #1f46a5;
+      background-color: #244fb6;
     }
     #result {
       margin-top: 15px;
       font-weight: 500;
       font-size: 15px;
     }
-    .success { color: green; }
-    .error { color: red; }
-    .hidden { display: none; }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    .hidden {
+      display: none;
+    }
     .link-btn {
       background: none;
       border: none;
@@ -87,10 +94,10 @@
 
   <div class="container" id="resetContainer">
     <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="logo">
-    <h2>Reset Your Password</h2>
-    <p>Enter your new password below.</p>
+    <h2 id="title">Reset Your Password</h2>
+    <p id="subtitle">Enter your new password below.</p>
 
-    <form id="resetForm">
+    <form id="resetForm" class="hidden">
       <input type="password" id="password" placeholder="New password" required minlength="6" />
       <input type="password" id="confirmPassword" placeholder="Confirm new password" required minlength="6" />
       <button type="submit">Update Password</button>
@@ -104,44 +111,28 @@
     const form = document.getElementById("resetForm");
     const resultDiv = document.getElementById("result");
     const backBtn = document.getElementById("backToLogin");
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
     const container = document.getElementById("resetContainer");
 
     // Extract token from URL
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
 
-    // 🧩 Step 1: Verify token validity on page load
-    async function verifyToken() {
-      if (!token) {
-        showInvalid("Invalid or missing reset token.");
-        return;
-      }
-
-      try {
-        const res = await fetch("https://api.presibo.com/tokens/verify-token.php?token=" + encodeURIComponent(token));
-        const data = await res.json();
-        console.log("Verify result:", data);
-
-        if (!data.valid) {
-          showInvalid("This password reset link is invalid or has expired.");
-        }
-      } catch (err) {
-        showInvalid("⚠️ Could not verify token. Please try again later.");
-      }
+    // Show invalid link immediately
+    if (!token) {
+      title.textContent = "Invalid Reset Link";
+      title.style.color = "red";
+      subtitle.textContent = "This password reset link is invalid or has expired.";
+      form.classList.add("hidden");
+      const invalidBtn = document.createElement("button");
+      invalidBtn.textContent = "Request New Reset Link";
+      invalidBtn.onclick = () => window.location.href = "forgot-password.html";
+      container.appendChild(invalidBtn);
+    } else {
+      form.classList.remove("hidden");
     }
 
-    function showInvalid(message) {
-      container.innerHTML = `
-        <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="logo">
-        <h2 style="color:red;">Invalid Reset Link</h2>
-        <p>${message}</p>
-        <button onclick="window.location.href='forgotpassword.html'">Request New Reset Link</button>
-      `;
-    }
-
-    verifyToken();
-
-    // 🧩 Step 2: Handle password reset submission
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -167,17 +158,18 @@
       resultDiv.className = "";
 
       try {
-        const res = await fetch("https://api.presibo.com/users/reset-password.php", {
+        const res = await fetch("https://api.presibo.com/users/index.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            action: "reset_password",
             token,
             newPassword: password
           }),
         });
 
         const data = await res.json();
-        console.log("Reset response:", data);
+        console.log(data);
 
         if (data.success) {
           resultDiv.textContent = "✅ Password reset successful! You can now sign in.";
@@ -185,7 +177,7 @@
           form.classList.add("hidden");
           backBtn.classList.remove("hidden");
         } else {
-          resultDiv.textContent = "❌ " + (data.error || "Failed to reset password.");
+          resultDiv.textContent = "❌ " + (data.message || "Failed to reset password.");
           resultDiv.className = "error";
         }
       } catch (err) {
