@@ -100,7 +100,7 @@
       // Step 1: Verify user exists
       const checkRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
       const checkData = await checkRes.json();
-      console.log("Check result:", checkData);
+      //console.log("Check result:", checkData);
 
       if (!checkData.users || checkData.users.length === 0) {
         resultDiv.textContent = "❌ Email not found. Please check and try again.";
@@ -146,7 +146,7 @@
       });
 
       const data = await res.json();
-      console.log("Email result:", data);
+      //console.log("Email result:", data);
 
       if (data.success) {
         resultDiv.textContent = "✅ A reset link has been sent to your email.";
