@@ -263,7 +263,7 @@
     // ✅ Ask More
     async function askMore(context){
       const res=await callPresiboAI({type:'followup',message:`Give more detail about ${context}`});
-      alert("🧠 "+res);
+      showPopup("🧠 "+res);
     }
 
     // ✅ Load doctors from API
@@ -282,6 +282,33 @@
       }catch(err){console.error(err);}
     }
     loadDoctors();
+
+
+    function showPopup(title, message) {
+    const modal = document.getElementById('popupModal');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+    const closeBtn = document.getElementById('popupClose');
+    const okBtn = document.getElementById('popupBtn');
+
+    popupTitle.textContent = title;
+    popupMessage.textContent = message;
+    modal.classList.remove('hidden');
+
+
+  function closeModal() {
+      modal.classList.add('hidden');
+      closeBtn.removeEventListener('click', closeModal);
+      okBtn.removeEventListener('click', closeModal);
+      //window.location = "/"; // ✅ login after closing modal
+      !email ? window.location = "/" : window.location.reload();
+
+      
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    okBtn.addEventListener('click', closeModal);
+  }
   </script>
 </body>
 </html>
