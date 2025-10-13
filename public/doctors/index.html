@@ -257,6 +257,9 @@ modalContent.innerHTML = `
           <img src="https://presibo-wl.vercel.app/photos/${d.thumbnail}.jpg" class="w-16 h-16 rounded-full mb-2 object-cover" alt="${d.name}">
           <h3 class="font-semibold text-lg">${d.name}</h3>
           <p class="text-sm text-gray-600 mb-2">${d.specialization}</p>
+          <p class="text-sm text-gray-600 mb-2">${d.location}</p>
+          <p class="text-sm text-gray-600 mb-2">${d.years} years</p>
+          
           <button onclick="openBookingModal('${d.id}')" class="book-appointment bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Book</button>
         </div>
       `).join('');
