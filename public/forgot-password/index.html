@@ -94,10 +94,31 @@
 
       const email = document.getElementById("email").value.trim();
       const resultDiv = document.getElementById("result");
-      resultDiv.textContent = "Sending reset link...";
+      resultDiv.textContent = "Checking email...";
       resultDiv.className = "";
 
       try {
+        // Step 1: Check if email exists
+        const checkRes = await fetch("https://api.presibo.com/users/index.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "checkEmail",
+            email: email
+          })
+        });
+
+        const checkData = await checkRes.json();
+        console.log("Check result:", checkData);
+
+        if (!checkData.success || !checkData.exists) {
+          resultDiv.textContent = "❌ Email not found. Please check and try again.";
+          resultDiv.className = "error";
+          return;
+        }
+
+        // Step 2: Send reset link if email exists
+        resultDiv.textContent = "Sending reset link...";
         const res = await fetch("https://api.presibo.com/email/index.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -116,7 +137,7 @@
         });
 
         const data = await res.json();
-        console.log(data);
+        console.log("Email result:", data);
 
         if (data.success) {
           resultDiv.textContent = "✅ A reset link has been sent to your email.";
