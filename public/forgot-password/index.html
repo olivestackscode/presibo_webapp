@@ -135,6 +135,7 @@
           type: "forgotpassword",
           email,
           title: "Password Reset Request",
+          link: tokenData.link,
           message: `
             <p>Hello ${checkData.users[0].first_name || ''},</p>
             <p>We received a request to reset your password for your Presibo Health account.</p>
