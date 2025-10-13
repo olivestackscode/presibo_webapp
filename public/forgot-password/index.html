@@ -93,7 +93,7 @@
 
     try {
       // Step 1: Check if email exists via GET request
-      const checkRes = await fetch(`https://api.presibo.com/users/index.php?action=checkEmail&email=${encodeURIComponent(email)}`);
+      const checkRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
       const checkData = await checkRes.json();
       console.log("Check result:", checkData);
 
