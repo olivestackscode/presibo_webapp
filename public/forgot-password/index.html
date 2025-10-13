@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forgot Password - Presibo Health</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f9ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 30px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      color: #2a5bd7;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+    }
+    input[type="email"]:focus {
+      border-color: #2a5bd7;
+      box-shadow: 0 0 0 2px rgba(42,91,215,0.1);
+    }
+    button {
+      width: 100%;
+      margin-top: 15px;
+      background-color: #2a5bd7;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    button:hover {
+      background-color: #244fb6;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Forgot Password?</h2>
+    <p>Enter your email address and we’ll send you a reset link.</p>
+
+    <form id="forgotForm">
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <button type="submit">Send Reset Link</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById("forgotForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = "Sending reset link...";
+      resultDiv.className = "";
+
+      try {
+        const res = await fetch("https://api.presibo.com/email/index.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "send",
+            type: "forgotpassword",
+            email,
+            title: "Password Reset Request",
+            message: `
+              <p>Hello,</p>
+              <p>We received a request to reset your password for your Presibo Health account.</p>
+              <p><a href="https://presibo.com/reset-password?email=${encodeURIComponent(email)}">Click here to reset your password</a></p>
+              <p>If you didn’t request this, please ignore this message.</p>
+            `
+          })
+        });
+
+        const data = await res.json();
+        console.log(data);
+
+        if (data.success) {
+          resultDiv.textContent = "✅ A reset link has been sent to your email.";
+          resultDiv.className = "success";
+        } else {
+          resultDiv.textContent = "❌ " + (data.error || "Failed to send reset link.");
+          resultDiv.className = "error";
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.textContent = "⚠️ Network error: " + err.message;
+        resultDiv.className = "error";
+      }
+    });
+  </script>
+
+</body>
+</html>
