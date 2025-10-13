@@ -496,7 +496,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
         .then(data => console.log(data))
         .catch(err => console.error(err));
       //end and redirect to dashboard
-      //window.location.href = '/dashboard';
+        window.location.href = '/dashboard';
     } else {
       // API error
       errorDiv.textContent = result.error || 'Signup failed. Please try again.';
