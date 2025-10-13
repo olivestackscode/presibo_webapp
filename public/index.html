@@ -488,7 +488,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
         body: JSON.stringify({
           action: "send",
           type: "welcome",
-          email: UserEmail,
+          email: signupData.email,
           name: signupData.first_name
         })
       })
