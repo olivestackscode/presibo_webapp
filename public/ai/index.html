@@ -192,6 +192,7 @@
 
     function addAIMessage(text) {
       const el = createMessageElement({ type: 'ai', content: text, timestamp: new Date() });
+      wordToLink(el);
       chatArea.appendChild(el);
       makeArrayClickable(el);
       scrollToBottom();
@@ -465,6 +466,12 @@
       });
     }
   });
+}
+
+    function wordToLink(element) {
+  const text = element.innerHTML;
+  const regex = /'"Book Appointment"'/gi;
+  element.innerHTML = text.replace(regex, `<a href="https://app.presibo.com/doctors" target="_blank">Book Appointment</a>`);
 }
   </script>
 </body>
