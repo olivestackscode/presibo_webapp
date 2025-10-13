@@ -243,6 +243,10 @@ modalContent.innerHTML = `
           id: user.id,
           name: user.fullname || `Dr. ${user.firstname} ${user.lastname}`,
           specialization: user.specialization || 'General Practitioner',
+          location: `${user.location}, ${user.country}` || 'General Practitioner',
+          years: user.years || 'General Practitioner',
+          
+          
           thumbnail: user.thumbnail || '/assets/img/doctor-default.png'
         }));
         renderDoctors(doctors);
