@@ -1,6 +1,6 @@
 <html>
 <script>
-  const first_name = "Phoebe";
+  const first_name = "User";
 
 fetch("https://api.presibo.com/email/index.php", {
   method: "POST",
@@ -8,7 +8,7 @@ fetch("https://api.presibo.com/email/index.php", {
   body: JSON.stringify({
     action: "send",
     type: "welcome",
-    email: "oeeferaro@gmail.com",
+    email: "info@presibo.com",
     name: first_name
   })
 })
