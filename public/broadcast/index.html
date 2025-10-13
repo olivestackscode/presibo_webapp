@@ -164,8 +164,16 @@
       statusMsg.textContent = "";
 
       let sent = 0;
+      
       for (const email of emailList) {
         try {
+          console.log("Sending payload:", {
+            action: "send",
+            type: "custom",
+            email,
+            title: subject,
+            message: message
+          });
           const res = await fetch("https://api.presibo.com/email/index.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
