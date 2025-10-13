@@ -83,62 +83,64 @@
   </div>
 
   <script>
-    document.getElementById("forgotForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+  document.getElementById("forgotForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
-      const resultDiv = document.getElementById("result");
-      resultDiv.textContent = "Checking email...";
-      resultDiv.className = "";
+    const email = document.getElementById("email").value.trim();
+    const resultDiv = document.getElementById("result");
+    resultDiv.textContent = "Checking email...";
+    resultDiv.className = "";
 
-      try {
-        // Step 1: Check if email exists via GET request
-        const checkRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
-        const checkData = await checkRes.json();
-        console.log("Check result:", checkData);
+    try {
+      // Step 1: Check if email exists via GET request
+      const checkRes = await fetch(`https://api.presibo.com/users/index.php?action=checkEmail&email=${encodeURIComponent(email)}`);
+      const checkData = await checkRes.json();
+      console.log("Check result:", checkData);
 
-        if (!checkData.success || !checkData.exists) {
-          resultDiv.textContent = "❌ Email not found. Please check and try again.";
-          resultDiv.className = "error";
-          return;
-        }
+      // ✅ FIXED condition
+      if (!checkData.users || checkData.users.length === 0) {
+        resultDiv.textContent = "❌ Email not found. Please check and try again.";
+        resultDiv.className = "error";
+        return;
+      }
 
-        // Step 2: Send reset link if email exists
-        resultDiv.textContent = "Sending reset link...";
-        const res = await fetch("https://api.presibo.com/email/index.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "send",
-            type: "forgotpassword",
-            email,
-            title: "Password Reset Request",
-            message: `
-              <p>Hello,</p>
-              <p>We received a request to reset your password for your Presibo Health account.</p>
-              <p><a href="https://presibo.com/reset-password?email=${encodeURIComponent(email)}">Click here to reset your password</a></p>
-              <p>If you didn’t request this, please ignore this message.</p>
-            `
-          })
-        });
+      // Step 2: Send reset link if email exists
+      resultDiv.textContent = "Sending reset link...";
+      const res = await fetch("https://api.presibo.com/email/index.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "send",
+          type: "forgotpassword",
+          email,
+          title: "Password Reset Request",
+          message: `
+            <p>Hello ${checkData.users[0].first_name || ''},</p>
+            <p>We received a request to reset your password for your Presibo Health account.</p>
+            <p><a href="https://presibo.com/reset-password?email=${encodeURIComponent(email)}">Click here to reset your password</a></p>
+            <p>If you didn’t request this, please ignore this message.</p>
+          `
+        })
+      });
 
-        const data = await res.json();
-        console.log("Email result:", data);
+      const data = await res.json();
+      console.log("Email result:", data);
 
-        if (data.success) {
-          resultDiv.textContent = "✅ A reset link has been sent to your email.";
-          resultDiv.className = "success";
-        } else {
-          resultDiv.textContent = "❌ " + (data.error || "Failed to send reset link.");
-          resultDiv.className = "error";
-        }
-      } catch (err) {
-        console.error(err);
-        resultDiv.textContent = "⚠️ Network error: " + err.message;
+      if (data.success) {
+        resultDiv.textContent = "✅ A reset link has been sent to your email.";
+        resultDiv.className = "success";
+      } else {
+        resultDiv.textContent = "❌ " + (data.error || "Failed to send reset link.");
         resultDiv.className = "error";
       }
-    });
-  </script>
+    } catch (err) {
+      console.error(err);
+      resultDiv.textContent = "⚠️ Network error: " + err.message;
+      resultDiv.className = "error";
+    }
+  });
+</script>
+
 
 </body>
 </html>
