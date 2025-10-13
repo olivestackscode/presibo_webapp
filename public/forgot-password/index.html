@@ -113,7 +113,7 @@
       const tokenRes = await fetch("https://api.presibo.com/tokens/reset-token.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({action: 'reset_password', email })
+        body: JSON.stringify({action: 'request_reset', email })
       });
 
       const tokenData = await tokenRes.json();
