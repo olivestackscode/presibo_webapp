@@ -85,52 +85,64 @@
   const statusMsg = document.getElementById("statusMsg");
 
   let allUsers = [];
-  let allDoctors = [];
+let allDoctors = [];
 
-  // Fetch users and doctors on load
-  async function fetchRecipients() {
-    try {
-      const [usersRes, doctorsRes] = await Promise.all([
-        fetch("https://api.presibo.com/users/index.php"),
-        fetch("https://presibo-wl.vercel.app/doctors.json")
-      ]);
+// Fetch users and doctors on load
+async function fetchRecipients() {
+  try {
+    const [usersRes, doctorsRes] = await Promise.all([
+      fetch("https://api.presibo.com/users/index.php"),
+      fetch("https://presibo-wl.vercel.app/doctors.json")
+    ]);
 
-      const usersData = await usersRes.json();
-      const doctorsData = await doctorsRes.json();
+    const usersData = await usersRes.json();
+    const doctorsData = await doctorsRes.json();
 
-      allUsers = Array.isArray(usersData)
-        ? usersData.map(u => u.email).filter(Boolean)
-        : [];
+    // Users could be inside usersData.users or directly in the array
+    const usersArray = Array.isArray(usersData)
+      ? usersData
+      : usersData.users || [];
 
-      allDoctors = Array.isArray(doctorsData)
-        ? doctorsData.map(d => d.email).filter(Boolean)
-        : [];
+    // Doctors could be inside doctorsData.doctors or directly in the array
+    const doctorsArray = Array.isArray(doctorsData)
+      ? doctorsData
+      : doctorsData.doctors || [];
 
-      console.log(`Loaded ${allUsers.length} users and ${allDoctors.length} doctors`);
-    } catch (err) {
-      console.error("Error fetching recipients:", err);
-    }
+    // Extract email addresses
+    allUsers = usersArray
+      .map(u => u.email)
+      .filter(email => typeof email === "string" && email.includes("@"));
+
+    allDoctors = doctorsArray
+      .map(d => d.email)
+      .filter(email => typeof email === "string" && email.includes("@"));
+
+    console.log(`✅ Loaded ${allUsers.length} users and ${allDoctors.length} doctors`);
+  } catch (err) {
+    console.error("❌ Error fetching recipients:", err);
+  }
+}
+
+fetchRecipients();
+
+recipientType.addEventListener("change", () => {
+  const type = recipientType.value;
+
+  externalEmailsContainer.classList.toggle("hidden", type !== "external");
+
+  let count = 0;
+  if (type === "users") count = allUsers.length;
+  else if (type === "doctors") count = allDoctors.length;
+  else if (type === "external") {
+    const emails = document.getElementById("externalEmails").value
+      .split(",")
+      .filter(e => e.includes("@"));
+    count = emails.length;
   }
 
-  fetchRecipients();
+  recipientCount.textContent = `Recipients: ${count}`;
+});
 
-  recipientType.addEventListener("change", () => {
-    const type = recipientType.value;
-
-    externalEmailsContainer.classList.toggle("hidden", type !== "external");
-
-    let count = 0;
-    if (type === "users") count = allUsers.length;
-    else if (type === "doctors") count = allDoctors.length;
-    else if (type === "external") {
-      const emails = document.getElementById("externalEmails").value
-        .split(",")
-        .filter(e => e.includes("@"));
-      count = emails.length;
-    }
-
-    recipientCount.textContent = `Recipients: ${count}`;
-  });
 
   document.getElementById("externalEmails").addEventListener("input", () => {
     if (recipientType.value === "external") {
