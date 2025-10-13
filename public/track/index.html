@@ -98,12 +98,12 @@
         
       
       <div class="d-flex gap-2 mb-5">
-      <!-- AI Chat  
+      <!-- AI Chat   -->  
         
         <input id="chatInput" class="form-control" placeholder="Ask Presibo AI about your health..." />
         <button id="sendButton" class="btn btn-primary">Send</button>
       
-      -->  
+     
       
       </div>
        
@@ -220,7 +220,7 @@
     // ✅ Chat
     const chatArea = document.getElementById('chatArea');
     //const chatInput = document.getElementById('chatInput');
-    const chatInput = "ASDF";
+    //const chatInput = "ASDF";
     const sendButton = document.getElementById('sendButton');
     function addMessage(msg, cls){const el=document.createElement('div');el.className='mb-2 p-2 rounded '+cls;el.textContent=msg;chatArea.appendChild(el);chatArea.scrollTop=chatArea.scrollHeight;}
     sendButton.addEventListener('click',async()=>{const msg=chatInput.value.trim();if(!msg)return;addMessage(msg,'bg-blue-600 text-white text-end');chatInput.value='';const reply=await callPresiboAI({type:'chat',message:msg});addMessage('🤖 '+reply,'bg-gray-100 text-gray-900');});
