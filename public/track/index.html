@@ -55,6 +55,7 @@
     .status-unknown { background: #F3F4F6; color: #6B7280; }
     .chat-area { max-height: 300px; overflow-y: auto; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
     @media (max-width: 768px) { .tracking-hero { padding: 60px 0; } }
+    .hidden{display:none;}
   </style>
 </head>
 
@@ -100,8 +101,8 @@
       <div class="d-flex gap-2 mb-5">
       <!-- AI Chat   -->  
         
-        <input id="chatInput" class="form-control" placeholder="Ask Presibo AI about your health..." />
-        <button id="sendButton" class="btn btn-primary">Send</button>
+        <input id="chatInput" class="form-control hidden" placeholder="Ask Presibo AI about your health..." />
+        <button id="sendButton" class="btn btn-primary hidden">Send</button>
       
      
       
