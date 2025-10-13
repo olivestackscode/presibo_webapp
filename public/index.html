@@ -481,14 +481,14 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
       console.log('Signup successful:', result);
       sessionStorage.setItem('email', signupData.email); // Store for session
       //prepare and send email to uers
-      UserEmail = sessionStorage.setItem('email', signupData.email);
+      //UserEmail = sessionStorage.setItem('email', signupData.email);
       fetch("https://api.presibo.com/email/index.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "send",
           type: "welcome",
-          email: "contributor.talkparlour@gmail.com",
+          email: signupData.email,
           name: signupData.first_name
         })
       })
