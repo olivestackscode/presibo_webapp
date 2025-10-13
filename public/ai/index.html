@@ -447,6 +447,25 @@
       // render initial welcome already added in DOM via addAIMessage
     })();
 
+    //link detection
+
+    function makeArrayClickable(element) {
+  const arrays = element.querySelectorAll('span');
+  arrays.forEach(array => {
+    const content = array.textContent;
+    if (content.startsWith('[') && content.endsWith(']')) {
+      const link = document.createElement('a');
+      link.href = content.slice(1, -1); // extract content between []
+      link.textContent = content;
+      array.replaceWith(link);
+      link.addEventListener('click', () => {
+        // add your desired click event handler
+        console.log(`Link clicked: ${link.href}`);
+      });
+    }
+  });
+}
+
   </script>
 </body>
 </html>
