@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reset Password - Presibo Health</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       background: #f5f9ff;
@@ -71,15 +69,9 @@
       font-weight: 500;
       font-size: 15px;
     }
-    .success {
-      color: green;
-    }
-    .error {
-      color: red;
-    }
-    .hidden {
-      display: none;
-    }
+    .success { color: green; }
+    .error { color: red; }
+    .hidden { display: none; }
     .link-btn {
       background: none;
       border: none;
@@ -94,8 +86,8 @@
 
   <div class="container" id="resetContainer">
     <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="logo">
-    <h2 id="title">Reset Your Password</h2>
-    <p id="subtitle">Enter your new password below.</p>
+    <h2 id="title">Checking Reset Link...</h2>
+    <p id="subtitle">Please wait while we verify your reset link.</p>
 
     <form id="resetForm" class="hidden">
       <input type="password" id="password" placeholder="New password" required minlength="6" />
@@ -115,24 +107,53 @@
     const subtitle = document.getElementById("subtitle");
     const container = document.getElementById("resetContainer");
 
-    // Extract token from URL
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
 
-    // Show invalid link immediately
-    if (!token) {
+    // Verify token immediately
+    async function verifyToken() {
+      if (!token) {
+        showInvalidLink("Missing token in the link.");
+        return;
+      }
+
+      try {
+        const res = await fetch("https://api.presibo.com/tokens/reset-token.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+
+        const data = await res.json();
+        console.log("Verification result:", data);
+
+        if (data.success) {
+          // Token valid
+          title.textContent = "Reset Your Password";
+          subtitle.textContent = "Enter your new password below.";
+          form.classList.remove("hidden");
+        } else {
+          showInvalidLink(data.error || "This link is invalid or expired.");
+        }
+      } catch (err) {
+        showInvalidLink("Network error verifying token: " + err.message);
+      }
+    }
+
+    function showInvalidLink(message) {
       title.textContent = "Invalid Reset Link";
       title.style.color = "red";
-      subtitle.textContent = "This password reset link is invalid or has expired.";
+      subtitle.textContent = message;
       form.classList.add("hidden");
       const invalidBtn = document.createElement("button");
       invalidBtn.textContent = "Request New Reset Link";
       invalidBtn.onclick = () => window.location.href = "forgot-password.html";
       container.appendChild(invalidBtn);
-    } else {
-      form.classList.remove("hidden");
     }
 
+    verifyToken();
+
+    // Handle password reset
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -177,7 +198,7 @@
           form.classList.add("hidden");
           backBtn.classList.remove("hidden");
         } else {
-          resultDiv.textContent = "❌ " + (data.message || "Failed to reset password.");
+          resultDiv.textContent = "❌ " + (data.message || data.error || "Failed to reset password.");
           resultDiv.className = "error";
         }
       } catch (err) {
