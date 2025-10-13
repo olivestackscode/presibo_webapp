@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forgot Password - Presibo Health</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       background: #f5f9ff;
@@ -66,12 +64,8 @@
       margin-top: 15px;
       font-weight: 500;
     }
-    .success {
-      color: green;
-    }
-    .error {
-      color: red;
-    }
+    .success { color: green; }
+    .error { color: red; }
   </style>
 </head>
 <body>
@@ -98,16 +92,8 @@
       resultDiv.className = "";
 
       try {
-        // Step 1: Check if email exists
-        const checkRes = await fetch("https://api.presibo.com/users/index.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "checkEmail",
-            email: email
-          })
-        });
-
+        // Step 1: Check if email exists via GET request
+        const checkRes = await fetch(`https://api.presibo.com/users/index.php?action=checkEmail&email=${encodeURIComponent(email)}`);
         const checkData = await checkRes.json();
         console.log("Check result:", checkData);
 
