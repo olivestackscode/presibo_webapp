@@ -190,13 +190,16 @@
       scrollToBottom();
     }
 
-    function addAIMessage(text) {
-      const el = createMessageElement({ type: 'ai', content: text, timestamp: new Date() });
-      wordToLink(el);
-      chatArea.appendChild(el);
-      makeArrayClickable(el);
-      scrollToBottom();
-    }
+  function addAIMessage(text) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  const el = createMessageElement({ type: 'ai', content: '', timestamp: new Date() });
+  el.querySelector('.text-sm').append(...doc.body.childNodes);
+  wordToLink(el);
+  makeArrayClickable(el);
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
 
     function addSubscriptionErrorMessage(text) {
       const el = createMessageElement({ type: 'error', content: text, timestamp: new Date(), isSubscriptionError:true });
