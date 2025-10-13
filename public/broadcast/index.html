@@ -92,7 +92,7 @@
     try {
       const [usersRes, doctorsRes] = await Promise.all([
         fetch("https://api.presibo.com/users/index.php"),
-        fetch("https://presibo-wl.vercel.app/database.json")
+        fetch("https://presibo-wl.vercel.app/doctors.json")
       ]);
 
       const usersData = await usersRes.json();
