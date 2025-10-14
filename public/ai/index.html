@@ -219,6 +219,7 @@
     }
 
   function addAIMessage(text) {
+  const htmlText = convertTextToHTML(text);
   const parser = new DOMParser();
   const doc = parser.parseFromString(text, 'text/html');
   const el = createMessageElement({ type: 'ai', content: '', timestamp: new Date() });
