@@ -218,19 +218,16 @@
       scrollToBottom();
     }
 
- function addAIMessage(text) {
-  const htmlText = convertTextToHTML(text);
+function addAIMessage(text) {
+  const cleanText = removeFormatting(text);
   const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlText, 'text/html');
+  const doc = parser.parseFromString(cleanText, 'text/html');
   const el = createMessageElement({ type: 'ai', content: '', timestamp: new Date() });
   el.querySelector('.text-sm').append(...doc.body.childNodes);
   wordToLink(el);
   makeArrayClickable(el);
   chatArea.appendChild(el);
   scrollToBottom();
-
-
-   
 }
     function addSubscriptionErrorMessage(text) {
       const el = createMessageElement({ type: 'error', content: text, timestamp: new Date(), isSubscriptionError:true });
@@ -514,6 +511,13 @@ function convertTextToHTML(text) {
   
   // Convert ##headings## to <h2>headings</h2>
   text = text.replace(/##(.*?)##/g, '<h2>$1</h2>');
+  
+  return text;
+}
+
+    function removeFormatting(text) {
+  // Remove ** and ##
+  text = text.replace(/[*#]/g, '');
   
   return text;
 }
