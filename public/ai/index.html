@@ -374,7 +374,7 @@
       typingEl.remove();
 
       if (!aiResult.ok) {
-        addAIMessage('Sorry — an error occurred while contacting the AI. Please try again later.');
+        addAIMessage('AI has too many requests now. Please try again later.');
         console.error('AI error', aiResult.error);
         return;
       }
