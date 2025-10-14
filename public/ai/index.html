@@ -225,6 +225,7 @@
   el.querySelector('.text-sm').append(...doc.body.childNodes);
   wordToLink(el);
   makeArrayClickable(el);
+  convertTextToHTML(el);
   chatArea.appendChild(el);
   scrollToBottom();
 }
@@ -504,6 +505,17 @@
   const regex = /'"Book Appointment"'/gi;
   element.innerHTML = text.replace(regex, `<a href="https://app.presibo.com/doctors" target="_blank">Book Appointment</a>`);
 }
+
+function convertTextToHTML(text) {
+  // Convert **bold words** to <b>bold words</b>
+  text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  
+  // Convert ##headings## to <h2>headings</h2>
+  text = text.replace(/##(.*?)##/g, '<h2>$1</h2>');
+  
+  return text;
+}
+      
   </script>
 </body>
 </html>
