@@ -254,6 +254,9 @@
           </div>
           <h5 class="mb-3">Recent Metrics</h5>
           <div id="recentMetrics"></div>
+          <div class="continue-chat mt-2" onclick="toggleContinueChat('${noteId}', '${escapeHtml(notes)}', '${escapeHtml(analysis)}')">
+            🔍
+          </div>
         </div>
       </div>
 
@@ -542,7 +545,7 @@
           <div class="mt-2"><strong>Notes:</strong> ${escapeHtml(notes)}</div>
           <div class="mt-2"><strong>AI Analysis:</strong> ${analysis}</div>
           <div class="continue-chat mt-2" onclick="toggleContinueChat('${noteId}', '${escapeHtml(notes)}', '${escapeHtml(analysis)}')">
-            🔍 Continue Chat on This Analysis
+            🔍
           </div>
           <div id="continue-${noteId}" class="chat-continue-input">
             <input type="text" class="form-control form-control-sm mb-1" id="continueInput-${noteId}" placeholder="Ask follow-up questions...">
