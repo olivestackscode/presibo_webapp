@@ -280,7 +280,7 @@
       const desc=document.getElementById('mealDesc').value;
       const reply=await callPresiboAI({type:'meal',message:`Meal: ${currentMeal} - ${meal}. Description: ${desc}`});
       const cleanReply = reply.replace(/[*#]/g, '');
-      const html=`<div class="meal-item"><div class="d-flex justify-content-between"><div><strong>${currentMeal} - ${meal}</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-success">Completed</span></div><div class="mt-2 small text-muted">${cleanReply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('${meal}')">View More...</a></div>`;
+      const html=`<div class="meal-item"><div class="d-flex justify-content-between"><div><strong>${currentMeal} - ${meal}</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-success">Completed</span></div><div class="mt-2 small text-muted">${cleanReply}</div><a class="text-primary small mt-1 d-block" onclick="askMore('${meal}')">View More...</a></div>`;
       document.getElementById('recentMeals').insertAdjacentHTML('afterbegin',html);
       mealModal.hide();
       e.target.reset();
@@ -290,7 +290,7 @@
     async function askMore(context){
       const res=await callPresiboAI({type:'followup',message:`Give more detail about ${context}`});
       const cleanRes = res.replace(/[*#]/g, '');
-      showPopup("🧠 "+cleanRes);
+      showPopup("🧠 "+res);
     }
 
     // ✅ Load doctors from API
