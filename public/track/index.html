@@ -289,8 +289,8 @@
     // ✅ Ask More
     async function askMore(context){
       const res=await callPresiboAI({type:'followup',message:`Give more detail about ${context}`});
-      //const cleanRes = res.replace(/[*#]/g, '');
-      showPopup("🧠 "+res);
+      const cleanRes = res.replace(/[*#]/g, '');
+      showPopup("🧠 "+cleanRes);
     }
 
     // ✅ Load doctors from API
