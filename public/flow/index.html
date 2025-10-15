@@ -73,6 +73,7 @@
     .aiLink:hover { background-color: #3e8e41; }
     .aiLink:active { background-color: #2e6e31; }
     .aiLink:focus { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50; }
+    .notes-item { background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #6B21A8; }
   </style>
 </head>
 
@@ -168,23 +169,82 @@
         </div>
       </div>
 
-      <!-- Track Vitals (Repurposed for Professional Monitoring) -->
+      <!-- Monitor Key Metrics (Updated with 10 Clinical Metrics) -->
       <div class="card mb-5">
         <div class="card-body p-4">
           <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-chart-line me-2 text-primary"></i>Monitor Key Metrics</h2>
           <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-              <div class="input-card" onclick="openMetricModal('patient_throughput')">
-                <i class="fas fa-users text-primary text-2xl mb-2"></i>
-                <h5 class="mb-1">Patient Throughput</h5>
-                <p class="text-muted small mb-0">Track daily appointments</p>
+            <!-- Row 1 -->
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('blood_pressure')">
+                <i class="fas fa-heart text-danger text-2xl mb-2"></i>
+                <h6 class="mb-1">Blood Pressure</h6>
+                <p class="text-muted small mb-0">Systolic/Diastolic</p>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <div class="input-card" onclick="openMetricModal('response_time')">
-                <i class="fas fa-clock text-warning text-2xl mb-2"></i>
-                <h5 class="mb-1">Response Times</h5>
-                <p class="text-muted small mb-0">Log avg. handling time</p>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('heart_rate')">
+                <i class="fas fa-heartbeat text-warning text-2xl mb-2"></i>
+                <h6 class="mb-1">Heart Rate</h6>
+                <p class="text-muted small mb-0">Beats per min</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('respiratory_rate')">
+                <i class="fas fa-lungs text-info text-2xl mb-2"></i>
+                <h6 class="mb-1">Respiratory Rate</h6>
+                <p class="text-muted small mb-0">Breaths per min</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('body_temperature')">
+                <i class="fas fa-thermometer-half text-success text-2xl mb-2"></i>
+                <h6 class="mb-1">Body Temperature</h6>
+                <p class="text-muted small mb-0">Core temp</p>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('oxygen_saturation')">
+                <i class="fas fa-percentage text-primary text-2xl mb-2"></i>
+                <h6 class="mb-1">Oxygen Saturation</h6>
+                <p class="text-muted small mb-0">SpO2 %</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('pain_level')">
+                <i class="fas fa-exclamation-triangle text-warning text-2xl mb-2"></i>
+                <h6 class="mb-1">Pain Level</h6>
+                <p class="text-muted small mb-0">0-10 scale</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('weight')">
+                <i class="fas fa-weight text-secondary text-2xl mb-2"></i>
+                <h6 class="mb-1">Weight</h6>
+                <p class="text-muted small mb-0">kg</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('height')">
+                <i class="fas fa-ruler-vertical text-info text-2xl mb-2"></i>
+                <h6 class="mb-1">Height</h6>
+                <p class="text-muted small mb-0">cm</p>
+              </div>
+            </div>
+            <!-- Row 3 -->
+            <div class="col-md-4 mb-3">
+              <div class="input-card" onclick="openMetricModal('bmi')">
+                <i class="fas fa-chart-bar text-success text-2xl mb-2"></i>
+                <h6 class="mb-1">BMI</h6>
+                <p class="text-muted small mb-0">Body Mass Index</p>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="input-card" onclick="openMetricModal('blood_glucose')">
+                <i class="fas fa-tint text-danger text-2xl mb-2"></i>
+                <h6 class="mb-1">Blood Glucose</h6>
+                <p class="text-muted small mb-0">mg/dL</p>
               </div>
             </div>
           </div>
@@ -193,14 +253,29 @@
         </div>
       </div>
 
-      <!-- Modals (Adapted) -->
+      <!-- Clerk Notes Section -->
+      <div class="card mb-5">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-file-alt me-2 text-primary"></i>Clerking Notes & AI Analysis</h2>
+          <div class="row mb-4">
+            <div class="col-md-12 mb-3">
+              <textarea id="clerkNotes" class="form-control" rows="4" placeholder="Enter patient clerking notes: history, symptoms, examination findings..."></textarea>
+              <button id="analyzeNotes" class="btn btn-primary mt-2">Analyze with AI</button>
+            </div>
+          </div>
+          <h5 class="mb-3">Recent Notes & Analysis</h5>
+          <div id="recentNotes"></div>
+        </div>
+      </div>
+
+      <!-- Modals (Adapted for Metrics) -->
       <div class="modal fade" id="metricModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header"><h5 id="metricModalTitle" class="modal-title">Add Metric</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
               <form id="metricForm">
-                <div class="mb-3"><label id="metricLabel">Value</label><input id="metricValue" type="number" class="form-control" required></div>
+                <div class="mb-3"><label id="metricLabel">Value</label><input id="metricValue" type="text" class="form-control" placeholder="e.g., 120/80 for BP" required></div>
                 <button class="btn btn-primary w-100">Save Metric</button>
               </form>
             </div>
@@ -248,10 +323,13 @@
     const subscribeNow = document.getElementById('subscribeNow');
     const closeModal = document.getElementById('closeModal');
     const metricModal = new bootstrap.Modal(document.getElementById('metricModal'));
+    const analyzeNotesBtn = document.getElementById('analyzeNotes');
+    const recentMetrics = document.getElementById('recentMetrics');
+    const recentNotes = document.getElementById('recentNotes');
     let currentMetric = '';
 
     // Initial Welcome
-    addAIMessage("Hello! I'm Presibo Flow AI, your workflow assistant for Nigerian healthcare pros. How can I help automate your day? (e.g., 'Streamline billing')");
+    addAIMessage("Hello! I'm Presibo Flow AI, your medical workflow assistant for Nigerian healthcare professionals. How can I help? (e.g., 'optimizing medical consultations')");
 
     // Helpers
     function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
@@ -334,12 +412,12 @@
     }
 
     // AI Call
-    async function callAI(message) {
+    async function callAI(payload) {
       try {
         const res = await fetch(AI_API, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
+          body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error(`API returned ${res.status}`);
         const data = await res.json();
@@ -366,7 +444,7 @@
       chatArea.appendChild(typingEl);
       scrollToBottom();
       sendButton.disabled = true;
-      const aiResult = await callAI(text);
+      const aiResult = await callAI({ message: text });
       sendButton.disabled = false;
       typingEl.remove();
       if (!aiResult.ok) {
@@ -393,21 +471,49 @@
       });
     });
 
-    // Metric Modals (Adapted)
+    // Metric Modals (Updated)
     function openMetricModal(type) {
       currentMetric = type;
-      document.getElementById('metricModalTitle').textContent = `Add ${type.replace('_', ' ')} Metric`;
-      document.getElementById('metricLabel').textContent = `${type.replace('_', ' ')} Value`;
+      const labels = {
+        blood_pressure: 'Systolic/Diastolic (e.g., 120/80)',
+        heart_rate: 'Beats per minute',
+        respiratory_rate: 'Breaths per minute',
+        body_temperature: 'Celsius (e.g., 37.5)',
+        oxygen_saturation: 'SpO2 %',
+        pain_level: '0-10 scale',
+        weight: 'kg',
+        height: 'cm',
+        bmi: 'BMI value',
+        blood_glucose: 'mg/dL'
+      };
+      document.getElementById('metricModalTitle').textContent = `Log ${type.replace('_', ' ').toUpperCase()}`;
+      document.getElementById('metricLabel').textContent = labels[type] || 'Value';
+      document.getElementById('metricValue').placeholder = labels[type] || 'Enter value';
       metricModal.show();
     }
     document.getElementById('metricForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const value = document.getElementById('metricValue').value;
-      const reply = await callAI({ type: 'metric', message: `${currentMetric}: ${value}` });
-      const html = `<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>${currentMetric}</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${value}</strong></div></div><div class="mt-2 small text-muted">${reply.reply || reply}</div></div>`;
-      document.getElementById('recentMetrics').insertAdjacentHTML('afterbegin', html);
+      const aiResult = await callAI({ type: 'metric', message: `${currentMetric}: ${value}` });
+      const html = `<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>${currentMetric.replace('_', ' ').toUpperCase()}</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${value}</strong></div></div><div class="mt-2 small text-muted">${aiResult.reply || aiResult}</div></div>`;
+      recentMetrics.insertAdjacentHTML('afterbegin', html);
       metricModal.hide();
       e.target.reset();
+    });
+
+    // Clerk Notes Analysis
+    analyzeNotesBtn.addEventListener('click', async () => {
+      const notes = document.getElementById('clerkNotes').value.trim();
+      if (!notes) return alert('Please enter clerking notes.');
+      analyzeNotesBtn.disabled = true;
+      analyzeNotesBtn.textContent = 'Analyzing...';
+      const aiResult = await callAI({ type: 'clerking_notes', message: notes });
+      const analysis = aiResult.reply || 'Analysis unavailable.';
+      const html = `<div class="notes-item"><div class="d-flex justify-content-between"><div><strong>Clerking Notes</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-primary">Analyzed</span></div><div class="mt-2"><strong>Notes:</strong> ${escapeHtml(notes)}</div><div class="mt-2"><strong>AI Analysis:</strong> ${analysis}</div></div>`;
+      recentNotes.insertAdjacentHTML('afterbegin', html);
+      document.getElementById('clerkNotes').value = '';
+      analyzeNotesBtn.disabled = false;
+      analyzeNotesBtn.textContent = 'Analyze with AI';
     });
 
     // Subscription
