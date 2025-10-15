@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presibo Flow - Doctor Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="font-sans bg-gray-50">
+
+  <!-- Navigation -->
+  <nav class="bg-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/index.html" class="text-2xl font-bold text-blue-600">Presibo Flow</a>
+      <div class="space-x-6">
+        <a href="/index.html" class="text-gray-700 hover:text-blue-600">Home</a>
+        <a href="/fordoctors.html" class="text-gray-700 hover:text-blue-600">For Doctors</a>
+        <a href="/contact.html" class="text-gray-700 hover:text-blue-600">Contact</a>
+        <a href="https://api.presibo.com/index.html" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Medical Cloud API</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login Section -->
+  <section class="py-20 bg-gray-100 min-h-screen flex items-center">
+    <div class="container mx-auto px-4 max-w-md">
+      <div class="bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Doctor Login</h2>
+
+        <div id="errorBox" class="hidden bg-red-100 text-red-700 p-3 rounded mb-4 text-center"></div>
+
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input type="email" id="email" required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your email">
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your password">
+          </div>
+          <div class="text-center">
+            <button type="submit"
+              class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700">
+              Log In
+            </button>
+          </div>
+        </form>
+
+        <p class="mt-4 text-center text-sm text-gray-600">
+          Don’t have an account?
+          <a href="/fordoctors.html" class="text-blue-600 hover:underline">Sign Up</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12 text-center">
+    <div class="container mx-auto px-4">
+      <p>&copy; <span id="year"></span> Presibo Flow. All rights reserved.</p>
+      <div class="mt-4 space-x-4">
+        <a href="/index.html" class="text-blue-400 hover:underline">Presibo Flow</a>
+        <a href="/fordoctors.html" class="text-blue-400 hover:underline">For Doctors</a>
+        <a href="/contact.html" class="text-blue-400 hover:underline">Contact</a>
+        <a href="https://api.presibo.com/api.json" class="text-blue-400 hover:underline">API Docs</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Logic -->
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const loginForm = document.getElementById("loginForm");
+    const errorBox = document.getElementById("errorBox");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.add("hidden");
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        showError("Please enter both email and password.");
+        return;
+      }
+
+      try {
+        const apiUrl = "https://api.presibo.com/doctors/index.php?action=verify_password";
+
+        const payload = { email, password };
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const httpCode = response.status;
+        const rawResponse = await response.text();
+
+        let data = {};
+        try {
+          data = JSON.parse(rawResponse);
+        } catch {
+          console.warn("Invalid JSON returned:", rawResponse);
+        }
+
+        console.group("%cPresibo API Debug Log", "color:#2563eb;font-weight:bold;");
+        console.log({
+          http_code: httpCode,
+          raw_response: rawResponse,
+          decoded_response: data
+        });
+        console.groupEnd();
+
+        if (httpCode === 200 && data.message && data.message.toLowerCase().includes("verified")) {
+          localStorage.setItem("doctor_email", email);
+          console.info("✅ Login successful. Redirecting...");
+          window.location.href = "/dashboard.html";
+        } else {
+          const errorMsg = data.error || data.message || "Invalid login credentials. Please try again.";
+          showError(errorMsg);
+          console.error("Login Error:", errorMsg);
+        }
+
+      } catch (error) {
+        console.error("Network/Fetch Error:", error);
+        showError("Unable to connect. Please check your network or try again later.");
+      }
+    });
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
