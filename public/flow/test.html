@@ -74,6 +74,10 @@
     .aiLink:active { background-color: #2e6e31; }
     .aiLink:focus { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50; }
     .notes-item { background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #6B21A8; }
+    .continue-chat { cursor: pointer; color: #3B82F6; text-decoration: underline; font-size: 0.875rem; }
+    .continue-chat:hover { color: #1D4ED8; }
+    .chat-continue-input { display: none; margin-top: 8px; }
+    .chat-continue-input.active { display: block; }
   </style>
 </head>
 
@@ -328,6 +332,7 @@
     let freeLimit = 5;
     let remaining = freeLimit;
     let isSubscribed = false;
+    let noteCounter = 0; // For unique IDs
 
     // DOM Elements
     const chatArea = document.getElementById('chatArea');
@@ -527,12 +532,56 @@
       analyzeNotesBtn.textContent = 'Analyzing...';
       const aiResult = await callAI({ type: 'clerking_notes', message: notes });
       const analysis = aiResult.reply || 'Analysis unavailable.';
-      const html = `<div class="notes-item"><div class="d-flex justify-content-between"><div><strong>Clerking Notes</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-primary">Analyzed</span></div><div class="mt-2"><strong>Notes:</strong> ${escapeHtml(notes)}</div><div class="mt-2"><strong>AI Analysis:</strong> ${analysis}</div></div>`;
+      const noteId = 'note-' + (++noteCounter);
+      const html = `
+        <div class="notes-item" id="${noteId}">
+          <div class="d-flex justify-content-between">
+            <div><strong>Clerking Notes</strong><br><small>${new Date().toLocaleString()}</small></div>
+            <span class="badge bg-primary">Analyzed</span>
+          </div>
+          <div class="mt-2"><strong>Notes:</strong> ${escapeHtml(notes)}</div>
+          <div class="mt-2"><strong>AI Analysis:</strong> ${analysis}</div>
+          <div class="continue-chat mt-2" onclick="toggleContinueChat('${noteId}', '${escapeHtml(notes)}', '${escapeHtml(analysis)}')">
+            🔍 Continue Chat on This Analysis
+          </div>
+          <div id="continue-${noteId}" class="chat-continue-input">
+            <input type="text" class="form-control form-control-sm mb-1" id="continueInput-${noteId}" placeholder="Ask follow-up questions...">
+            <button class="btn btn-sm btn-outline-primary" onclick="sendContinueChat('${noteId}', '${escapeHtml(notes)}', '${escapeHtml(analysis)}')">Send</button>
+          </div>
+        </div>`;
       recentNotes.insertAdjacentHTML('afterbegin', html);
       document.getElementById('clerkNotes').value = '';
       analyzeNotesBtn.disabled = false;
       analyzeNotesBtn.textContent = 'Analyze with AI';
     });
+
+    // Toggle Continue Chat
+    function toggleContinueChat(noteId, notes, analysis) {
+      const inputDiv = document.getElementById(`continue-${noteId}`);
+      if (inputDiv.classList.contains('active')) {
+        inputDiv.classList.remove('active');
+      } else {
+        inputDiv.classList.add('active');
+        document.getElementById(`continueInput-${noteId}`).focus();
+      }
+    }
+
+    // Send Continue Chat
+    async function sendContinueChat(noteId, notes, analysis) {
+      const input = document.getElementById(`continueInput-${noteId}`);
+      const query = input.value.trim();
+      if (!query) return;
+      const loadingModalInstance = new bootstrap.Modal(document.getElementById('loadingModal'));
+      loadingModalInstance.show();
+      const context = `Previous notes: ${notes}\nPrevious analysis: ${analysis}\nFollow-up query: ${query}`;
+      const aiResult = await callAI({ type: 'clerking_followup', message: context });
+      loadingModalInstance.hide();
+      const followUpHtml = `<div class="mt-3 p-2 bg-light rounded"><strong>Your Query:</strong> ${escapeHtml(query)}</div><div class="mt-2"><strong>AI Response:</strong> ${aiResult.reply || 'No response.'}</div>`;
+      const noteItem = document.getElementById(noteId);
+      const continueDiv = document.getElementById(`continue-${noteId}`);
+      continueDiv.innerHTML += followUpHtml + '<hr class="my-2"><div class="continue-chat mt-2" onclick="toggleContinueChat(\'' + noteId + '\', \'' + escapeHtml(notes) + '\', \'' + escapeHtml(analysis) + '\')">+ Add Another Question</div>';
+      input.value = '';
+    }
 
     // Subscription
     closeModal.addEventListener('click', () => subscriptionModal.classList.remove('active'));
