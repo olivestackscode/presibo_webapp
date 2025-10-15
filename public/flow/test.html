@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo Flow AI - Healthcare Workflow Assistant</title>
+  <meta name="description" content="Presibo Flow AI: Automate your healthcare workflows with AI-powered insights for Nigerian doctors, hospitals, and professionals. Streamline scheduling, integrations, and monitoring.">
+  <meta name="keywords" content="Presibo Flow AI, Healthcare Workflow, AI Assistant Nigeria, Medical Automation, EHR Integration">
+
+  <!-- Favicons -->
+  <link href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" rel="icon">
+  <link href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tracking-hero { background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%); color: white; padding: 80px 0; text-align: center; }
+    .input-card { border: 2px dashed #D1D5DB; border-radius: 12px; padding: 24px; text-align: center; transition: border-color 0.3s ease; cursor: pointer; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .input-card:hover { border-color: #10B981; background-color: rgba(16, 185, 129, 0.05); }
+    .reading-item, .meal-item { background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .reading-item { border-left: 4px solid #10B981; }
+    .meal-item { border-left: 4px solid #F97316; }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-normal { background: #DCFCE7; color: #166534; }
+    .status-elevated { background: #FEF3C7; color: #92400E; }
+    .status-high { background: #FECACA; color: #DC2626; }
+    .status-unknown { background: #F3F4F6; color: #6B7280; }
+    .chat-area { max-height: 500px; overflow-y: auto; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .presibo-flow-table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .presibo-flow-table th { background: #3B82F6; color: white; padding: 12px; text-align: left; font-weight: 600; }
+    .presibo-flow-table td { padding: 12px; border-bottom: 1px solid #E5E7EB; vertical-align: top; }
+    .presibo-flow-table td.ai-tables { background: #F9FAFB; font-size: 14px; line-height: 1.5; }
+    .presibo-flow-table tr:last-child td { border-bottom: none; }
+    @media (max-width: 768px) { .tracking-hero { padding: 60px 0; } }
+    .hidden { display: none; }
+    .scroll-area { height: 500px; overflow-y: auto; padding-right: 1rem; }
+    .dialog-overlay { position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000; }
+    .dialog-overlay.active { display:flex; }
+    .dialog-content { background:white;border-radius:.5rem;max-width:28rem;width:100%;padding:1.5rem;}
+    .input { width:100%; padding:.75rem; border:1px solid #e5e7eb; border-radius:.5rem; outline:none; }
+    .animate-bounce { animation: bounce 1s infinite; }
+    .bg-purple-600 {background: linear-gradient(135deg, #8b5cf6, #7c3aed);}
+    @keyframes bounce { 0%,100%{ transform:translateY(0);}50%{ transform:translateY(-5px);} }
+    .aiLink { display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; text-decoration: none; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; transition: background-color 0.3s ease; }
+    .aiLink:hover { background-color: #3e8e41; }
+    .aiLink:active { background-color: #2e6e31; }
+    .aiLink:focus { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50; }
+    .notes-item { background: #F8FAFC; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #6B21A8; }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm fixed-top">
+    <div class="container-xl">
+      <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/"><h1 class="mb-0">Presibo Flow</h1></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link active" href="flow-ai.html">Flow AI</a></li>
+            <li class="nav-item"><a class="nav-link" href="/integrations">Integrations</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://app.presibo.com/login">Login</a></li>
+            <li class="nav-item"><a class="nav-link btn btn-success ms-2" href="https://app.presibo.com/join">Sign Up</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-5 mt-5">
+    <section class="tracking-hero">
+      <div class="container">
+        <h1 class="display-5 mb-3">Presibo Flow AI Assistant</h1>
+        <p class="lead mb-0">Automate workflows, gain AI insights, and optimize your practice. Tailored for Nigerian healthcare professionals.</p>
+      </div>
+    </section>
+
+    <div class="container my-5">
+      <!-- Quick Questions for Professionals -->
+      <div class="bg-white shadow rounded-lg p-4 mb-4">
+        <h3 class="font-semibold mb-3">Quick Workflow Queries:</h3>
+        <div class="flex flex-wrap gap-2">
+          <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="How do I automate appointment scheduling?">Automate Scheduling</button>
+          <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Integrate with EHR systems">EHR Integration</button>
+          <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Predictive diagnostics for chronic conditions">Predictive Diagnostics</button>
+          <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Monitor performance KPIs">Performance Monitoring</button>
+          <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Secure lab result delivery">Lab Integration</button>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Chat -->
+        <div class="lg:col-span-2">
+          <div class="bg-white shadow rounded-lg flex flex-col min-h-[500px]">
+            <div class="p-6"><h2 class="text-lg font-semibold">AI Workflow Assistant</h2></div>
+            <div class="flex-1 px-6">
+              <div id="chatArea" class="scroll-area">
+                <!-- messages render here -->
+              </div>
+            </div>
+            <div class="separator h-px bg-gray-100"></div>
+            <div class="p-6 flex gap-2">
+              <input id="chatInput" class="input flex-1" placeholder="Ask about workflows, integrations, or insights (e.g., 'Automate billing')..." />
+              <button id="sendButton" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="bg-white shadow rounded-lg p-4">
+            <h3 class="font-semibold mb-3">Suggested Professional Queries</h3>
+            <div class="space-y-2">
+              <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="How to set up secure integrations with pharmacies?">Pharmacy Integration</button>
+              <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Generate AI insights for patient data trends">Patient Insights</button>
+              <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Scale automation for multi-clinic setup">Scale Automation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow Recommendations (hidden until results) -->
+      <div id="workflowRecommendations" class="hidden mt-4">
+        <div class="bg-white shadow rounded-lg">
+          <div class="p-6">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Recommended Workflow Tools
+            </h2>
+          </div>
+          <div id="workflowList" class="p-6 pt-0 grid gap-4"></div>
+        </div>
+      </div>
+
+      <!-- Monitor Key Metrics (Updated with 10 Clinical Metrics) -->
+      <div class="card mb-5">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-chart-line me-2 text-primary"></i>Monitor Key Metrics</h2>
+          <div class="row mb-4">
+            <!-- Row 1 -->
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('blood_pressure')">
+                <i class="fas fa-heart text-danger text-2xl mb-2"></i>
+                <h6 class="mb-1">Blood Pressure</h6>
+                <p class="text-muted small mb-0">Systolic/Diastolic</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('heart_rate')">
+                <i class="fas fa-heartbeat text-warning text-2xl mb-2"></i>
+                <h6 class="mb-1">Heart Rate</h6>
+                <p class="text-muted small mb-0">Beats per min</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('respiratory_rate')">
+                <i class="fas fa-lungs text-info text-2xl mb-2"></i>
+                <h6 class="mb-1">Respiratory Rate</h6>
+                <p class="text-muted small mb-0">Breaths per min</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('body_temperature')">
+                <i class="fas fa-thermometer-half text-success text-2xl mb-2"></i>
+                <h6 class="mb-1">Body Temperature</h6>
+                <p class="text-muted small mb-0">Core temp</p>
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('oxygen_saturation')">
+                <i class="fas fa-percentage text-primary text-2xl mb-2"></i>
+                <h6 class="mb-1">Oxygen Saturation</h6>
+                <p class="text-muted small mb-0">SpO2 %</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('pain_level')">
+                <i class="fas fa-exclamation-triangle text-warning text-2xl mb-2"></i>
+                <h6 class="mb-1">Pain Level</h6>
+                <p class="text-muted small mb-0">0-10 scale</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('weight')">
+                <i class="fas fa-weight text-secondary text-2xl mb-2"></i>
+                <h6 class="mb-1">Weight</h6>
+                <p class="text-muted small mb-0">kg</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-card" onclick="openMetricModal('height')">
+                <i class="fas fa-ruler-vertical text-info text-2xl mb-2"></i>
+                <h6 class="mb-1">Height</h6>
+                <p class="text-muted small mb-0">cm</p>
+              </div>
+            </div>
+            <!-- Row 3 -->
+            <div class="col-md-4 mb-3">
+              <div class="input-card" onclick="openMetricModal('bmi')">
+                <i class="fas fa-chart-bar text-success text-2xl mb-2"></i>
+                <h6 class="mb-1">BMI</h6>
+                <p class="text-muted small mb-0">Body Mass Index</p>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="input-card" onclick="openMetricModal('blood_glucose')">
+                <i class="fas fa-tint text-danger text-2xl mb-2"></i>
+                <h6 class="mb-1">Blood Glucose</h6>
+                <p class="text-muted small mb-0">mg/dL</p>
+              </div>
+            </div>
+          </div>
+          <h5 class="mb-3">Recent Metrics</h5>
+          <div id="recentMetrics"></div>
+        </div>
+      </div>
+
+      <!-- Clerk Notes Section -->
+      <div class="card mb-5">
+        <div class="card-body p-4">
+          <h2 class="card-title mb-4 d-flex align-items-center"><i class="fas fa-file-alt me-2 text-primary"></i>Clerking Notes & AI Analysis</h2>
+          <div class="row mb-4">
+            <div class="col-md-12 mb-3">
+              <textarea id="clerkNotes" class="form-control" rows="4" placeholder="Enter patient clerking notes: history, symptoms, examination findings..."></textarea>
+              <button id="analyzeNotes" class="btn btn-primary mt-2">Analyze with AI</button>
+            </div>
+          </div>
+          <h5 class="mb-3">Recent Notes & Analysis</h5>
+          <div id="recentNotes"></div>
+        </div>
+      </div>
+
+      <!-- Modals (Adapted for Metrics) -->
+      <div class="modal fade" id="metricModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header"><h5 id="metricModalTitle" class="modal-title">Add Metric</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              <form id="metricForm">
+                <div class="mb-3"><label id="metricLabel">Value</label><input id="metricValue" type="text" class="form-control" placeholder="e.g., 120/80 for BP" required></div>
+                <button class="btn btn-primary w-100">Save Metric</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Subscription Modal (Adapted for Pro) -->
+  <div id="subscriptionModal" class="dialog-overlay">
+    <div class="dialog-content">
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="text-lg font-semibold">Flow AI Pro Subscription</h2>
+      </div>
+      <div class="space-y-4">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600 mb-2">₦5,000</div>
+          <div class="text-sm text-gray-600">per month</div>
+        </div>
+        <div class="space-y-2">
+          <button id="subscribeNow" class="w-full bg-purple-600 text-white py-2 rounded-lg">Subscribe for ₦5,000/month</button>
+          <button id="closeModal" class="w-full border border-gray-200 py-2 rounded-lg">Maybe Later</button>
+        </div>
+        <div class="text-xs text-gray-500 text-center">Unlimited workflows & advanced insights.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js" async></script>
+
+  <script>
+    // Config / State
+    const AI_API = 'https://api.presibo.com/ai/flow.php';
+    let freeLimit = 5;
+    let remaining = freeLimit;
+    let isSubscribed = false;
+
+    // DOM Elements
+    const chatArea = document.getElementById('chatArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const subscriptionModal = document.getElementById('subscriptionModal');
+    const subscribeNow = document.getElementById('subscribeNow');
+    const closeModal = document.getElementById('closeModal');
+    const metricModal = new bootstrap.Modal(document.getElementById('metricModal'));
+    const analyzeNotesBtn = document.getElementById('analyzeNotes');
+    const recentMetrics = document.getElementById('recentMetrics');
+    const recentNotes = document.getElementById('recentNotes');
+    let currentMetric = '';
+
+    // Initial Welcome
+    addAIMessage("Hello! I'm Presibo Flow AI, your workflow assistant for Nigerian healthcare pros. How can I help automate your day? (e.g., 'Streamline billing')");
+
+    // Helpers
+    function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
+
+    function createMessageElement({ type, content, timestamp = new Date(), isSubscriptionError = false }) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-3`;
+      const bubbleColor = type === 'user' ? 'bg-blue-600 text-white' : isSubscriptionError ? 'bg-red-50 border border-red-200 text-red-800' : 'bg-gray-100 text-gray-900';
+      wrapper.innerHTML = `
+        <div class="flex gap-2 max-w-[80%] ${type === 'user' ? 'flex-row-reverse' : 'flex-row'}">
+          <div class="${type === 'user' ? 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center' : 'w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center'}">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              ${type === 'user' ? '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>' : '<path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path>'}
+            </svg>
+          </div>
+          <div class="rounded-lg p-3 ${bubbleColor}">
+            <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
+            ${isSubscriptionError ? `<div class="mt-3 pt-3 border-t border-red-200"><button class="subscribe-now w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">Subscribe</button><span class="text-xs text-red-600 mt-2 block">Free limit reached. Subscribe for unlimited access.</span></div>` : ''}
+            <div class="text-xs opacity-70 mt-1">${new Date(timestamp).toLocaleTimeString()}</div>
+          </div>
+        </div>
+      `;
+      setTimeout(() => {
+        const btn = wrapper.querySelector('.subscribe-now');
+        if (btn) btn.addEventListener('click', () => subscriptionModal.classList.add('active'));
+      }, 0);
+      return wrapper;
+    }
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
+    function addUserMessage(text) {
+      const el = createMessageElement({ type: 'user', content: text });
+      chatArea.appendChild(el);
+      scrollToBottom();
+    }
+
+    function addAIMessage(text) {
+      const cleanText = removeFormatting(text);
+      const el = createMessageElement({ type: 'ai', content: '' });
+      const tableHtml = `<table class="presibo-flow-table"><tr><th>Section</th><th>Details</th></tr>${cleanText}</table>`;
+      el.querySelector('.text-sm').innerHTML = tableHtml;
+      wordToLink(el);
+      makeArrayClickable(el);
+      chatArea.appendChild(el);
+      scrollToBottom();
+    }
+
+    function addSubscriptionErrorMessage(text) {
+      const el = createMessageElement({ type: 'error', content: text, isSubscriptionError: true });
+      chatArea.appendChild(el);
+      scrollToBottom();
+    }
+
+    function removeFormatting(text) {
+      return text.replace(/[*#]/g, '').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/##(.*?)##/g, '<h2>$1</h2>');
+    }
+
+    function wordToLink(element) {
+      const text = element.innerHTML;
+      element.innerHTML = text.replace(/'"Book Integration"'/gi, `<a href="https://flow.presibo.com/integrations" target="_blank" class="aiLink">Book Integration</a>`);
+    }
+
+    function makeArrayClickable(element) {
+      const arrays = element.querySelectorAll('span');
+      arrays.forEach(array => {
+        const content = array.textContent;
+        if (content.startsWith('[') && content.endsWith(']')) {
+          const link = document.createElement('a');
+          link.href = content.slice(1, -1);
+          link.textContent = content;
+          link.className = 'aiLink';
+          array.replaceWith(link);
+          link.addEventListener('click', () => console.log(`Link clicked: ${link.href}`));
+        }
+      });
+    }
+
+    // AI Call
+    async function callAI(payload) {
+      try {
+        const res = await fetch(AI_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
+        const data = await res.json();
+        return { ok: true, reply: data.reply || 'No response.' };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
+
+    // Send Message
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      if (!isSubscribed && remaining <= 0) {
+        addSubscriptionErrorMessage('Free limit reached. Subscribe for unlimited workflow assistance.');
+        subscriptionModal.classList.add('active');
+        return;
+      }
+      addUserMessage(text);
+      chatInput.value = '';
+      const typingEl = document.createElement('div');
+      typingEl.className = 'flex justify-start mb-3';
+      typingEl.innerHTML = `<div class="flex gap-2"><div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path></svg></div><div class="bg-gray-100 rounded-lg p-3"><div class="flex gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div></div></div></div>`;
+      chatArea.appendChild(typingEl);
+      scrollToBottom();
+      sendButton.disabled = true;
+      const aiResult = await callAI({ message: text });
+      sendButton.disabled = false;
+      typingEl.remove();
+      if (!aiResult.ok) {
+        addAIMessage('Service temporarily unavailable. Try again.');
+        return;
+      }
+      addAIMessage(aiResult.reply);
+      if (!isSubscribed) {
+        remaining = Math.max(0, remaining - 1);
+        if (remaining <= 0) {
+          // Update UI for exhausted limit
+          document.querySelector('#usageStatus') ? (document.querySelector('#usageStatus').innerHTML = '<div class="text-red-800 font-medium">Limit Exhausted</div><div class="text-xs text-red-600">Subscribe for more</div>') : null;
+        }
+      }
+    }
+
+    // Events
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+    document.querySelectorAll('.quick-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        chatInput.value = btn.dataset.question;
+        setTimeout(sendMessage, 120);
+      });
+    });
+
+    // Metric Modals (Updated)
+    function openMetricModal(type) {
+      currentMetric = type;
+      const labels = {
+        blood_pressure: 'Systolic/Diastolic (e.g., 120/80)',
+        heart_rate: 'Beats per minute',
+        respiratory_rate: 'Breaths per minute',
+        body_temperature: 'Celsius (e.g., 37.5)',
+        oxygen_saturation: 'SpO2 %',
+        pain_level: '0-10 scale',
+        weight: 'kg',
+        height: 'cm',
+        bmi: 'BMI value',
+        blood_glucose: 'mg/dL'
+      };
+      document.getElementById('metricModalTitle').textContent = `Log ${type.replace('_', ' ').toUpperCase()}`;
+      document.getElementById('metricLabel').textContent = labels[type] || 'Value';
+      document.getElementById('metricValue').placeholder = labels[type] || 'Enter value';
+      metricModal.show();
+    }
+    document.getElementById('metricForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const value = document.getElementById('metricValue').value;
+      const aiResult = await callAI({ type: 'metric', message: `${currentMetric}: ${value}` });
+      const html = `<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>${currentMetric.replace('_', ' ').toUpperCase()}</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${value}</strong></div></div><div class="mt-2 small text-muted">${aiResult.reply || aiResult}</div></div>`;
+      recentMetrics.insertAdjacentHTML('afterbegin', html);
+      metricModal.hide();
+      e.target.reset();
+    });
+
+    // Clerk Notes Analysis
+    analyzeNotesBtn.addEventListener('click', async () => {
+      const notes = document.getElementById('clerkNotes').value.trim();
+      if (!notes) return alert('Please enter clerking notes.');
+      analyzeNotesBtn.disabled = true;
+      analyzeNotesBtn.textContent = 'Analyzing...';
+      const aiResult = await callAI({ type: 'clerking_notes', message: notes });
+      const analysis = aiResult.reply || 'Analysis unavailable.';
+      const html = `<div class="notes-item"><div class="d-flex justify-content-between"><div><strong>Clerking Notes</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-primary">Analyzed</span></div><div class="mt-2"><strong>Notes:</strong> ${escapeHtml(notes)}</div><div class="mt-2"><strong>AI Analysis:</strong> ${analysis}</div></div>`;
+      recentNotes.insertAdjacentHTML('afterbegin', html);
+      document.getElementById('clerkNotes').value = '';
+      analyzeNotesBtn.disabled = false;
+      analyzeNotesBtn.textContent = 'Analyze with AI';
+    });
+
+    // Subscription
+    closeModal.addEventListener('click', () => subscriptionModal.classList.remove('active'));
+    subscribeNow.addEventListener('click', () => {
+      const email = prompt('Enter email for receipt:') || 'pro@example.com';
+      subscribeNow.disabled = true;
+      subscribeNow.textContent = 'Processing...';
+      if (!window.PaystackPop) {
+        alert('Payment loading...');
+        subscribeNow.disabled = false;
+        subscribeNow.textContent = 'Subscribe for ₦5,000/month';
+        return;
+      }
+      const handler = PaystackPop.setup({
+        key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // Replace with actual key
+        email,
+        amount: 500000, // ₦5,000 in kobo
+        onSuccess: () => {
+          isSubscribed = true;
+          subscriptionModal.classList.remove('active');
+          alert('Pro subscription active!');
+          subscribeNow.disabled = false;
+          subscribeNow.textContent = 'Subscribed!';
+        },
+        onCancel: () => {
+          subscribeNow.disabled = false;
+          subscribeNow.textContent = 'Subscribe for ₦5,000/month';
+        }
+      });
+      handler.openIframe();
+    });
+  </script>
+</body>
+</html>
