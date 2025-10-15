@@ -221,7 +221,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
+        const cleanRes = res.replace(/[*#]/g, '');
+        const data = await cleanRes.json();
         return data.reply || "No response from AI.";
       } catch (err) {
         console.error("AI Error:", err);
@@ -285,7 +286,8 @@
     // ✅ Ask More
     async function askMore(context){
       const res=await callPresiboAI({type:'followup',message:`Give more detail about ${context}`});
-      showPopup("🧠 "+res);
+      const cleanRes = res.replace(/[*#]/g, '');
+      showPopup("🧠 "+cleanRes);
     }
 
     // ✅ Load doctors from API
@@ -323,7 +325,7 @@
       closeBtn.removeEventListener('click', closeModal);
       okBtn.removeEventListener('click', closeModal);
       //window.location = "/"; // ✅ login after closing modal
-      !email ? window.location = "/" : window.location.reload();
+      //!email ? window.location = "/" : window.location.reload();
 
       
     }
@@ -331,6 +333,7 @@
     closeBtn.addEventListener('click', closeModal);
     okBtn.addEventListener('click', closeModal);
   }
+    
   </script>
 </body>
 </html>
