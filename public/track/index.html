@@ -222,7 +222,7 @@
           body: JSON.stringify(payload)
         });
         const cleanRes = res.replace(/[*#]/g, '');
-        const data = await cleanRes.json();
+        const data = await res.json();
         return data.reply || "No response from AI.";
       } catch (err) {
         console.error("AI Error:", err);
