@@ -254,7 +254,8 @@
       const s=document.getElementById('systolic').value;
       const d=document.getElementById('diastolic').value;
       const reply=await callPresiboAI({type:'blood_pressure',message:`Blood pressure reading: ${s}/${d}`});
-      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Pressure</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${s}/${d}</strong></div></div><div class="mt-2 small text-muted">${reply}</div><a class="text-primary small mt-1 d-block" onclick="askMore('BP ${s}/${d}')">View More...</a></div>`;
+      const cleanReply = reply.replace(/[*#]/g, '');
+      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Pressure</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${s}/${d}</strong></div></div><div class="mt-2 small text-muted">${cleanReply}</div><a class="text-primary small mt-1 d-block" onclick="askMore('BP ${s}/${d}')">View More...</a></div>`;
       document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
       bpModal.hide();
       e.target.reset();
@@ -265,7 +266,8 @@
       e.preventDefault();
       const val=document.getElementById('bloodSugar').value;
       const reply=await callPresiboAI({type:'blood_sugar',message:`Blood sugar reading: ${val}`});
-      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Sugar</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${val} mg/dL</strong></div></div><div class="mt-2 small text-muted">${reply}</div><a class="text-primary small mt-1 d-block" onclick="askMore('Blood sugar ${val}')">View More...</a></div>`;
+      const cleanReply = reply.replace(/[*#]/g, '');
+      const html=`<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>Blood Sugar</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${val} mg/dL</strong></div></div><div class="mt-2 small text-muted">${cleanReply}</div><a class="text-primary small mt-1 d-block" onclick="askMore('Blood sugar ${val}')">View More...</a></div>`;
       document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
       bsModal.hide();
       e.target.reset();
@@ -277,7 +279,8 @@
       const meal=document.getElementById('mealName').value;
       const desc=document.getElementById('mealDesc').value;
       const reply=await callPresiboAI({type:'meal',message:`Meal: ${currentMeal} - ${meal}. Description: ${desc}`});
-      const html=`<div class="meal-item"><div class="d-flex justify-content-between"><div><strong>${currentMeal} - ${meal}</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-success">Completed</span></div><div class="mt-2 small text-muted">${reply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('${meal}')">View More...</a></div>`;
+      const cleanReply = reply.replace(/[*#]/g, '');
+      const html=`<div class="meal-item"><div class="d-flex justify-content-between"><div><strong>${currentMeal} - ${meal}</strong><br><small>${new Date().toLocaleString()}</small></div><span class="badge bg-success">Completed</span></div><div class="mt-2 small text-muted">${cleanReply}</div><a href="#" class="text-primary small mt-1 d-block" onclick="askMore('${meal}')">View More...</a></div>`;
       document.getElementById('recentMeals').insertAdjacentHTML('afterbegin',html);
       mealModal.hide();
       e.target.reset();
