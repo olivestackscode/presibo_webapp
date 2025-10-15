@@ -135,7 +135,7 @@
             </div>
             <div class="separator h-px bg-gray-100"></div>
             <div class="p-6 flex gap-2">
-              <input id="chatInput" class="input flex-1" placeholder="Ask about workflows, integrations, or insights (e.g., 'Automate billing')..." />
+              <input id="chatInput" class="input flex-1" placeholder="Ask about medical workflows or patient insights..." />
               <button id="sendButton" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
               </button>
@@ -282,6 +282,20 @@
           </div>
         </div>
       </div>
+
+      <!-- Loading Modal -->
+      <div class="modal fade" id="loadingModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center p-4">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mb-0">Loading results...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -323,6 +337,7 @@
     const subscribeNow = document.getElementById('subscribeNow');
     const closeModal = document.getElementById('closeModal');
     const metricModal = new bootstrap.Modal(document.getElementById('metricModal'));
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     const analyzeNotesBtn = document.getElementById('analyzeNotes');
     const recentMetrics = document.getElementById('recentMetrics');
     const recentNotes = document.getElementById('recentNotes');
@@ -494,7 +509,10 @@
     document.getElementById('metricForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const value = document.getElementById('metricValue').value;
+      const loadingModalInstance = new bootstrap.Modal(document.getElementById('loadingModal'));
+      loadingModalInstance.show();
       const aiResult = await callAI({ type: 'metric', message: `${currentMetric}: ${value}` });
+      loadingModalInstance.hide();
       const html = `<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>${currentMetric.replace('_', ' ').toUpperCase()}</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${value}</strong></div></div><div class="mt-2 small text-muted">${aiResult.reply || aiResult}</div></div>`;
       recentMetrics.insertAdjacentHTML('afterbegin', html);
       metricModal.hide();
