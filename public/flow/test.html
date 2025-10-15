@@ -556,15 +556,32 @@
     });
 
     // Toggle Continue Chat
-    function toggleContinueChat(noteId, notes, analysis) {
-      const inputDiv = document.getElementById(`continue-${noteId}`);
-      if (inputDiv.classList.contains('active')) {
-        inputDiv.classList.remove('active');
-      } else {
-        inputDiv.classList.add('active');
-        document.getElementById(`continueInput-${noteId}`).focus();
+    // Replace existing toggleContinueChat with this
+function toggleContinueChat(noteId /*, ...ignored */) {
+  try {
+    // Defensive: only use the first arg as the note id
+    if (!noteId) return;
+
+    const contId = `continue-${noteId}`;
+    const inputDiv = document.getElementById(contId);
+    if (!inputDiv) return;
+
+    // Toggle visibility class
+    inputDiv.classList.toggle('active');
+
+    // If now active, focus the input inside (if present)
+    if (inputDiv.classList.contains('active')) {
+      const input = document.getElementById(`continueInput-${noteId}`);
+      if (input) {
+        // small timeout to ensure element is visible before focus
+        setTimeout(() => input.focus(), 50);
       }
     }
+  } catch (err) {
+    console.error('toggleContinueChat error', err);
+  }
+}
+
 
     // Send Continue Chat
     async function sendContinueChat(noteId, notes, analysis) {
