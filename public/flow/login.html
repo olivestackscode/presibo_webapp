@@ -125,7 +125,7 @@
         if (httpCode === 200 && data.message && data.message.toLowerCase().includes("verified")) {
           localStorage.setItem("doctor_email", email);
           console.info("✅ Login successful. Redirecting...");
-          window.location.href = "/dashboard.html";
+          //window.location.href = "/dashboard.html";
         } else {
           const errorMsg = data.error || data.message || "Invalid login credentials. Please try again.";
           showError(errorMsg);
