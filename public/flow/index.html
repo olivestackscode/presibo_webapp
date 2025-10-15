@@ -282,6 +282,20 @@
           </div>
         </div>
       </div>
+
+      <!-- Loading Modal -->
+      <div class="modal fade" id="loadingModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center p-4">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mb-0">Loading results...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -323,6 +337,7 @@
     const subscribeNow = document.getElementById('subscribeNow');
     const closeModal = document.getElementById('closeModal');
     const metricModal = new bootstrap.Modal(document.getElementById('metricModal'));
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     const analyzeNotesBtn = document.getElementById('analyzeNotes');
     const recentMetrics = document.getElementById('recentMetrics');
     const recentNotes = document.getElementById('recentNotes');
@@ -494,7 +509,10 @@
     document.getElementById('metricForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const value = document.getElementById('metricValue').value;
+      const loadingModalInstance = new bootstrap.Modal(document.getElementById('loadingModal'));
+      loadingModalInstance.show();
       const aiResult = await callAI({ type: 'metric', message: `${currentMetric}: ${value}` });
+      loadingModalInstance.hide();
       const html = `<div class="reading-item"><div class="d-flex justify-content-between"><div><strong>${currentMetric.replace('_', ' ').toUpperCase()}</strong><br><small>${new Date().toLocaleString()}</small></div><div><strong>${value}</strong></div></div><div class="mt-2 small text-muted">${aiResult.reply || aiResult}</div></div>`;
       recentMetrics.insertAdjacentHTML('afterbegin', html);
       metricModal.hide();
