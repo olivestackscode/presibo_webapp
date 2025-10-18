@@ -1,21 +1,44 @@
-<html>
-  <body>
-    <h1>Dashboard</h1>
-  </body>
-  <script>
-    
 let counter = 0;
 let pageName = '/dashboard';
+let userEmail = 'user@example.com'; // Replace with actual user email
+let startTime = new Date();
 
-async function onloadcount() {
+fetch('https:                             
+  .then(response => response.json())
+  .then(data => {
+    let userIp = data.ip;
+    onloadcount(userIp);
+  })
+  .catch(error => console.error(error));
+
+async function onloadcount(userIp) {
   counter++;
+  let currentTime = new Date();
+  let timeSpent = (currentTime - startTime) / 1000;                         
   try {
-    const response = await fetch('https://api.presibo.com/counter/index.php', {
+    const response = await fetch('//api.ipify.org?format=json')
+  .then(response => response.json())
+  .then(data => {
+    let userIp = data.ip;
+    onloadcount(userIp);
+  })
+  .catch(error => console.error(error));
+
+async function onloadcount(userIp) {
+  counter++;
+  let currentTime = new Date();
+  let timeSpent = (currentTime - startTime) / 1000; // Time spent in seconds
+  try {
+    const response = await fetch('/api/counter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         pageName: pageName,
         count: counter,
+        userEmail: userEmail,
+        userIp: userIp,
+        timeSpent: timeSpent,
+        currentTime: currentTime.toISOString(),
       }),
     });
     const data = await response.json();
@@ -23,11 +46,5 @@ async function onloadcount() {
   } catch (error) {
     console.error(error);
   }
-  onloadcount(); // Recursive call
+  setTimeout(() => onloadcount(userIp), 1000); // Schedule the next call every 1 second
 }
-
-// Call the function initially
-onloadcount();
-
-      </script>
-</html>
