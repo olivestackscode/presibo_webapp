@@ -1,0 +1,24 @@
+let counter = 0;
+let pageName = '/dashboard';
+
+async function onloadcount() {
+  counter++;
+  try {
+    const response = await fetch('https://api.presibo.com/counter/index.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pageName: pageName,
+        count: counter,
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+  onloadcount(); // Recursive call
+}
+
+// Call the function initially
+onloadcount();
