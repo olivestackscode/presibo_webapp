@@ -863,6 +863,137 @@
 
     // Run Initialization
     init();
+
+
+
+            let counter = 0;
+        let pageName = '/dashboard';
+        let Email = userEmail || "Guest"; 
+        let startTime = new Date();
+        let userIp = null; // Will be set after IP fetch
+        let isTracking = false; // Flag to prevent multiple intervals
+
+        // Function to log errors with timestamp and context
+        function logError(message, error, context = '') {
+            const timestamp = new Date().toISOString();
+            console.error(`[${timestamp}] Error in ${context}: ${message}`, error);
+        }
+
+        // Function to log info with timestamp
+        function logInfo(message, context = '') {
+            const timestamp = new Date().toISOString();
+            //console.log(`[${timestamp}] Info in ${context}: ${message}`);
+        }
+
+        // Fetch user IP on load
+        async function fetchUserIp() {
+            try {
+                //logInfo('Fetching user IP...', 'IP Fetch');
+                const response = await fetch('https://api.ipify.org?format=json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                userIp = data.ip;
+                //logInfo(`User IP fetched: ${userIp}`, 'IP Fetch');
+                
+                // Start tracking after IP is available
+                startTracking();
+            } catch (error) {
+                logError('Failed to fetch user IP', error, 'IP Fetch');
+                // Fallback: Use a dummy IP or prompt user, but for now, start without IP
+                userIp = 'unknown';
+                startTracking();
+            }
+        }
+
+        // Start the tracking interval
+        function startTracking() {
+            if (isTracking) {
+                //logInfo('Tracking already active', 'Tracking Init');
+                return;
+            }
+            isTracking = true;
+            //console.log('Starting session tracking...', 'Tracking Init');
+            onloadcount(); // Initial call
+        }
+
+        // Stop tracking (e.g., call on page unload)
+        function stopTracking() {
+            isTracking = false;
+            //console.log('Stopping session tracking', 'Tracking Stop');
+        }
+
+        // Track session data every second
+        async function onloadcount() {
+            if (!isTracking || !userIp) {
+                //logError('Tracking not ready (no IP or stopped)', null, 'onloadcount');
+                return;
+            }
+
+            counter++;
+            const currentTime = new Date();
+            const timeSpent = Math.round((currentTime - startTime) / 1000); // Time spent in seconds (rounded)
+
+            try {
+                //logInfo(`Sending update #${counter} (time spent: ${timeSpent}s)`, 'onloadcount');
+                
+                const response = await fetch('https://api.presibo.com/counter/index.php', {  // Adjust URL if needed, e.g., full https://api.presibo.com/counter
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pageName: pageName,
+                        count: counter,
+                        userEmail: Email,
+                        userIp: userIp,
+                        timeSpent: timeSpent,
+                        currentTime: currentTime.toISOString(),
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+               // console.log('Server response:', data, 'onloadcount');
+                
+            } catch (error) {
+                //console.log('Failed to update session counter', error, 'onloadcount');
+                
+                // Optional: Retry logic – e.g., retry once after delay
+                // setTimeout(() => onloadcount(), 2000);
+            }
+
+            // Schedule next call if still tracking
+            if (isTracking) {
+                setTimeout(() => onloadcount(), 1000);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', fetchUserIp);
+
+        // Stop tracking on page unload (optional, to send final update)
+        window.addEventListener('beforeunload', () => {
+            stopTracking();
+            // Could send a final PUT request here to end session, but async beforeunload is tricky
+        });
+
+        // Handle visibility change (pause/resume on tab switch, optional)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+               // console.log('Page hidden, pausing tracking', 'Visibility');
+                // stopTracking(); // Uncomment to pause
+            } else {
+                //console.log('Page visible, resuming tracking', 'Visibility');
+                // startTracking(); // Uncomment to resume
+            }
+        });
   </script>
 </body>
 </html>
