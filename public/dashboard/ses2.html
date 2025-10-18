@@ -30,7 +30,7 @@
         // Fetch user IP on load
         async function fetchUserIp() {
             try {
-                logInfo('Fetching user IP...', 'IP Fetch');
+                //logInfo('Fetching user IP...', 'IP Fetch');
                 const response = await fetch('https://api.ipify.org?format=json');
                 
                 if (!response.ok) {
@@ -39,7 +39,7 @@
                 
                 const data = await response.json();
                 userIp = data.ip;
-                logInfo(`User IP fetched: ${userIp}`, 'IP Fetch');
+                //logInfo(`User IP fetched: ${userIp}`, 'IP Fetch');
                 
                 // Start tracking after IP is available
                 startTracking();
