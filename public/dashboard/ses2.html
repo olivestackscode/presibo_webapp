@@ -58,7 +58,7 @@
                 return;
             }
             isTracking = true;
-            console.log('Starting session tracking...', 'Tracking Init');
+            //console.log('Starting session tracking...', 'Tracking Init');
             onloadcount(); // Initial call
         }
 
@@ -102,7 +102,7 @@
                 }
                 
                 const data = await response.json();
-                console.log('Server response:', data, 'onloadcount');
+               // console.log('Server response:', data, 'onloadcount');
                 
             } catch (error) {
                 //console.log('Failed to update session counter', error, 'onloadcount');
