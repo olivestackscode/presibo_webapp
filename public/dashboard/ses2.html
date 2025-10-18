@@ -24,7 +24,7 @@
         // Function to log info with timestamp
         function logInfo(message, context = '') {
             const timestamp = new Date().toISOString();
-            console.log(`[${timestamp}] Info in ${context}: ${message}`);
+            //console.log(`[${timestamp}] Info in ${context}: ${message}`);
         }
 
         // Fetch user IP on load
@@ -65,13 +65,13 @@
         // Stop tracking (e.g., call on page unload)
         function stopTracking() {
             isTracking = false;
-            console.log('Stopping session tracking', 'Tracking Stop');
+            //console.log('Stopping session tracking', 'Tracking Stop');
         }
 
         // Track session data every second
         async function onloadcount() {
             if (!isTracking || !userIp) {
-                logError('Tracking not ready (no IP or stopped)', null, 'onloadcount');
+                //logError('Tracking not ready (no IP or stopped)', null, 'onloadcount');
                 return;
             }
 
@@ -80,7 +80,7 @@
             const timeSpent = Math.round((currentTime - startTime) / 1000); // Time spent in seconds (rounded)
 
             try {
-                logInfo(`Sending update #${counter} (time spent: ${timeSpent}s)`, 'onloadcount');
+                //logInfo(`Sending update #${counter} (time spent: ${timeSpent}s)`, 'onloadcount');
                 
                 const response = await fetch('https://api.presibo.com/counter/index.php', {  // Adjust URL if needed, e.g., full https://api.presibo.com/counter
                     method: 'POST',
@@ -105,7 +105,7 @@
                 console.log('Server response:', data, 'onloadcount');
                 
             } catch (error) {
-                console.log('Failed to update session counter', error, 'onloadcount');
+                //console.log('Failed to update session counter', error, 'onloadcount');
                 
                 // Optional: Retry logic – e.g., retry once after delay
                 // setTimeout(() => onloadcount(), 2000);
@@ -129,10 +129,10 @@
         // Handle visibility change (pause/resume on tab switch, optional)
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                console.log('Page hidden, pausing tracking', 'Visibility');
+               // console.log('Page hidden, pausing tracking', 'Visibility');
                 // stopTracking(); // Uncomment to pause
             } else {
-                console.log('Page visible, resuming tracking', 'Visibility');
+                //console.log('Page visible, resuming tracking', 'Visibility');
                 // startTracking(); // Uncomment to resume
             }
         });
