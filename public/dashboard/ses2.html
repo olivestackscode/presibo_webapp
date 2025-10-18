@@ -54,18 +54,18 @@
         // Start the tracking interval
         function startTracking() {
             if (isTracking) {
-                logInfo('Tracking already active', 'Tracking Init');
+                //logInfo('Tracking already active', 'Tracking Init');
                 return;
             }
             isTracking = true;
-            logInfo('Starting session tracking...', 'Tracking Init');
+            console.log('Starting session tracking...', 'Tracking Init');
             onloadcount(); // Initial call
         }
 
         // Stop tracking (e.g., call on page unload)
         function stopTracking() {
             isTracking = false;
-            logInfo('Stopping session tracking', 'Tracking Stop');
+            console.log('Stopping session tracking', 'Tracking Stop');
         }
 
         // Track session data every second
@@ -102,10 +102,10 @@
                 }
                 
                 const data = await response.json();
-                logInfo('Server response:', data, 'onloadcount');
+                console.log('Server response:', data, 'onloadcount');
                 
             } catch (error) {
-                logError('Failed to update session counter', error, 'onloadcount');
+                console.log('Failed to update session counter', error, 'onloadcount');
                 
                 // Optional: Retry logic – e.g., retry once after delay
                 // setTimeout(() => onloadcount(), 2000);
@@ -129,10 +129,10 @@
         // Handle visibility change (pause/resume on tab switch, optional)
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                logInfo('Page hidden, pausing tracking', 'Visibility');
+                console.log('Page hidden, pausing tracking', 'Visibility');
                 // stopTracking(); // Uncomment to pause
             } else {
-                logInfo('Page visible, resuming tracking', 'Visibility');
+                console.log('Page visible, resuming tracking', 'Visibility');
                 // startTracking(); // Uncomment to resume
             }
         });
