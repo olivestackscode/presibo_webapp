@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8">derm
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Presibo - Find Hospitals Near You</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -91,7 +91,8 @@
         <button class="border px-3 py-1 rounded" data-value="All">All</button>
         <button class="border px-3 py-1 rounded" data-value="Cardiology">Cardiology</button>
         <button class="border px-3 py-1 rounded" data-value="Pediatrics">Pediatrics</button>
-        <button class="border px-3 py-1 rounded" data-value="Dermatology">Dermatology</button>
+        <button class="border px-3 py-1 rounded" data-value="Fertility">Fertility</button>
+        
       </div>
     </div>
 
@@ -264,7 +265,6 @@ modalContent.innerHTML = `
           <h3 class="font-semibold text-lg">${d.name}</h3>
           <p class="text-sm text-gray-600 mb-2">${d.specialization}</p>
           <p class="text-sm text-gray-600 mb-2">${d.location}</p>
-          <p class="text-sm text-gray-600 mb-2">${d.years} years established</p>
           
           <button onclick="openBookingModal('${d.id}')" class="book-appointment bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Contact</button>
         </div>
