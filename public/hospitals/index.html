@@ -95,7 +95,7 @@
       </div>
     </div>
 
-    <div id="doctorsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div id="hospitalsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </main>
 
   <!-- Booking Modal -->
@@ -104,7 +104,7 @@
       <h2 class="text-lg font-semibold mb-4">Contact Hospital</h2>
       <div id="booking-modal-content" class="text-sm text-gray-700 mb-4"></div>
       <div class="flex gap-2">
-        <button id="booking-modal-action" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Book Now</button>
+        <button id="booking-modal-action" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Book Appointment</button>
         <button class="modal-close border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
       </div>
     </div>
@@ -128,9 +128,9 @@
 <script>
     let email = sessionStorage.getItem('email') || null;
     const searchInput = document.getElementById('searchInput');
-    const doctorsList = document.getElementById('doctorsList');
+    const hospitalsList = document.getElementById('hospitalsList');
     const specialtyFilters = document.querySelectorAll('#specialtyFilters button');
-    let doctors = [];
+    let hospitals = [];
     let selectedSpecialty = 'All';
 
     async function fetchJSON(url) {
@@ -139,12 +139,12 @@
       return res.json();
     }
 
-    async function openBookingModal(doctorId, date = 'N/A', time = 'N/A') {
+    async function openBookingModal(hospitalId, date = 'N/A', time = 'N/A') {
       const email = sessionStorage.getItem('email');
       if (!email) return showPopup("Not Logged in", "");
 
       try {
-        const doctor = doctors.find(d => d.id == doctorId);
+        const hospital = hospitals.find(d => d.id == hospitalId);
 
         const userRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
         const userData = await userRes.json();
@@ -156,8 +156,8 @@
 
        const modalContent = document.getElementById('booking-modal-content');
 modalContent.innerHTML = `
-  <p><strong>Doctor:</strong> ${doctor?.name || 'N/A'}</p>
-  <p><strong>Specialization:</strong> ${doctor?.specialization || 'N/A'}</p>
+  <p><strong>Hospital:</strong> ${hospital?.name || 'N/A'}</p>
+  <p><strong>Specialty:</strong> ${hospital?.specialization || 'N/A'}</p>
 
   <label class="block mt-3 text-sm font-medium text-gray-700">
     <strong>Date:</strong>
@@ -184,9 +184,9 @@ modalContent.innerHTML = `
 
     
     const bookingData = {
-      doctor_id: doctor?.id,
-      doctor: doctor?.name,
-      specialty: doctor?.specialization,
+      hospital_id: hospital?.id,
+      hospital: hospital?.name,
+      specialty: hospital?.specialization,
       name: fullName,
       date: dateInput,
       time: timeInput,
@@ -204,7 +204,7 @@ modalContent.innerHTML = `
 
     if (result.status === "success") {
       //alert(`✅ Appointment booked successfully with ${doctor?.name} by ${fullName} on ${date} at ${time}.`);
-      showPopup("Booking Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
+      showPopup("Appointment Submitted Successfully", "Our team will contact you soon to confirm your appointment.");
       closeBookingModal();
     } else {
       throw new Error(result.message || "Unknown server error");
@@ -238,57 +238,55 @@ modalContent.innerHTML = `
     const mobileMenu = document.getElementById('mobile-menu');
     mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
 
-    // Fetch and render doctors
-    async function fetchDoctors() {
-      doctorsList.innerHTML = `<div class="text-center py-8 text-gray-500">Loading doctors...</div>`;
+    // Fetch and render hospitals
+    async function fetchHospitals() {
+      hospitalsList.innerHTML = `<div class="text-center py-8 text-gray-500">Loading hospitals...</div>`;
       try {
         const data = await fetchJSON('https://api.presibo.com/hospitals/index.php');
-        doctors = data.users.map(user => ({
+        hospitals = data.users.map(user => ({
           id: user.id,
-          name: user.fullname || `Dr. ${user.firstname} ${user.lastname}`,
-          specialization: user.specialization || 'General Practitioner',
-          location: `${user.location}, ${user.country}` || 'General Practitioner',
-          years: user.years || 'General Practitioner',
-          
-          
-          thumbnail: user.thumbnail || '/assets/img/doctor-default.png'
+          name: user.name || user.fullname || 'Unnamed Hospital',
+          specialization: user.specialization || 'General Hospital',
+          location: `${user.location}, ${user.country}` || 'Unknown Location',
+          years: user.years || 0,
+          thumbnail: user.thumbnail || '/assets/img/hospital-default.png'
         }));
-        renderDoctors(doctors);
+        renderHospitals(hospitals);
       } catch (error) {
-        doctorsList.innerHTML = `<div class="text-center py-8 text-red-500">Unable to load hospitals.</div>`;
+        hospitalsList.innerHTML = `<div class="text-center py-8 text-red-500">Unable to load hospitals.</div>`;
       }
     }
 
-    function renderDoctors(list) {
-      doctorsList.innerHTML = list.map(d => `
+    function renderHospitals(list) {
+      hospitalsList.innerHTML = list.map(d => `
         <div class="bg-white rounded-xl p-4 shadow hover:shadow-lg transition">
-          <img src="https://presibo-wl.vercel.app/photos/${d.thumbnail}.jpg" class="w-16 h-16 rounded-full mb-2 object-cover" alt="${d.name}">
+          <img src="https://presibo-wl.vercel.app/photos/${d.thumbnail}.jpg" class="w-16 h-16 rounded-full mb-2 object-cover" alt="${d.name} Hospital">
           <h3 class="font-semibold text-lg">${d.name}</h3>
           <p class="text-sm text-gray-600 mb-2">${d.specialization}</p>
           <p class="text-sm text-gray-600 mb-2">${d.location}</p>
-          <p class="text-sm text-gray-600 mb-2">${d.years} years experience</p>
+          <p class="text-sm text-gray-600 mb-2">${d.years} years established</p>
           
-          <button onclick="openBookingModal('${d.id}')" class="book-appointment bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Book</button>
+          <button onclick="openBookingModal('${d.id}')" class="book-appointment bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Contact</button>
         </div>
       `).join('');
     }
 
-    function filterDoctors() {
+    function filterHospitals() {
       const search = searchInput.value.toLowerCase();
-      const filtered = doctors.filter(d =>
+      const filtered = hospitals.filter(d =>
         (selectedSpecialty === 'All' || d.specialization === selectedSpecialty) &&
-        d.name.toLowerCase().includes(search)
+        (d.name.toLowerCase().includes(search) || d.location.toLowerCase().includes(search) || d.specialization.toLowerCase().includes(search))
       );
-      renderDoctors(filtered);
+      renderHospitals(filtered);
     }
 
-    searchInput.addEventListener('input', filterDoctors);
+    searchInput.addEventListener('input', filterHospitals);
     specialtyFilters.forEach(btn => {
       btn.addEventListener('click', () => {
         specialtyFilters.forEach(b => b.classList.remove('bg-purple-600', 'text-white'));
         btn.classList.add('bg-purple-600', 'text-white');
         selectedSpecialty = btn.dataset.value;
-        filterDoctors();
+        filterHospitals();
       });
     });
 
@@ -318,7 +316,7 @@ modalContent.innerHTML = `
     okBtn.addEventListener('click', closeModal);
   }
 
-    fetchDoctors();
+    fetchHospitals();
   </script>
 </body>
 </html>
