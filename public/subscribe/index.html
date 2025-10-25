@@ -242,8 +242,8 @@
   </div>
 
   <script>
-    // Mock User Data
-    const user = { email: 'user@example.com' };
+    // Get User Email from sessionStorage
+    const userEmail = sessionStorage.getItem('email');
 
     // Subscription Plans
     const subscriptionPlans = [
@@ -402,7 +402,7 @@
 
     // Handle Subscription
     function handleSubscribe(plan) {
-      if (!user.email) {
+      if (!userEmail) {
         showToast('Authentication Required', 'Please log in to subscribe', 'destructive');
         return;
       }
@@ -410,22 +410,36 @@
         showToast('Payment Loading', 'Payment system is loading. Please try again in a moment.', 'destructive');
         return;
       }
-      alert('Paystack payment is disabled in this demo.');
-      const startDate = new Date();
-      const endDate = new Date();
-      switch (plan.duration) {
-        case 'day':
-          endDate.setDate(startDate.getDate() + 1);
-          break;
-        case 'week':
-          endDate.setDate(startDate.getDate() + 7);
-          break;
-        case 'month':
-          endDate.setMonth(startDate.getMonth() + 1);
-          break;
-      }
-      const transaction = { reference: 'mock-ref-' + Date.now() };
-      showToast('Payment Successful!', `Welcome to the ${plan.name}! Reference: ${transaction.reference}`);
+      const handler = PaystackPop.setup({
+        key: 'pk_test_your_public_key_here', // Replace with your actual Paystack public key
+        email: userEmail,
+        amount: plan.amount,
+        currency: 'NGN',
+        ref: 'presibo_sub_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          const startDate = new Date();
+          const endDate = new Date();
+          switch (plan.duration) {
+            case 'day':
+              endDate.setDate(startDate.getDate() + 1);
+              break;
+            case 'week':
+              endDate.setDate(startDate.getDate() + 7);
+              break;
+            case 'month':
+              endDate.setMonth(startDate.getMonth() + 1);
+              break;
+          }
+          const transaction = { reference: response.reference };
+          showToast('Payment Successful!', `Welcome to the ${plan.name}! Reference: ${transaction.reference}`);
+          // Optionally, send transaction details to your backend for verification
+          // fetch('/api/verify-payment', { method: 'POST', body: JSON.stringify({ reference: response.reference }) });
+        },
+        onClose: function() {
+          showToast('Payment Cancelled', 'Subscription payment was cancelled.', 'destructive');
+        }
+      });
+      handler.openIframe();
     }
 
     // Initialize
