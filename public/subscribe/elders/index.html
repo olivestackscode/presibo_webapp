@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Standard Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Elder Care Services</title>
+  <meta name="description" content="Comprehensive elder care and monitoring services for your loved ones in Nigeria. Choose from our Care, Thrive, and Vital plans.">
+  <meta name="keywords" content="Presibo, elder care, senior healthcare, family monitoring, Nigeria healthcare, telemedicine">
+  <meta name="author" content="Presibo Team">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://presibo--web.vercel.app/elder-care.html">
+
+  <!-- Favicon Meta Tags -->
+  <link rel="icon" type="image/png" href="assets/img/new_presibo_icon.png">
+  <link rel="apple-touch-icon" href="assets/img/new_presibo_icon.png">
+  <meta name="msapplication-TileImage" content="assets/img/new_presibo_icon.png">
+  <link rel="preload" href="assets/img/new_presibo_icon.png" as="image" importance="high">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Presibo - Elder Care Services">
+  <meta property="og:description" content="Dedicated elder care plans with monitoring, consultations, and family support tailored for Nigerian families.">
+  <meta property="og:image" content="https://presibo--web.vercel.app/assets/img/new_presibo_icon.png">
+  <meta property="og:image:width" content="192">
+  <meta property="og:image:height" content="192">
+  <meta property="og:image:alt" content="Presibo Logo">
+  <meta property="og:url" content="https://presibo--web.vercel.app/elder-care.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Presibo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo - Elder Care Services">
+  <meta name="twitter:description" content="Subscribe to Presibo Elder Care for comprehensive monitoring and support for seniors in Nigeria.">
+  <meta name="twitter:image" content="https://presibo--web.vercel.app/assets/img/new_presibo_icon.png">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Web App Manifest (PWA) -->
+  <link rel="manifest" href="assets/manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+    }
+    .toast.destructive {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+    .toast.active {
+      display: block;
+    }
+    .card {
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .popular {
+      border-color: #008753 !important;
+      transform: scale(1.05);
+    }
+    .popular-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #008753;
+      color: white;
+      padding: 0.25rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .back-btn {
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+    }
+    .back-btn:hover {
+      background: #f9fafb;
+    }
+    .subscribe-btn {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1.125rem;
+      color: white;
+    }
+    .contact-btn {
+      padding: 0.75rem 1.5rem;
+      color: white;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .contact-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 font-sans">
+  <div id="elder-care-page" class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <button onclick="window.location.href='/'" class="back-btn btn mb-4 inline-flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Back to Dashboard
+      </button>
+      
+      <div class="text-center">
+        <div class="mb-6">
+          <i class="fas fa-heart text-6xl text-warm-orange mb-4"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Elder Care Services</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Comprehensive care and monitoring for your elderly loved ones. 
+          Choose the plan that best fits your family's needs.
+        </p>
+      </div>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Care Plan -->
+      <div class="card relative overflow-hidden">
+        <div class="card-header text-white bg-gradient-to-r from-blue-700 to-blue-900 pb-8 relative">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold mb-2">Care</h3>
+            <div class="text-4xl font-bold mb-2">₦15,000</div>
+            <p class="text-sm">/month</p>
+            <p class="text-sm opacity-90 mt-2">Essential elder care monitoring and support</p>
+          </div>
+        </div>
+        <div class="card-content p-6">
+          <div class="space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Digital medical records</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Medication reminders</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">1 family profile</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Basic health monitoring</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Emergency contact system</span>
+              </div>
+            </div>
+            <button class="subscribe-btn bg-gradient-to-r from-blue-700 to-blue-900 text-white" onclick="handlePayment('Care', 15000, 'Essential elder care monitoring and support')">
+              <i class="fas fa-credit-card mr-2"></i>
+              Subscribe to Care
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thrive Plan -->
+      <div class="card relative overflow-hidden popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="card-header text-white bg-gradient-to-r from-green-700 to-green-900 pb-8 relative">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold mb-2">Thrive</h3>
+            <div class="text-4xl font-bold mb-2">₦30,000</div>
+            <p class="text-sm">/month</p>
+            <p class="text-sm opacity-90 mt-2">Comprehensive elder care with priority support</p>
+          </div>
+        </div>
+        <div class="card-content p-6">
+          <div class="space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">All Care benefits</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Priority doctor booking</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Home monitoring kits</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Dedicated case manager</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">2 family profiles</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">1 weekly video consultation</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">24/7 support hotline</span>
+              </div>
+            </div>
+            <button class="subscribe-btn bg-gradient-to-r from-green-700 to-green-900 text-white" onclick="handlePayment('Thrive', 30000, 'Comprehensive elder care with priority support')">
+              <i class="fas fa-credit-card mr-2"></i>
+              Subscribe to Thrive
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vital Plan -->
+      <div class="card relative overflow-hidden">
+        <div class="card-header text-white bg-gradient-to-r from-gray-800 to-black pb-8 relative">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold mb-2">Vital</h3>
+            <div class="text-4xl font-bold mb-2">₦50,000</div>
+            <p class="text-sm">/month</p>
+            <p class="text-sm opacity-90 mt-2">Premium elder care with home visit services</p>
+          </div>
+        </div>
+        <div class="card-content p-6">
+          <div class="space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">All Thrive benefits</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">3 family profiles</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Home visit option</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Advanced health monitoring</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Specialist consultations</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Personal care coordinator</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-check-circle text-naija-green mr-3"></i>
+                <span class="text-gray-700">Monthly health reports</span>
+              </div>
+            </div>
+            <button class="subscribe-btn bg-gradient-to-r from-gray-800 to-black text-white" onclick="handlePayment('Vital', 50000, 'Premium elder care with home visit services')">
+              <i class="fas fa-credit-card mr-2"></i>
+              Subscribe to Vital
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="max-w-4xl mx-auto mt-12">
+      <div class="card bg-white">
+        <div class="card-header p-6">
+          <h3 class="text-center text-2xl text-gray-800">Why Choose Our Elder Care Services?</h3>
+        </div>
+        <div class="card-content p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <i class="fas fa-shield-alt text-trust-blue text-2xl mr-4 mt-1"></i>
+                <div>
+                  <h4 class="font-semibold text-gray-800 mb-2">Trusted Care</h4>
+                  <p class="text-gray-600">Professional healthcare providers with years of experience in elder care</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-clock text-warm-orange text-2xl mr-4 mt-1"></i>
+                <div>
+                  <h4 class="font-semibold text-gray-800 mb-2">24/7 Monitoring</h4>
+                  <p class="text-gray-600">Round-the-clock health monitoring and emergency response</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <i class="fas fa-users text-royal-purple text-2xl mr-4 mt-1"></i>
+                <div>
+                  <h4 class="font-semibold text-gray-800 mb-2">Family Involvement</h4>
+                  <p class="text-gray-600">Keep family members informed and involved in care decisions</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-home text-naija-green text-2xl mr-4 mt-1"></i>
+                <div>
+                  <h4 class="font-semibold text-gray-800 mb-2">Home-Based Care</h4>
+                  <p class="text-gray-600">Comfort of home with professional medical support</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="max-w-2xl mx-auto mt-8 text-center">
+      <div class="card bg-gradient-to-r from-warm-orange/10 to-golden-yellow/10">
+        <div class="card-content p-6">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">
+            Need Help Choosing a Plan?
+          </h3>
+          <p class="text-gray-600 mb-4">
+            Our care coordinators are available to help you select the best plan for your family's needs.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <button class="contact-btn bg-warm-orange" onclick="window.open('tel:+2347032810862', '_self')">
+              <i class="fas fa-phone"></i>
+              Call Us Now
+            </button>
+            <button class="contact-btn bg-naija-green" onclick="window.open('https://wa.me/2347032810862?text=Hello, I need help choosing an elder care plan', '_blank')">
+              <i class="fab fa-whatsapp"></i>
+              WhatsApp Us
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <h4 id="toast-title" class="font-semibold"></h4>
+      <p id="toast-description" class="text-sm"></p>
+    </div>
+  </div>
+
+  <script>
+    // Get User Email from sessionStorage
+    const userEmail = sessionStorage.getItem('email');
+
+    // DOM Elements
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastDescription = document.getElementById('toast-description');
+
+    // Toast Notification
+    function showToast(title, description, variant = 'default') {
+      toastTitle.textContent = title;
+      toastDescription.textContent = description;
+      toast.className = `toast ${variant === 'destructive' ? 'destructive' : ''} active`;
+      setTimeout(() => {
+        toast.className = `toast ${variant === 'destructive' ? 'destructive' : ''}`;
+      }, 3000);
+    }
+
+    // Handle Payment
+    function handlePayment(planName, price, description) {
+      if (!userEmail) {
+        showToast('Authentication Required', 'Please log in to subscribe to elder care services', 'destructive');
+        return;
+      }
+
+      if (!window.PaystackPop) {
+        showToast('Payment Loading', 'Payment system is loading. Please try again in a moment.', 'destructive');
+        return;
+      }
+
+      const paystack = window.PaystackPop.setup({
+        key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // Replace with your actual Paystack public key if needed
+        email: userEmail,
+        amount: price * 100, // Convert to kobo
+        currency: 'NGN',
+        ref: 'presibo_elder_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          const startDate = new Date();
+          const endDate = new Date();
+          endDate.setMonth(startDate.getMonth() + 1); // Monthly plan
+          const transaction = { reference: response.reference };
+          showToast('Payment Successful!', `Successfully subscribed to ${planName} plan. Reference: ${transaction.reference}`);
+          console.log('Payment successful:', response);
+          // Optionally, send to backend: fetch('/api/subscriptions', { method: 'POST', body: JSON.stringify({ ... }) });
+        },
+        onClose: function() {
+          showToast('Payment Cancelled', 'Your payment was cancelled. You can try again anytime.', 'destructive');
+          console.log('Payment cancelled');
+        },
+        onError: function(error) {
+          showToast('Payment Failed', 'Payment failed. Please try again.', 'destructive');
+          console.error('Payment error:', error);
+        }
+      });
+
+      paystack.openIframe();
+    }
+
+    // Initialize
+    function init() {
+      // Load Paystack Script
+      const script = document.createElement('script');
+      script.src = 'https://js.paystack.co/v1/inline.js';
+      script.async = true;
+      script.onload = () => console.log('Paystack script loaded');
+      document.head.appendChild(script);
+    }
+
+    // Run Initialization
+    window.onload = init;
+  </script>
+</body>
+</html>
