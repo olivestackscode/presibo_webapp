@@ -514,8 +514,8 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   }
 });
 
-
-          let counter = 0;
+        const userEmail = sessionStorage.getItem('email');
+        let counter = 0;
         let pageName = '/app';
         let Email = userEmail || "Guest"; 
         let startTime = new Date();
