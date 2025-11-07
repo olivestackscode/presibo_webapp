@@ -80,7 +80,7 @@
       analyzeBtn.disabled = true;
 
       try {
-        const res = await fetch("https://api.presibo.com/ai/assessment.php", {
+        const res = await fetch("https://api.presibo.com/ai/open.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, symptoms }),
