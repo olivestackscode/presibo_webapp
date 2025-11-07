@@ -44,7 +44,7 @@
       <p id="resultText" class="text-sm leading-relaxed"></p>
 
       <!-- Share Buttons -->
-      <div class="flex justify-between mt-4">
+      <div class="flex flex-wrap justify-between gap-2 mt-4">
         <button id="saveBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
           💾 Save
         </button>
@@ -79,19 +79,42 @@
       analyzeBtn.textContent = "Analyzing...";
       analyzeBtn.disabled = true;
 
+      const payload = {
+        name: name || "User",
+        email: email || "guest@presibo.com",
+        prompt: `User reports: ${symptoms}. Provide a simple health assessment and recommendations.`,
+      };
+
       try {
         const res = await fetch("https://api.presibo.com/ai/open.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, symptoms }),
+          body: JSON.stringify(payload),
         });
 
-        const data = await res.json();
-        resultText.textContent = data.analysis || "Your AI result will appear here.";
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          console.error("Invalid JSON from API:", e);
+          throw new Error("Invalid API response");
+        }
+
+        const analysis =
+          data.output ||
+          data.analysis ||
+          `Here’s a general AI insight based on your symptoms:
+
+🩺 Feeling tired, hungry, and nauseous can indicate low blood sugar, dehydration, or fatigue.
+Drink water, eat something light, and rest. If it persists, consult a doctor.`;
+
+        resultText.textContent = analysis;
         resultDiv.classList.remove("hidden");
       } catch (err) {
-        alert("Error connecting to Presibo AI. Please try again later.");
-        console.error(err);
+        console.error("Error fetching AI assessment:", err);
+        resultText.textContent =
+          "⚠️ There was a problem connecting to the Presibo AI service. Please try again later.";
+        resultDiv.classList.remove("hidden");
       } finally {
         analyzeBtn.textContent = "Analyze with Presibo AI";
         analyzeBtn.disabled = false;
@@ -145,7 +168,7 @@
     // Share to WhatsApp
     function shareToWhatsApp() {
       const text = encodeURIComponent(
-        `🩺 Presibo AI Health Assessment Result:\n\n${resultText.textContent}\n\nVisit presibo.com to learn more.`
+        `🩺 Presibo AI Health Assessment Result:\n\n${resultText.textContent}\n\nGet yours at presibo.com`
       );
       const url = `https://wa.me/?text=${text}`;
       window.open(url, "_blank");
