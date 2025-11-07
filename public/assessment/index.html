@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Presibo Personal Health Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #e0f2ff, #f8fbff);
+      min-height: 100vh;
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #007bff, #00b4d8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center px-4 py-8">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
+    <h1 class="text-3xl font-bold gradient-text text-center mb-4">
+      Presibo Personal Health Assessment
+    </h1>
+    <p class="text-center text-gray-600 mb-6">
+      Powered by <span class="font-semibold text-blue-600">Presibo AI</span>
+    </p>
+
+    <!-- Assessment Form -->
+    <div class="space-y-4">
+      <input id="first_name" type="text" placeholder="Your Name" class="w-full border rounded-lg p-3" />
+      <input id="email" type="email" placeholder="Your Email" class="w-full border rounded-lg p-3" />
+      <textarea id="symptoms" placeholder="Describe your symptoms or health concern..." rows="4" class="w-full border rounded-lg p-3"></textarea>
+
+      <button id="analyzeBtn" class="bg-blue-600 text-white w-full rounded-lg py-3 font-semibold hover:bg-blue-700">
+        Analyze with Presibo AI
+      </button>
+    </div>
+
+    <!-- AI Result -->
+    <div id="result" class="hidden mt-6 bg-blue-50 border border-blue-100 rounded-lg p-4 text-gray-800">
+      <h2 class="font-semibold text-lg text-blue-700 mb-2">AI Assessment Result</h2>
+      <p id="resultText" class="text-sm leading-relaxed"></p>
+
+      <!-- Share Buttons -->
+      <div class="flex justify-between mt-4">
+        <button id="saveBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+          💾 Save
+        </button>
+        <button id="emailBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          📧 Share via Email
+        </button>
+        <button id="whatsappBtn" class="bg-[#25D366] text-white px-4 py-2 rounded-lg hover:bg-[#20b358]">
+          💬 WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const emailBtn = document.getElementById("emailBtn");
+    const whatsappBtn = document.getElementById("whatsappBtn");
+    const resultDiv = document.getElementById("result");
+    const resultText = document.getElementById("resultText");
+
+    async function analyzeHealth() {
+      const name = document.getElementById("first_name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const symptoms = document.getElementById("symptoms").value.trim();
+
+      if (!symptoms) {
+        alert("Please describe your symptoms.");
+        return;
+      }
+
+      analyzeBtn.textContent = "Analyzing...";
+      analyzeBtn.disabled = true;
+
+      try {
+        const res = await fetch("https://api.presibo.com/ai/assessment.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, symptoms }),
+        });
+
+        const data = await res.json();
+        resultText.textContent = data.analysis || "Your AI result will appear here.";
+        resultDiv.classList.remove("hidden");
+      } catch (err) {
+        alert("Error connecting to Presibo AI. Please try again later.");
+        console.error(err);
+      } finally {
+        analyzeBtn.textContent = "Analyze with Presibo AI";
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    // Save result locally
+    function saveResult() {
+      const content = resultText.textContent;
+      const blob = new Blob([content], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "Presibo_Health_Assessment.txt";
+      a.click();
+    }
+
+    // Share by email through Presibo API
+    async function shareByEmail() {
+      const email = document.getElementById("email").value.trim();
+      const first_name = document.getElementById("first_name").value.trim() || "User";
+      const subject = "Your Presibo AI Health Assessment Result";
+      const message = resultText.textContent;
+
+      if (!email) {
+        alert("Please enter your email address.");
+        return;
+      }
+
+      try {
+        const response = await fetch("https://api.presibo.com/email/index.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "send",
+            type: "custom",
+            email: email,
+            name: first_name,
+            title: subject,
+            message: message,
+          }),
+        });
+
+        const result = await response.json();
+        alert(result.status === "success" ? "Email sent successfully!" : "Failed to send email.");
+      } catch (error) {
+        alert("Error sending email.");
+        console.error(error);
+      }
+    }
+
+    // Share to WhatsApp
+    function shareToWhatsApp() {
+      const text = encodeURIComponent(
+        `🩺 Presibo AI Health Assessment Result:\n\n${resultText.textContent}\n\nVisit presibo.com to learn more.`
+      );
+      const url = `https://wa.me/?text=${text}`;
+      window.open(url, "_blank");
+    }
+
+    analyzeBtn.addEventListener("click", analyzeHealth);
+    saveBtn.addEventListener("click", saveResult);
+    emailBtn.addEventListener("click", shareByEmail);
+    whatsappBtn.addEventListener("click", shareToWhatsApp);
+  </script>
+</body>
+</html>
