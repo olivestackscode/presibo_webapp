@@ -91,48 +91,35 @@
       console.log("📤 Sending payload to AI API:", payload);
 
       try {
-        const res = await fetch("https://api.presibo.com/ai/open.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+  console.log("📤 Sending payload to AI API:", payload);
+  
+  const res = await fetch("https://api.presibo.com/ai/open.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  
+  console.log("✅ Raw API Response Object:", res);
+  
+  const data = await res.json();
+  console.log("✅ Parsed API Response JSON:", data);
 
-        console.log("✅ Raw API Response Object:", res);
+  // ✅ Correct handling
+  if (data.status === "success" && data.reply) {
+    console.log("🧠 AI Message Received:", data.reply);
+    document.getElementById("aiResponse").innerText = data.reply;
+  } else {
+    console.warn("⚠️ AI did not return any analysis. Response was:", data);
+    document.getElementById("aiResponse").innerText =
+      "⚠️ AI did not return any analysis. Please try again later.";
+  }
 
-        if (!res.ok) {
-          console.error("❌ HTTP error:", res.status, res.statusText);
-          throw new Error(`HTTP ${res.status}`);
-        }
+} catch (error) {
+  console.error("❌ API call failed:", error);
+  document.getElementById("aiResponse").innerText =
+    "❌ An error occurred while connecting to the AI.";
+}
 
-        let data;
-        try {
-          data = await res.json();
-          console.log("✅ Parsed API Response JSON:", data);
-        } catch (e) {
-          console.error("❌ Invalid JSON from API:", e);
-          throw new Error("Invalid JSON response");
-        }
-
-        const analysis =
-          data.message ||
-          data.output ||
-          data.analysis ||
-          "⚠️ AI did not return any analysis. Please try again later.";
-
-        console.log("🧠 AI Message Received:", analysis);
-
-        resultText.textContent = analysis;
-        resultDiv.classList.remove("hidden");
-      } catch (err) {
-        console.error("🚨 Error fetching AI assessment:", err);
-        resultText.textContent =
-          "⚠️ There was a problem connecting to the Presibo AI service. Please try again later.";
-        resultDiv.classList.remove("hidden");
-      } finally {
-        analyzeBtn.textContent = "Analyze with Presibo AI";
-        analyzeBtn.disabled = false;
-      }
-    }
 
     // Save result locally
     function saveResult() {
