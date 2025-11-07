@@ -18,6 +18,7 @@
     }
   </style>
 </head>
+
 <body class="flex flex-col items-center justify-center px-4 py-8">
   <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
     <h1 class="text-3xl font-bold gradient-text text-center mb-4">
@@ -80,10 +81,14 @@
       analyzeBtn.disabled = true;
 
       const payload = {
+        message: `Analyze this user's symptoms and provide a helpful health insight:\n${symptoms}`,
         name: name || "User",
         email: email || "guest@presibo.com",
-        message:symptoms,
+        temperature: 0.7,
+        max_tokens: 400
       };
+
+      console.log("📤 Sending payload to AI API:", payload);
 
       try {
         const res = await fetch("https://api.presibo.com/ai/open.php", {
@@ -92,26 +97,34 @@
           body: JSON.stringify(payload),
         });
 
+        console.log("✅ Raw API Response Object:", res);
+
+        if (!res.ok) {
+          console.error("❌ HTTP error:", res.status, res.statusText);
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         let data;
         try {
           data = await res.json();
+          console.log("✅ Parsed API Response JSON:", data);
         } catch (e) {
-          console.error("Invalid JSON from API:", e);
-          throw new Error("Invalid API response");
+          console.error("❌ Invalid JSON from API:", e);
+          throw new Error("Invalid JSON response");
         }
 
         const analysis =
+          data.message ||
           data.output ||
           data.analysis ||
-          `Here’s a general AI insight based on your symptoms:
+          "⚠️ AI did not return any analysis. Please try again later.";
 
-🩺 Feeling tired, hungry, and nauseous can indicate low blood sugar, dehydration, or fatigue.
-Drink water, eat something light, and rest. If it persists, consult a doctor.`;
+        console.log("🧠 AI Message Received:", analysis);
 
         resultText.textContent = analysis;
         resultDiv.classList.remove("hidden");
       } catch (err) {
-        console.error("Error fetching AI assessment:", err);
+        console.error("🚨 Error fetching AI assessment:", err);
         resultText.textContent =
           "⚠️ There was a problem connecting to the Presibo AI service. Please try again later.";
         resultDiv.classList.remove("hidden");
@@ -129,6 +142,7 @@ Drink water, eat something light, and rest. If it persists, consult a doctor.`;
       a.href = URL.createObjectURL(blob);
       a.download = "Presibo_Health_Assessment.txt";
       a.click();
+      console.log("💾 Result saved locally.");
     }
 
     // Share by email through Presibo API
@@ -142,6 +156,8 @@ Drink water, eat something light, and rest. If it persists, consult a doctor.`;
         alert("Please enter your email address.");
         return;
       }
+
+      console.log("📧 Sending email via Presibo API:", { email, first_name, subject, message });
 
       try {
         const response = await fetch("https://api.presibo.com/email/index.php", {
@@ -158,10 +174,12 @@ Drink water, eat something light, and rest. If it persists, consult a doctor.`;
         });
 
         const result = await response.json();
+        console.log("✅ Email API Response:", result);
+
         alert(result.status === "success" ? "Email sent successfully!" : "Failed to send email.");
       } catch (error) {
-        alert("Error sending email.");
-        console.error(error);
+        console.error("🚨 Email sending error:", error);
+        alert("Error sending email. Check console for details.");
       }
     }
 
@@ -171,6 +189,7 @@ Drink water, eat something light, and rest. If it persists, consult a doctor.`;
         `🩺 Presibo AI Health Assessment Result:\n\n${resultText.textContent}\n\nGet yours at presibo.com`
       );
       const url = `https://wa.me/?text=${text}`;
+      console.log("📱 Opening WhatsApp share:", url);
       window.open(url, "_blank");
     }
 
