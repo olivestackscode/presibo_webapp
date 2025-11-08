@@ -519,8 +519,33 @@ async function shareViaEmail(message) {
 }
 
 
+function renderPlainLinks(inputHTML) {
+  // Create a temporary element to parse the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = inputHTML;
+
+  // Find all links
+  const links = tempDiv.querySelectorAll('a');
+
+  // Build plain text output
+  let plainText = '';
+  links.forEach(link => {
+    const text = link.textContent.trim();
+    const url = link.href.replace(/^https?:\/\//, ''); // remove https:// for WhatsApp style
+    plainText += `${text}: ${url}\n`;
+  });
+
+  return plainText.trim(); // remove last newline
+}
+
+// Example usage:
+const aiResponse = message;
+
+console.log(renderPlainLinks(aiResponse));
+
+    
 function shareViaWhatsApp(message) {
-  const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${message}`);
+  const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${(renderPlainLinks(aiResponse))}`);
    //const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${encoded}`;
   const url = `https://wa.me/?text=${encoded}`;
   console.log("📲 Opening WhatsApp share:", url);
