@@ -486,7 +486,7 @@ async function shareViaEmail(message) {
   // Handle send button
   sendEmailBtn.onclick = async () => {
     const recipient = recipientEmailInput.value.trim();
-    if (!recipient) return showNotification("Please enter a valid email.");
+    if (!recipient) return alert("Please enter a valid email.");
 
     hideEmailModal(); // hide modal while sending
 
@@ -504,11 +504,11 @@ async function shareViaEmail(message) {
       });
 
       const data = await res.json();
-      showNotification('Chat shared via email!');
+      alert('Chat shared via email!');
       console.log("Email API response:", data);
     } catch (err) {
       console.error("Email API error:", err);
-      showNotification('Failed to share via email.');
+      alert('Failed to share via email.');
     }
   };
 }
