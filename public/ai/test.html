@@ -543,8 +543,8 @@ function shareViaWhatsApp(message) {
 
 const aiResponse = message;
 
-console.log(renderPlainLinks(aiResponse)); 
-const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${renderPlainLinks(aiResponse)}`);
+console.log(renderTextWithLinks(aiResponse)); 
+const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${renderTextWithLinks(aiResponse)}`);
    //const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${encoded}`;
   const url = `https://wa.me/?text=${encoded}`;
   console.log("📲 Opening WhatsApp share:", url);
