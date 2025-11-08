@@ -520,23 +520,21 @@ async function shareViaEmail(message) {
 
 
 //formatlinks for whatsapp
-function renderPlainLinks(inputHTML) {
+function renderTextWithLinks(inputHTML) {
   // Create a temporary element to parse the HTML
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = inputHTML;
 
-  // Find all links
-  const links = tempDiv.querySelectorAll('a');
-
-  // Build plain text output
-  let plainText = '';
-  links.forEach(link => {
+  // Replace each <a> tag with plain text "Text: url"
+  tempDiv.querySelectorAll('a').forEach(link => {
     const text = link.textContent.trim();
-    const url = link.href.replace(/^https?:\/\//, ''); // remove https:// for WhatsApp style
-    plainText += `${text}: ${url}\n`;
+    const url = link.href.replace(/^https?:\/\//, ''); // remove https://
+    const plain = `${text}: ${url}`;
+    link.replaceWith(plain);
   });
 
-  return plainText.trim(); // remove last newline
+  // Return the text content with formatting preserved
+  return tempDiv.innerText;
 }
 
     
