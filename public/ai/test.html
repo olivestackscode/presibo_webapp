@@ -687,6 +687,18 @@ function hideEmailModal() {
 closeEmailModal.addEventListener('click', hideEmailModal);
 
 
+const notificationModal = document.getElementById('notificationModal');
+const notificationMessage = document.getElementById('notificationMessage');
+const closeNotification = document.getElementById('closeNotification');
+
+function showNotification(message) {
+  notificationMessage.textContent = message;
+  notificationModal.classList.add('active');
+}
+
+closeNotification.addEventListener('click', () => {
+  notificationModal.classList.remove('active');
+});
 
 
 </script>
