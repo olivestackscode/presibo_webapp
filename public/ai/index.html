@@ -45,12 +45,92 @@
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+  <!-- Header with Menu Bar -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left side: Brand and Mobile Menu -->
+        <div class="flex items-center">
+          <!-- Mobile menu button -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <span class="sr-only">Open main menu</span>
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <!-- Mobile Brand: Logo + Title on left after menu -->
+          <div class="md:hidden flex items-center space-x-2">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+          <!-- Desktop Brand: Logo + Title on left -->
+          <div class="hidden md:flex items-center space-x-2">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-bold text-purple">Presibo</span>
+          </div>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-8 mx-auto">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/doctors" class="menu-link">Doctors</a>
+          <a href="/food" class="menu-link">Meals</a>
+          <a href="/insights" class="menu-link active">Insights Hub</a>
+          <a href="https://presibo.com/community" class="menu-link">Community</a>
+          <a href="/challenges" class="menu-link">Challenges</a>
+          <a href="/support" class="menu-link">Support</a>
+        </nav>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button id="notification-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full relative">
+              <i class="fas fa-bell text-xl"></i>
+              <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            <div id="notification-dropdown" class="notification-dropdown">
+              <div class="p-4 border-b">
+                <h4 class="font-semibold text-sm">Notifications</h4>
+              </div>
+              <div id="notification-list">
+                <!-- Dynamic notifications will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Icon -->
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block">Dashboard</a>
+        <a href="/vitals" class="menu-link block">Vitals</a>
+        <a href="/meals" class="menu-link block">Meals</a>
+        <a href="/insights-hub" class="menu-link active block">Insights Hub</a>
+        <a href="/community" class="menu-link block">Community</a>
+        <a href="/challenges" class="menu-link block">Challenges</a>
+        <a href="/support" class="menu-link block">Support</a>
+      </nav>
+    </div>
+  </header>
   <div class="max-w-7xl mx-auto space-y-4">
     <!-- Header -->
     <div class="bg-white shadow rounded-lg">
       <div class="p-6 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img src="assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-12 h-12 object-contain">
+          <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-12 h-12 object-contain">
           <h1 class="text-xl font-semibold text-gray-900">Presibo AI Health Assistant</h1>
         </div>
         <div class="text-right">
@@ -75,7 +155,7 @@
         <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Chest pain or discomfort">Chest pain or discomfort</button>
         <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Diabetes management questions">Diabetes management questions</button>
         <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Get Health Assessment">Get Health Assessment</button>
-        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Track Vitals">Track Vitals</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Track my vitals">Track my vitals</button>
         <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Recommend healthy meals for me">Recommend healthy meals for me</button>
         <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Find hospitals near me">Find hospitals near me</button>
         
@@ -115,6 +195,11 @@
             <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="How to manage diabetes effectively?">How to manage diabetes effectively?</button>
             <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="What causes frequent headaches?">What causes frequent headaches?</button>
             <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Find doctors around me">Find doctors around me</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Get Health Assessment">Get Health Assessment</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Track my vitals">Track my vitals</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Recommend healthy meals for me">Recommend healthy meals for me</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Find hospitals near me">Find hospitals near me</button>
+            
             
           </div>
         </div>
