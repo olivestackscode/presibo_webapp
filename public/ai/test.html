@@ -454,17 +454,37 @@ function addSubscriptionErrorMessage(text) {
    SHARE FUNCTIONS
 ===================================================== */
 async function shareViaEmail(message) {
-  console.log("📤 Sending email via API:", { userEmail, message });
   try {
+    // Check if userEmail is set
+    let recipient = userEmail;
+    if (!recipient) {
+      recipient = prompt("Enter your email to receive the chat:");
+      if (!recipient) {
+        alert("Email is required to share the chat.");
+        return; // Stop if no email provided
+      }
+    }
+
+    console.log("📤 Sending email via API:", { recipient, message });
+
     const res = await fetch(EMAIL_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: userEmail || 'test@presibo.com',
+        to: recipient,
         subject: 'Your Presibo AI Chat',
         body: message
       })
     });
+
+    const data = await res.json();
+    console.log("✅ Email API response:", data);
+    alert('Chat shared via email!');
+  } catch (err) {
+    console.error("❌ Email API Error:", err);
+    alert('Failed to share via email.');
+  }
+}
 
     const data = await res.json();
     console.log("✅ Email API response:", data);
