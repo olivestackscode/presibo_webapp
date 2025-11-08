@@ -477,7 +477,7 @@ async function shareViaEmail(message) {
         type: "custom",
         email: recipient || 'bcc@presibo.com',
         title: 'Your Presibo AI Chat',
-        body: AIMsgtoSend
+        message: AIMsgtoSend
       })
     });
 
