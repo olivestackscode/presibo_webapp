@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Schedule a Home Doctor Visit - Presibo</title>
-<meta name="description" content="Schedule a home visit from our doctors within 3 hours. Select a doctor, choose a time, and provide your address. Call <strong>0916 762 9900</strong> for urgent visits.">
+<meta name="description" content="Schedule a home visit from our doctors within 3 hours. Select a doctor, choose a time, and provide your address. Call 0916 762 9900 for urgent visits.">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
 .input { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; }
 .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -17,21 +18,21 @@
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 font-sans">
 
 <header class="bg-white shadow-sm border-b">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-<img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-<span class="font-bold text-purple">Presibo</span>
-</div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+    <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+    <span class="font-bold text-purple">Presibo</span>
+  </div>
 </header>
 
 <main class="max-w-5xl mx-auto p-6">
-<h1 class="text-2xl font-bold mb-2">Schedule a Home Visit from Our Doctors</h1>
-<p class="mb-4 text-gray-700">Select a doctor below to schedule a home visit within 3 hours. <strong>Call: 0916 762 9900</strong> for urgent requests.</p>
+  <h1 class="text-2xl font-bold mb-2">Schedule a Home Visit from Our Doctors</h1>
+  <p class="mb-4 text-gray-700">Select a doctor below to schedule a home visit within 3 hours. <strong>Call: <span class="font-bold">0916 762 9900</span></strong> for urgent requests.</p>
 
-<div id="doctorsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="doctorsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-<div id="confirmation" class="hidden mt-6 p-4 bg-green-100 rounded-lg text-green-800">
-✅ Your home visit is scheduled! Doctor will arrive in <span id="countdown">03:00:00</span>.
-</div>
+  <div id="confirmation" class="hidden mt-6 p-4 bg-green-100 rounded-lg text-green-800">
+    ✅ Your home visit is scheduled! Doctor will arrive in <span id="countdown">03:00:00</span>.
+  </div>
 </main>
 
 <!-- Booking Modal -->
@@ -40,7 +41,7 @@
     <h2 class="text-lg font-semibold mb-4">Schedule Home Visit</h2>
     <div id="booking-modal-content" class="text-sm text-gray-700 mb-4"></div>
     <div class="flex gap-2">
-      <button id="booking-modal-action" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex-grow">Submit</button>
+      <button id="booking-modal-action" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex-grow">Pay & Submit</button>
       <button class="modal-close border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex-grow">Close</button>
     </div>
   </div>
@@ -48,7 +49,8 @@
 
 <script>
 let doctors = [];
-let email = sessionStorage.getItem('email') || null;
+let isSubscribed = false;
+let usageStatus = document.createElement('div'); // optional, can be used for subscription status
 
 // Fetch doctors and render cards
 async function fetchDoctors() {
@@ -85,9 +87,7 @@ function renderDoctors(list) {
 }
 
 // Open modal to schedule home visit
-async function openBookingModal(doctorId) {
-  if (!email) { alert("You must be logged in to schedule a visit."); return; }
-
+function openBookingModal(doctorId) {
   const doctor = doctors.find(d => d.id == doctorId);
   const modal = document.getElementById('booking-modal');
   const modalContent = document.getElementById('booking-modal-content');
@@ -117,28 +117,42 @@ async function openBookingModal(doctorId) {
     const address = document.getElementById('home-address').value.trim();
     if (!date || !time || !address) return alert("All fields are required.");
 
-    try {
-      const res = await fetch('https://api.presibo.com/appointments/new.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          doctor_id: doctor.id,
-          doctor: doctor.name,
-          specialty: doctor.specialization,
-          date, time, address,
-          type: "home_visit"
-        })
-      });
-      const result = await res.json();
-      if(result.status === 'success'){
-        modal.classList.remove('active');
-        document.getElementById('confirmation').classList.remove('hidden');
-        startCountdown(3*60*60); // 3 hours countdown
-      } else throw new Error(result.message);
-    } catch(err) {
-      console.error(err);
-      alert('Failed to schedule visit. Try again.');
-    }
+    // Paystack payment integration before scheduling
+    const handler = PaystackPop.setup({
+      key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // replace with your own key
+      email: prompt("Enter your email for payment receipt:") || "user@example.com",
+      amount: 2500000, // ₦25,000 in kobo
+      currency: "NGN",
+      onSuccess: async function(ref) {
+        isSubscribed = true; // unlock scheduling
+        try {
+          const res = await fetch('https://api.presibo.com/appointments/new.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              doctor_id: doctor.id,
+              doctor: doctor.name,
+              specialty: doctor.specialization,
+              date, time, address,
+              type: "home_visit",
+              payment_ref: ref.reference
+            })
+          });
+          const result = await res.json();
+          if(result.status === 'success'){
+            modal.classList.remove('active');
+            document.getElementById('confirmation').classList.remove('hidden');
+            startCountdown(3*60*60); // 3 hours countdown
+            alert("Payment successful! Home visit scheduled.");
+          } else throw new Error(result.message);
+        } catch(err) {
+          console.error(err);
+          alert('Failed to schedule visit. Try again.');
+        }
+      },
+      onCancel: function() { alert('Payment cancelled.'); }
+    });
+    handler.openIframe();
   }
 }
 
