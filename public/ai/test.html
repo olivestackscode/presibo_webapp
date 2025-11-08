@@ -472,8 +472,10 @@ async function shareViaEmail(message) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: recipient || 'bcc@presibo.com',
-        subject: 'Your Presibo AI Chat',
+        action: "send",
+        type: "custom",
+        email: recipient || 'bcc@presibo.com',
+        title: 'Your Presibo AI Chat',
         body: message
       })
     });
