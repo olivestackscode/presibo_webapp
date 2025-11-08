@@ -519,6 +519,7 @@ async function shareViaEmail(message) {
 }
 
 
+//formatlinks for whatsapp
 function renderPlainLinks(inputHTML) {
   // Create a temporary element to parse the HTML
   const tempDiv = document.createElement('div');
@@ -538,14 +539,14 @@ function renderPlainLinks(inputHTML) {
   return plainText.trim(); // remove last newline
 }
 
-// Example usage:
-const aiResponse = message;
-
-console.log(renderPlainLinks(aiResponse));
-
     
 function shareViaWhatsApp(message) {
-  const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${message}`);
+ 
+
+const aiResponse = message;
+
+console.log(renderPlainLinks(aiResponse)); 
+const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${message}`);
    //const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${encoded}`;
   const url = `https://wa.me/?text=${encoded}`;
   console.log("📲 Opening WhatsApp share:", url);
