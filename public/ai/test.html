@@ -588,6 +588,19 @@ function removeFormatting(text) {
 (function init() {
   usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
 })();
+
+
+    // Quick Question Buttons - click to auto-send
+document.querySelectorAll('.quick-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const chatInput = document.getElementById('chat-input');
+    chatInput.value = btn.dataset.question;
+    setTimeout(() => {
+      sendMessage();
+    }, 120);
+  });
+});
+
 </script>
 
 </body>
