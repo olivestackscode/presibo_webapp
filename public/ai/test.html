@@ -558,7 +558,7 @@ async function sendMessage() {
   const text = chatInput.value.trim();
   
   if (!text) return;
-  const lastUserMessage = text;
+  lastUserMessage = text;
 
   if (!isSubscribed && remaining <= 0) {
     addSubscriptionErrorMessage('Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.');
