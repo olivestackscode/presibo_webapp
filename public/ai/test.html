@@ -331,6 +331,13 @@
   </div>
 </div>
 
+<!-- Notification Modal -->
+<div id="notificationModal" class="dialog-overlay">
+  <div class="dialog-content text-center">
+    <p id="notificationMessage" class="text-gray-900 text-sm"></p>
+    <button id="closeNotification" class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">OK</button>
+  </div>
+</div>
 
   <script>
 /* =====================================================
@@ -479,7 +486,7 @@ async function shareViaEmail(message) {
   // Handle send button
   sendEmailBtn.onclick = async () => {
     const recipient = recipientEmailInput.value.trim();
-    if (!recipient) return alert("Please enter a valid email.");
+    if (!recipient) return showNotification("Please enter a valid email.");
 
     hideEmailModal(); // hide modal while sending
 
@@ -497,11 +504,11 @@ async function shareViaEmail(message) {
       });
 
       const data = await res.json();
-      alert('Chat shared via email!');
+      showNotification('Chat shared via email!');
       console.log("Email API response:", data);
     } catch (err) {
       console.error("Email API error:", err);
-      alert('Failed to share via email.');
+      showNotification('Failed to share via email.');
     }
   };
 }
@@ -677,7 +684,22 @@ function hideEmailModal() {
 }
 
 // Close button
-closeEmailModal.addEventListener('click', hideEmailModal);
+closeEmailModal.addEventListener('click', hideEmailModal);\
+
+
+const notificationModal = document.getElementById('notificationModal');
+const notificationMessage = document.getElementById('notificationMessage');
+const closeNotification = document.getElementById('closeNotification');
+
+function showNotification(message) {
+  notificationMessage.textContent = message;
+  notificationModal.classList.add('active');
+}
+
+closeNotification.addEventListener('click', () => {
+  notificationModal.classList.remove('active');
+});
+
 
 </script>
 
