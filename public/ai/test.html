@@ -480,7 +480,7 @@ async function shareViaEmail(message) {
     let recipient = userEmail;
     if (!recipient) {
       //recipient = prompt("Please enter your email to receive the chat:");
-      const recipient = recipientEmailInput.value.trim();
+      recipient = recipientEmailInput.value.trim();
       if (!recipient) {
         alert("Email is required to share the chat.");
         return; // Stop execution if user cancels
