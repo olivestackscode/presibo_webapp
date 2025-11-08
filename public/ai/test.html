@@ -412,6 +412,12 @@ function addAIMessage(text) {
     </div>
   `;
 
+  const el = createMessageElement({ type: 'ai', content: '', timestamp: new Date() });
+  el.querySelector('.text-sm').append(...doc.body.childNodes);
+  wordToLink(el);
+  makeArrayClickable(el);
+  chatArea.appendChild(el);
+
   wrapper.appendChild(bubble);
   chatArea.appendChild(wrapper);
   scrollToBottom();
