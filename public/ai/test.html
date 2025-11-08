@@ -325,7 +325,8 @@ const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
 const EMAIL_API = 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
 let freeLimit = 5;
 let remaining = freeLimit;
-let isSubscribed = false;
+let isSubscribed = false
+let AIMsgtoSend = 'null';  
 
 /* =====================================================
    DOM ELEMENTS
@@ -548,6 +549,7 @@ async function sendMessage() {
 
   sendButton.disabled = true;
   const aiResult = await callAI(text);
+  AIMsgtoSend = aiResult;
   sendButton.disabled = false;
   typingEl.remove();
 
