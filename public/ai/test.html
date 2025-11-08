@@ -479,7 +479,7 @@ function addSubscriptionErrorMessage(text) {
 ===================================================== */
 async function shareViaEmail(message) {
   const cleanMessage = cleanMessageHTML(message); // clean HTML
-  const fullMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
+//const fullMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
   //const fullMessage = `${chatInput.value}:<br>${message}`;
 
   
@@ -503,7 +503,7 @@ async function shareViaEmail(message) {
           type: "custom",
           email: recipient,
           title: 'Your Presibo AI Chat',
-          message: fullMessage
+          message: message
         })
       });
 
