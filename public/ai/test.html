@@ -362,7 +362,7 @@ const closeModal = document.getElementById('closeModal');
 /* =====================================================
    INITIAL WELCOME MESSAGE
 ===================================================== */
-addAIMessage("Hello! I'm your Personal AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?");
+addAIMessage("Hello! I'm your Personal AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?", false);
 
 /* =====================================================
    HELPERS
@@ -434,7 +434,7 @@ function addUserMessage(text) {
   scrollToBottom();
 }
 
-function addAIMessage(text) {
+function addAIMessage(text, shareDiv = true) {
   const cleanText = removeFormatting(text);
   const parser = new DOMParser();
   const doc = parser.parseFromString(cleanText, 'text/html');
