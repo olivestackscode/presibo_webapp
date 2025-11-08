@@ -520,9 +520,9 @@ async function shareViaEmail(message) {
 
 
 function shareViaWhatsApp(message) {
-  const encoded = encodeURIComponent(message);
-   const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
-  const url = `https://wa.me/?text=${fullencodedMessage}`;
+  const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${message}`);
+   //const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${encoded}`;
+  const url = `https://wa.me/?text=${encoded}`;
   console.log("📲 Opening WhatsApp share:", url);
   window.open(url, '_blank');
 }
