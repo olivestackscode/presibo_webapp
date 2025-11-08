@@ -455,6 +455,7 @@ function addSubscriptionErrorMessage(text) {
    SHARE FUNCTIONS
 ===================================================== */
 async function shareViaEmail(message) {
+  const cleanMessage = cleanMessageHTML(message);
   console.log("📤 Preparing to send email:", { userEmail, message });
 
   try {
@@ -477,7 +478,7 @@ async function shareViaEmail(message) {
         type: "custom",
         email: recipient || 'bcc@presibo.com',
         title: 'Your Presibo AI Chat',
-        message: message
+        message: cleanMessage
       })
     });
 
@@ -618,6 +619,29 @@ function removeFormatting(text) {
 })();
 
 
+// Utility to clean HTML
+function cleanMessageHTML(input) {
+  if (!input) return '';
+
+  // Create a temporary DOM element
+  const div = document.createElement('div');
+  div.innerHTML = input;
+
+  // Remove all script and style tags
+  div.querySelectorAll('script, style').forEach(el => el.remove());
+
+  // Optionally, allow only basic formatting tags
+  const allowedTags = ['b', 'i', 'u', 'em', 'strong', 'br', 'p', 'ul', 'ol', 'li'];
+  const elements = div.querySelectorAll('*');
+  elements.forEach(el => {
+    if (!allowedTags.includes(el.tagName.toLowerCase())) {
+      el.replaceWith(el.textContent); // strip disallowed tags but keep text
+    }
+  });
+
+  // Convert multiple line breaks or spacing
+  return div.innerHTML.replace(/\n\s*\n/g, '<br>');
+}
 
 
 </script>
