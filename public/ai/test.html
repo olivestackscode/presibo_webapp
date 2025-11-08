@@ -503,7 +503,7 @@ async function shareViaEmail(message) {
           action: "send",
           type: "custom",
           email: recipient,
-          title: 'Your Presibo AI Chat',
+          title: `Your Presibo AI Chat [${lastUserMessage}]`,
           message: fullMessage
         })
       });
