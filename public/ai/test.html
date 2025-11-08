@@ -434,29 +434,28 @@ function addUserMessage(text) {
   scrollToBottom();
 }
 
-function addAIMessage(text, shareDiv = true) {
+function addAIMessage(text, includeShareButtons = true) {
   const cleanText = removeFormatting(text);
   const parser = new DOMParser();
   const doc = parser.parseFromString(cleanText, 'text/html');
+
   const el = createMessageElement({ type: 'ai', content: '' });
   el.querySelector('.text-sm').append(...doc.body.childNodes);
 
-  // Convert links + arrays
-  wordToLink(el);
-  makeArrayClickable(el);
+  if (includeShareButtons) {
+    // Add share buttons below AI message
+    const shareDiv = document.createElement('div');
+    shareDiv.className = "flex gap-3 mt-2";
+    shareDiv.innerHTML = `
+      <button class="share-email text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Share via Email</button>
+      <button class="share-whatsapp text-sm bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">Share via WhatsApp</button>
+    `;
+    el.querySelector('.text-sm').after(shareDiv);
 
-  // Add share buttons below AI message
-  const shareDiv = document.createElement('div');
-  shareDiv.className = "flex gap-3 mt-2";
-  shareDiv.innerHTML = `
-    <button class="share-email text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Share via Email</button>
-    <button class="share-whatsapp text-sm bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">Share via WhatsApp</button>
-  `;
-  el.querySelector('.text-sm').after(shareDiv);
-
-  // Share button handlers
-  shareDiv.querySelector('.share-email').addEventListener('click', () => shareViaEmail(cleanText));
-  shareDiv.querySelector('.share-whatsapp').addEventListener('click', () => shareViaWhatsApp(cleanText));
+    // Share button handlers
+    shareDiv.querySelector('.share-email').addEventListener('click', () => shareViaEmail(cleanText));
+    shareDiv.querySelector('.share-whatsapp').addEventListener('click', () => shareViaWhatsApp(cleanText));
+  }
 
   chatArea.appendChild(el);
   scrollToBottom();
