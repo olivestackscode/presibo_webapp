@@ -472,42 +472,39 @@ function addSubscriptionErrorMessage(text) {
    SHARE FUNCTIONS
 ===================================================== */
 async function shareViaEmail(message) {
-  const cleanMessage = cleanMessageHTML(message);
-  console.log("📤 Preparing to send email:", { userEmail, message });
+  const cleanMessage = cleanMessageHTML(message); // clean HTML
 
-  try {
-    // Determine recipient email
-    let recipient = userEmail;
-    if (!recipient) {
-      //recipient = prompt("Please enter your email to receive the chat:");
-      recipient = recipientEmailInput.value.trim();
-      if (!recipient) {
-        alert("Email is required to share the chat.");
-        return; // Stop execution if user cancels
-      }
+  // Show modal to enter recipient email
+  showEmailModal();
+
+  // Handle send button
+  sendEmailBtn.onclick = async () => {
+    const recipient = recipientEmailInput.value.trim();
+    if (!recipient) return alert("Please enter a valid email.");
+
+    hideEmailModal(); // hide modal while sending
+
+    try {
+      const res = await fetch(EMAIL_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: recipient,
+          subject: 'Your Presibo AI Chat',
+          body: cleanMessage
+        })
+      });
+
+      const data = await res.json();
+      alert('Chat shared via email!');
+      console.log("Email API response:", data);
+    } catch (err) {
+      console.error("Email API error:", err);
+      alert('Failed to share via email.');
     }
-
-    // Send email via API
-    const res = await fetch(EMAIL_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: "send",
-        type: "custom",
-        email: recipient || 'bcc@presibo.com',
-        title: 'Your Presibo Personal AI Chat',
-        message: message
-      })
-    });
-
-    const data = await res.json();
-    console.log("✅ Email API response:", data);
-    alert('Chat shared via email successfully!');
-  } catch (err) {
-    console.error("❌ Email API Error:", err);
-    alert('Failed to share chat via email.');
-  }
+  };
 }
+
 
 function shareViaWhatsApp(message) {
   const encoded = encodeURIComponent(message);
