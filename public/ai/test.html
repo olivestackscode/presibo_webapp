@@ -558,15 +558,16 @@ chatInput.addEventListener('keypress', e => {
 
 
         // Quick Question Buttons - click to auto-send
+// Quick Question Buttons - click to auto-send
 document.querySelectorAll('.quick-question').forEach(btn => {
   btn.addEventListener('click', () => {
-    const chatInput = document.getElementById('chat-input');
-    chatInput.value = btn.dataset.question;
+    chatInput.value = btn.dataset.question; // use existing chatInput variable
     setTimeout(() => {
       sendMessage();
     }, 120);
   });
 });
+
 /* =====================================================
    UTILS (LINK / CLEAN TEXT)
 ===================================================== */
