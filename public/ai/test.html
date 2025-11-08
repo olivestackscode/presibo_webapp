@@ -479,6 +479,9 @@ function addSubscriptionErrorMessage(text) {
 ===================================================== */
 async function shareViaEmail(message) {
   const cleanMessage = cleanMessageHTML(message); // clean HTML
+  const fullMessage = `${chatInput.value}:<br>${message}`;
+
+  
 
   // Show modal to enter recipient email
   showEmailModal();
@@ -499,7 +502,7 @@ async function shareViaEmail(message) {
           type: "custom",
           email: recipient,
           title: 'Your Presibo AI Chat',
-          message: message
+          message: fullMessage
         })
       });
 
