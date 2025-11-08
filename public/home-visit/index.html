@@ -50,7 +50,6 @@
 <script>
 let doctors = [];
 let isSubscribed = false;
-let usageStatus = document.createElement('div'); // optional, can be used for subscription status
 
 // Fetch doctors and render cards
 async function fetchDoctors() {
@@ -96,6 +95,10 @@ function openBookingModal(doctorId) {
     <p><strong>Doctor:</strong> ${doctor.name}</p>
     <p><strong>Specialization:</strong> ${doctor.specialization}</p>
     <label class="block mt-2">
+      <span>Email (for receipt):</span>
+      <input type="email" id="user-email" class="input" placeholder="you@example.com" required />
+    </label>
+    <label class="block mt-2">
       <span>Date:</span>
       <input type="date" id="visit-date" class="input" required />
     </label>
@@ -112,19 +115,21 @@ function openBookingModal(doctorId) {
   modal.classList.add('active');
 
   document.getElementById('booking-modal-action').onclick = async () => {
+    const email = document.getElementById('user-email').value.trim();
     const date = document.getElementById('visit-date').value;
     const time = document.getElementById('visit-time').value;
     const address = document.getElementById('home-address').value.trim();
-    if (!date || !time || !address) return alert("All fields are required.");
 
-    // Paystack payment integration before scheduling
+    if (!email || !date || !time || !address) return;
+
+    // Paystack payment integration
     const handler = PaystackPop.setup({
-      key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // replace with your own key
-      email: prompt("Enter your email for payment receipt:") || "user@example.com",
-      amount: 2500000, // ₦25,000 in kobo
+      key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+      email,
+      amount: 2500000, // ₦25,000
       currency: "NGN",
       onSuccess: async function(ref) {
-        isSubscribed = true; // unlock scheduling
+        isSubscribed = true;
         try {
           const res = await fetch('https://api.presibo.com/appointments/new.php', {
             method: 'POST',
@@ -142,15 +147,13 @@ function openBookingModal(doctorId) {
           if(result.status === 'success'){
             modal.classList.remove('active');
             document.getElementById('confirmation').classList.remove('hidden');
-            startCountdown(3*60*60); // 3 hours countdown
-            alert("Payment successful! Home visit scheduled.");
-          } else throw new Error(result.message);
+            startCountdown(3*60*60); // 3 hours
+          }
         } catch(err) {
           console.error(err);
-          alert('Failed to schedule visit. Try again.');
         }
       },
-      onCancel: function() { alert('Payment cancelled.'); }
+      onCancel: function() { /* payment cancelled */ }
     });
     handler.openIframe();
   }
