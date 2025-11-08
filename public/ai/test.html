@@ -503,7 +503,7 @@ async function shareViaEmail(message) {
           action: "send",
           type: "custom",
           email: recipient,
-          title: `Your Presibo AI Chat [${lastUserMessage}]`,
+          title: `Your Presibo AI Chat: ${lastUserMessage}`,
           message: fullMessage
         })
       });
@@ -521,7 +521,8 @@ async function shareViaEmail(message) {
 
 function shareViaWhatsApp(message) {
   const encoded = encodeURIComponent(message);
-  const url = `https://wa.me/?text=${encoded}`;
+   const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
+  const url = `https://wa.me/?text=${fullencodedMessage}`;
   console.log("📲 Opening WhatsApp share:", url);
   window.open(url, '_blank');
 }
