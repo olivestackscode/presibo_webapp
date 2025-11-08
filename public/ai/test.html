@@ -479,7 +479,8 @@ function addSubscriptionErrorMessage(text) {
 ===================================================== */
 async function shareViaEmail(message) {
   const cleanMessage = cleanMessageHTML(message); // clean HTML
-  const fullMessage = `${chatInput.value}:<br>${message}`;
+  const fullMessage = `You asked: ${chatInput.value}\n\nAI Response: ${message}`;
+  //const fullMessage = `${chatInput.value}:<br>${message}`;
 
   
 
