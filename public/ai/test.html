@@ -316,605 +316,279 @@
   </div>
 
   <script>
-    // -----------------------
-    // Config / state
-    // -----------------------
-    const userEmail = sessionStorage.getItem('email');
-    const AI_API = 'https://api.presibo.com/ai/openrouter.php';
-    const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
-    let freeLimit = 5;
-    let remaining = freeLimit;
-    let isSubscribed = false;
+/* =====================================================
+   CONFIG / STATE
+===================================================== */
+const userEmail = sessionStorage.getItem('email');
+const AI_API = 'https://api.presibo.com/ai/openrouter.php';
+const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
+const EMAIL_API = 'https://api.presibo.com/email/send.php'; // <-- your email API endpoint
+let freeLimit = 5;
+let remaining = freeLimit;
+let isSubscribed = false;
 
-    // DOM
-    const chatArea = document.getElementById('chatArea');
-    const chatInput = document.getElementById('chatInput');
-    const sendButton = document.getElementById('sendButton');
-    const doctorRecommendations = document.getElementById('doctorRecommendations');
-    const doctorList = document.getElementById('doctorList');
-    const usageStatus = document.getElementById('usageStatus');
-    const usageRemaining = document.getElementById('usageRemaining');
-    const subscriptionModal = document.getElementById('subscriptionModal');
-    const subscribeNow = document.getElementById('subscribeNow');
-    const closeModal = document.getElementById('closeModal');
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+const chatArea = document.getElementById('chatArea');
+const chatInput = document.getElementById('chatInput');
+const sendButton = document.getElementById('sendButton');
+const doctorRecommendations = document.getElementById('doctorRecommendations');
+const doctorList = document.getElementById('doctorList');
+const usageStatus = document.getElementById('usageStatus');
+const usageRemaining = document.getElementById('usageRemaining');
+const subscriptionModal = document.getElementById('subscriptionModal');
+const subscribeNow = document.getElementById('subscribeNow');
+const closeModal = document.getElementById('closeModal');
 
-    // initial welcome message
-    addAIMessage("Hello! I'm your AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?");
+/* =====================================================
+   INITIAL WELCOME MESSAGE
+===================================================== */
+addAIMessage("Hello! I'm your AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?");
 
-    // helpers
-    function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
-    function createMessageElement({ type, content, timestamp = new Date(), isSubscriptionError=false }) {
-      const wrapper = document.createElement('div');
-      wrapper.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-3`;
-      const bubbleColor = type === 'user' ? 'bg-blue-600 text-white' : isSubscriptionError ? 'bg-red-50 border border-red-200 text-red-800' : 'bg-gray-100 text-gray-900';
-      wrapper.innerHTML = `
-        <div class="flex gap-2 max-w-[80%] ${type === 'user' ? 'flex-row-reverse' : 'flex-row'}">
-          <div class="${type === 'user' ? 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center' : 'w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center'}">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              ${type === 'user'
-                ? '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>'
-                : '<path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path>'
-              }
-            </svg>
-          </div>
-          <div class="rounded-lg p-3 ${bubbleColor}">
-            <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
-            ${isSubscriptionError ? `<div class="mt-3 pt-3 border-t border-red-200"><button class="subscribe-now w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">Subscribe</button><span class="text-xs text-red-600 mt-2 block">You've used all ${freeLimit} free consultations. Subscribe for unlimited access.</span></div>` : ''}
-            <div class="text-xs opacity-70 mt-1">${new Date(timestamp).toLocaleTimeString()}</div>
-          </div>
-        </div>
-      `;
-      // hook subscribe button if present
-      setTimeout(() => {
-        const btn = wrapper.querySelector('.subscribe-now');
-        if (btn) btn.addEventListener('click', () => subscriptionModal.classList.add('active'));
-      }, 0);
-      return wrapper;
-    }
+/* =====================================================
+   HELPERS
+===================================================== */
+function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
 
-    function escapeHtml(unsafe) {
-      if (!unsafe) return '';
-      return unsafe
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
 
-    function addUserMessage(text) {
-      const el = createMessageElement({ type: 'user', content: text, timestamp: new Date() });
-      chatArea.appendChild(el);
-      scrollToBottom();
-    }
-
-function addAIMessage(text) {
-  const cleanText = removeFormatting(text);
+function createMessageElement({ type, content, timestamp = new Date(), isSubscriptionError = false }) {
   const wrapper = document.createElement('div');
-  wrapper.className = 'flex justify-start mb-3';
+  wrapper.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-3`;
 
-  const bubble = document.createElement('div');
-  bubble.className = 'flex gap-2 max-w-[80%]';
+  const bubbleColor = type === 'user'
+    ? 'bg-blue-600 text-white'
+    : isSubscriptionError
+      ? 'bg-red-50 border border-red-200 text-red-800'
+      : 'bg-gray-100 text-gray-900';
 
-  bubble.innerHTML = `
-    <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path>
-      </svg>
-    </div>
-    <div class="rounded-lg p-3 bg-gray-100 text-gray-900">
-      <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(cleanText)}</div>
-      <div class="flex gap-3 mt-3">
-        <button class="email-share text-xs text-blue-600 underline">Share via Email</button>
-        <button class="whatsapp-share text-xs text-green-600 underline">Share via WhatsApp</button>
+  wrapper.innerHTML = `
+    <div class="flex gap-2 max-w-[80%] ${type === 'user' ? 'flex-row-reverse' : 'flex-row'}">
+      <div class="${type === 'user'
+        ? 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center'
+        : 'w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center'}">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          ${type === 'user'
+            ? '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>'
+            : '<path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path>'
+          }
+        </svg>
       </div>
-      <div class="text-xs opacity-70 mt-1">${new Date().toLocaleTimeString()}</div>
+      <div class="rounded-lg p-3 ${bubbleColor}">
+        <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
+        ${isSubscriptionError
+          ? `<div class="mt-3 pt-3 border-t border-red-200">
+              <button class="subscribe-now w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">
+                Subscribe
+              </button>
+              <span class="text-xs text-red-600 mt-2 block">
+                You've used all ${freeLimit} free consultations. Subscribe for unlimited access.
+              </span>
+            </div>` : ''}
+        <div class="text-xs opacity-70 mt-1">${new Date(timestamp).toLocaleTimeString()}</div>
+      </div>
     </div>
   `;
 
-  const el = createMessageElement({ type: 'ai', content: '', timestamp: new Date() });
+  setTimeout(() => {
+    const btn = wrapper.querySelector('.subscribe-now');
+    if (btn) btn.addEventListener('click', () => subscriptionModal.classList.add('active'));
+  }, 0);
+
+  return wrapper;
+}
+
+/* =====================================================
+   MESSAGE HANDLERS
+===================================================== */
+function addUserMessage(text) {
+  const el = createMessageElement({ type: 'user', content: text });
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+function addAIMessage(text) {
+  const cleanText = removeFormatting(text);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(cleanText, 'text/html');
+  const el = createMessageElement({ type: 'ai', content: '' });
   el.querySelector('.text-sm').append(...doc.body.childNodes);
+
+  // Convert links + arrays
   wordToLink(el);
   makeArrayClickable(el);
-  chatArea.appendChild(el);
 
-  wrapper.appendChild(bubble);
-  chatArea.appendChild(wrapper);
+  // Add share buttons below AI message
+  const shareDiv = document.createElement('div');
+  shareDiv.className = "flex gap-3 mt-2";
+  shareDiv.innerHTML = `
+    <button class="share-email text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Share via Email</button>
+    <button class="share-whatsapp text-sm bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">Share via WhatsApp</button>
+  `;
+  el.querySelector('.text-sm').after(shareDiv);
+
+  // Share button handlers
+  shareDiv.querySelector('.share-email').addEventListener('click', () => shareViaEmail(cleanText));
+  shareDiv.querySelector('.share-whatsapp').addEventListener('click', () => shareViaWhatsApp(cleanText));
+
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+function addSubscriptionErrorMessage(text) {
+  const el = createMessageElement({ type: 'error', content: text, isSubscriptionError: true });
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+/* =====================================================
+   SHARE FUNCTIONS
+===================================================== */
+async function shareViaEmail(message) {
+  console.log("📤 Sending email via API:", { userEmail, message });
+  try {
+    const res = await fetch(EMAIL_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: userEmail || 'test@presibo.com',
+        subject: 'Your Presibo AI Chat',
+        body: message
+      })
+    });
+
+    const data = await res.json();
+    console.log("✅ Email API response:", data);
+    alert('Chat shared via email!');
+  } catch (err) {
+    console.error("❌ Email API Error:", err);
+    alert('Failed to share via email.');
+  }
+}
+
+function shareViaWhatsApp(message) {
+  const encoded = encodeURIComponent(message);
+  const url = `https://wa.me/?text=${encoded}`;
+  console.log("📲 Opening WhatsApp share:", url);
+  window.open(url, '_blank');
+}
+
+/* =====================================================
+   AI CALL
+===================================================== */
+async function callAI(message) {
+  try {
+    console.log("🤖 Sending to AI API:", message);
+    const res = await fetch(AI_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+    console.log("✅ AI API response:", data);
+    if (data.status === 'success' && typeof data.reply === 'string') {
+      return { ok: true, reply: data.reply };
+    } else {
+      throw new Error('Invalid AI response format');
+    }
+  } catch (err) {
+    console.error("❌ AI API Error:", err);
+    return { ok: false, error: err.message };
+  }
+}
+
+/* =====================================================
+   MESSAGE SEND FLOW
+===================================================== */
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  if (!isSubscribed && remaining <= 0) {
+    addSubscriptionErrorMessage('Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.');
+    subscriptionModal.classList.add('active');
+    return;
+  }
+
+  addUserMessage(text);
+  chatInput.value = '';
+
+  // Show typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'flex justify-start mb-3';
+  typingEl.innerHTML = `<div class="flex gap-2"><div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2z"></path></svg>
+  </div><div class="bg-gray-100 rounded-lg p-3"><div class="flex gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div></div></div></div>`;
+  chatArea.appendChild(typingEl);
   scrollToBottom();
 
-  // --- SHARE FUNCTIONALITY ---
-  const emailBtn = bubble.querySelector('.email-share');
-  const whatsappBtn = bubble.querySelector('.whatsapp-share');
+  sendButton.disabled = true;
+  const aiResult = await callAI(text);
+  sendButton.disabled = false;
+  typingEl.remove();
 
-  emailBtn.addEventListener('click', () => {
-    console.log('Preparing to send email...');
-    sendEmail(cleanText);
-  });
+  if (!aiResult.ok) {
+    addAIMessage('AI is busy right now. Please try again later.');
+    return;
+  }
 
-  whatsappBtn.addEventListener('click', () => {
-    const encoded = encodeURIComponent(cleanText);
-    const waUrl = `https://wa.me/?text=${encoded}`;
-    window.open(waUrl, '_blank');
-  });
+  addAIMessage(aiResult.reply);
 }
 
-// -----------------------------
-// EMAIL API FUNCTION
-// -----------------------------
-function sendEmail(message) {
-  const emailData = {
-    to: userEmail || 'test@presibo.com',
-    subject: 'Shared AI Chat from Presibo',
-    body: message
-  };
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+sendButton.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
 
-  console.log('Sending email with data:', emailData);
-
-  fetch('https://api.presibo.com/email/send.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(emailData)
-  })
-    .then(res => {
-      console.log('Email API response:', res);
-      return res.json();
-    })
-    .then(data => {
-      console.log('Email API parsed response:', data);
-      alert('Chat shared via email successfully!');
-    })
-    .catch(err => {
-      console.error('Email API error:', err);
-      alert('Failed to send email.');
-    });
-}
-
-// -----------------------------
-// FORMATTING CLEANER
-// -----------------------------
-function removeFormatting(text) {
-  if (!text) return '';
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '$1') // remove bold markdown
-    .replace(/\*(.*?)\*/g, '$1') // remove italics markdown
-    .replace(/#+\s?/g, '') // remove headings
-    .replace(/`{1,3}(.*?)`{1,3}/g, '$1') // remove code blocks
-    .replace(/\n{3,}/g, '\n\n'); // compress newlines
-}
-
-    function addSubscriptionErrorMessage(text) {
-      const el = createMessageElement({ type: 'error', content: text, timestamp: new Date(), isSubscriptionError:true });
-      chatArea.appendChild(el);
-      scrollToBottom();
-    }
-
-    // simple symptoms analyzer -> suggested specialties
-    function analyzeSymptoms(text) {
-      const lower = (text || '').toLowerCase();
-      const specialties = new Set();
-      if (/(diabetes|blood sugar|glucose|insulin)/.test(lower)) specialties.add('Nutritionist');
-      if (/(blood pressure|hypertension|chest pain|palpita|heart)/.test(lower)) specialties.add('Cardiology');
-      if (/(fever|malaria|headache|typhoid)/.test(lower)) specialties.add('General Practitioner');
-      if (/(diet|nutrition|meal|weight)/.test(lower)) specialties.add('Nutritionist');
-      // fallback
-      if (specialties.size === 0) specialties.add('General Practitioner');
-      return Array.from(specialties);
-    }
-
-    // fetch doctors list
-    async function fetchDoctors() {
-      try {
-        const res = await fetch(DOCTORS_API);
-        const data = await res.json();
-        // API may return {users: [...] } or array directly
-        if (Array.isArray(data)) return data;
-        if (Array.isArray(data.users)) return data.users;
-        if (Array.isArray(data.doctors)) return data.doctors;
-        // fallback: try common keys
-        for (const key of Object.keys(data)) {
-          if (Array.isArray(data[key])) return data[key];
-        }
-        return [];
-      } catch (err) {
-        console.error('Failed to load doctors:', err);
-        return [];
-      }
-    }
-
-    // find top N doctors matching specialties
-    function findMatchingDoctors(doctors, specialties, limit = 3) {
-      if (!Array.isArray(doctors) || doctors.length === 0) return [];
-      const lowerSpecs = specialties.map(s => s.toLowerCase());
-      const matches = doctors.filter(d => {
-        const spec = (d.specialization || d.speciality || d.title || '').toLowerCase();
-        return lowerSpecs.some(ls => spec.includes(ls));
-      });
-      // fallback to top experienced if not enough matches
-      if (matches.length >= limit) return matches.slice(0, limit);
-      // sort by years or experience if available
-      const remainder = doctors
-        .filter(d => !matches.includes(d))
-        .sort((a,b) => (b.years||b.experience||0) - (a.years||a.experience||0));
-      return matches.concat(remainder).slice(0, limit);
-    }
-
-    // render doctor cards
-    function renderDoctorCards(doctors) {
-      doctorList.innerHTML = '';
-      if (!doctors || doctors.length === 0) {
-        doctorRecommendations.classList.add('hidden');
-        return;
-      }
-      doctors.forEach(doc => {
-        const card = document.createElement('div');
-        card.className = 'p-4 bg-white shadow rounded-lg hover:shadow-md';
-        const name = `${doc.firstname || doc.first_name || doc.name || ''} ${doc.lastname || doc.last_name || ''}`.trim();
-        const spec = doc.specialization || doc.speciality || doc.title || 'General Practitioner';
-        const location = doc.location || doc.city || doc.area || 'Nigeria';
-        const years = doc.years || doc.experience || 0;
-        const phone = doc.phone || doc.tel || doc.mobile || '';
-        const reason = doc.reason || 'Experienced clinician';
-        card.innerHTML = `
-          <div>
-            <h4 class="font-semibold text-lg">Dr. ${escapeHtml(name) || 'Unknown'}</h4>
-            <span class="inline-block mt-1 px-2 py-1 rounded text-xs bg-gray-100">${escapeHtml(spec)}</span>
-            <div class="flex items-center gap-4 text-sm text-gray-600 mt-3 mb-2">
-              <div class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>${escapeHtml(location)}</div>
-              <div class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>${years} yrs</div>
-            </div>
-            <p class="text-sm text-gray-700 mb-3"><strong>Why recommended:</strong> ${escapeHtml(reason)}</p>
-            <div class="flex gap-2">
-              <button class="call-doctor bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-purple-700" data-phone="${escapeHtml(phone)}">Call Now</button>
-              <button class="view-profile border border-gray-200 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100">View Profile</button>
-            </div>
-          </div>
-        `;
-        doctorList.appendChild(card);
-      });
-      doctorRecommendations.classList.remove('hidden');
-      scrollToBottom();
-    }
-
-    // -----------------------
-    // AI call
-    // -----------------------
-    async function callAI(message) {
-      // Send POST { message: "..." } and expect {status:"success", reply:"..."}
-      try {
-        const res = await fetch(AI_API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
-        });
-        if (!res.ok) {
-          throw new Error(`AI API returned ${res.status}`);
-        }
-        const data = await res.json();
-        // Accept the exact shape the user provided
-        if (data && data.status === 'success' && typeof data.reply === 'string') {
-          return { ok: true, reply: data.reply };
-        } else {
-          return { ok: false, error: 'Invalid AI response' };
-        }
-      } catch (err) {
-        return { ok: false, error: err.message || String(err) };
-      }
-    }
-
-    // -----------------------
-    // Send flow
-    // -----------------------
-    async function sendMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      if (isSubscribed === false && remaining <= 0) {
-        addSubscriptionErrorMessage(`Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.`);
-        subscriptionModal.classList.add('active');
-        return;
-      }
-
-      addUserMessage(text);
-      chatInput.value = '';
-      // typing indicator
-      const typingEl = document.createElement('div');
-      typingEl.className = 'flex justify-start mb-3';
-      typingEl.innerHTML = `<div class="flex gap-2"><div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path></svg></div><div class="bg-gray-100 rounded-lg p-3"><div class="flex gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div></div></div></div>`;
-      chatArea.appendChild(typingEl);
-      scrollToBottom();
-      sendButton.disabled = true;
-      const aiResult = await callAI(text);
-      sendButton.disabled = false;
-      typingEl.remove();
-
-      if (!aiResult.ok) {
-        addAIMessage('AI has too many requests now. Please try again later.');
-        console.error('AI error', aiResult.error);
-        return;
-      }
-
-      addAIMessage(aiResult.reply);
-
-      // decrement free quota if not subscribed
-      if (!isSubscribed) {
-        remaining = Math.max(0, remaining - 1);
-        usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
-        if (remaining <= 0) {
-          usageStatus.className = 'bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm';
-          usageStatus.querySelector('.text-blue-800').className = 'text-red-800 font-medium';
-          usageStatus.querySelector('.text-blue-800').textContent = 'Free Consultations Exhausted';
-          usageRemaining.className = 'text-xs text-red-600';
-        }
-      }
-
-      // analyze symptoms and fetch relevant doctors
-      const specialties = analyzeSymptoms(text); // e.g. ['Cardiology']
-      const doctors = await fetchDoctors();
-      const matched = findMatchingDoctors(doctors, specialties, 3);
-      if (matched.length > 0) {
-        renderDoctorCards(matched);
-      }
-    }
-
-    // send events
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    document.querySelectorAll('.quick-question').forEach(btn => {
-      btn.addEventListener('click', () => {
-        chatInput.value = btn.dataset.question;
-        setTimeout(sendMessage, 120);
-      });
-    });
-
-    // doctor call/view actions
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('call-doctor')) {
-        const phone = e.target.dataset.phone;
-        if (phone) window.location.href = `tel:${phone}`;
-        else alert('Phone number not available');
-      } else if (e.target.classList.contains('view-profile')) {
-        alert('Doctor profile page not implemented in this demo.');
-      }
-    });
-
-    // -----------------------
-    // Subscription / Paystack
-    // -----------------------
-    document.getElementById('closeModal').addEventListener('click', () => subscriptionModal.classList.remove('active'));
-    subscribeNow.addEventListener('click', () => {
-      const email = prompt('Enter email for payment (used for receipt):') || 'user@example.com';
-      subscribeNow.disabled = true;
-      subscribeNow.textContent = 'Processing...';
-
-      if (!window.PaystackPop) {
-        alert('Payment system not loaded. Try again later.');
-        subscribeNow.disabled = false;
-        subscribeNow.textContent = 'Subscribe for ₦1,000/week';
-        return;
-      }
-
-      const handler = PaystackPop.setup({
-        key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // replace with your own key
-        email,
-        amount: 100000, // ₦1,000 in kobo
-        onSuccess: (ref) => {
-          isSubscribed = true;
-          remaining = 10;
-          usageStatus.className = 'bg-purple-50 border border-green-200 rounded-lg px-3 py-2 text-sm';
-          usageStatus.innerHTML = `<div class="text-green-800 font-medium">Active Subscription</div><div class="text-xs text-green-600">${remaining} consultations remaining</div>`;
-          subscriptionModal.classList.remove('active');
-          alert('Subscription successful — you now have 10 consultations.');
-          subscribeNow.disabled = false;
-          subscribeNow.textContent = 'Subscribe for ₦1,000/week';
-        },
-        onCancel: () => {
-          alert('Payment cancelled.');
-          subscribeNow.disabled = false;
-          subscribeNow.textContent = 'Subscribe for ₦1,000/week';
-        },
-        onError: (err) => {
-          alert('Payment error: ' + (err?.message || 'unknown'));
-          subscribeNow.disabled = false;
-          subscribeNow.textContent = 'Subscribe for ₦1,000/week';
-        }
-      });
-      handler.openIframe();
-    });
-
-    // initial render of welcome message
-    (function init() {
-      // usage display
-      usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
-      // render initial welcome already added in DOM via addAIMessage
-    })();
-
-    //link detection
-
-  function makeArrayClickable(element) {
-  const arrays = element.querySelectorAll('span');
-  arrays.forEach(array => {
-    const content = array.textContent;
-    if (content.startsWith('[') && content.endsWith(']')) {
-      const link = document.createElement('a');
-      link.href = content.slice(1, -1); // extract content between []
-      link.textContent = content;
-      array.replaceWith(link);
-      link.addEventListener('click', () => {
-        // add your desired click event handler
-        console.log(`Link clicked: ${link.href}`);
-      });
-    }
-  });
-}
-
-    function wordToLink(element) {
+/* =====================================================
+   UTILS (LINK / CLEAN TEXT)
+===================================================== */
+function wordToLink(element) {
   const text = element.innerHTML;
-  const regex = /'"Book Appointment"'/gi;
+  const regex = /"Book Appointment"/gi;
   element.innerHTML = text.replace(regex, `<a href="https://app.presibo.com/doctors" target="_blank">Book Appointment</a>`);
 }
 
-function convertTextToHTML(text) {
-  // Convert **bold words** to <b>bold words</b>
-  text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  
-  // Convert ##headings## to <h2>headings</h2>
-  text = text.replace(/##(.*?)##/g, '<h2>$1</h2>');
-  
-  return text;
+function makeArrayClickable(element) {
+  const spans = element.querySelectorAll('span');
+  spans.forEach(span => {
+    const content = span.textContent;
+    if (content.startsWith('[') && content.endsWith(']')) {
+      const link = document.createElement('a');
+      link.href = content.slice(1, -1);
+      link.textContent = content;
+      span.replaceWith(link);
+    }
+  });
 }
 
-    function removeFormatting(text) {
-  // Remove ** and ##
-  text = text.replace(/[*#]/g, '');
-  
-  return text;
+function removeFormatting(text) {
+  return text.replace(/[*#]/g, '');
 }
-      
 
-        let counter = 0;
-        let pageName = '/ai';
-        let Email = userEmail || "Guest"; 
-        let startTime = new Date();
-        let userIp = null; // Will be set after IP fetch
-        let isTracking = false; // Flag to prevent multiple intervals
+/* =====================================================
+   INIT
+===================================================== */
+(function init() {
+  usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
+})();
+</script>
 
-        // Function to log errors with timestamp and context
-        function logError(message, error, context = '') {
-            const timestamp = new Date().toISOString();
-            console.error(`[${timestamp}] Error in ${context}: ${message}`, error);
-        }
-
-        // Function to log info with timestamp
-        function logInfo(message, context = '') {
-            const timestamp = new Date().toISOString();
-            //console.log(`[${timestamp}] Info in ${context}: ${message}`);
-        }
-
-        // Fetch user IP on load
-        async function fetchUserIp() {
-            try {
-                //logInfo('Fetching user IP...', 'IP Fetch');
-                const response = await fetch('https://api.ipify.org?format=json');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                userIp = data.ip;
-                //logInfo(`User IP fetched: ${userIp}`, 'IP Fetch');
-                
-                // Start tracking after IP is available
-                startTracking();
-            } catch (error) {
-                logError('Failed to fetch user IP', error, 'IP Fetch');
-                // Fallback: Use a dummy IP or prompt user, but for now, start without IP
-                userIp = 'unknown';
-                startTracking();
-            }
-        }
-
-        // Start the tracking interval
-        function startTracking() {
-            if (isTracking) {
-                //logInfo('Tracking already active', 'Tracking Init');
-                return;
-            }
-            isTracking = true;
-            //console.log('Starting session tracking...', 'Tracking Init');
-            onloadcount(); // Initial call
-        }
-
-        // Stop tracking (e.g., call on page unload)
-        function stopTracking() {
-            isTracking = false;
-            //console.log('Stopping session tracking', 'Tracking Stop');
-        }
-
-        // Track session data every second
-        async function onloadcount() {
-            if (!isTracking || !userIp) {
-                //logError('Tracking not ready (no IP or stopped)', null, 'onloadcount');
-                return;
-            }
-
-            counter++;
-            const currentTime = new Date();
-            const timeSpent = Math.round((currentTime - startTime) / 1000); // Time spent in seconds (rounded)
-
-            try {
-                //logInfo(`Sending update #${counter} (time spent: ${timeSpent}s)`, 'onloadcount');
-                
-                const response = await fetch('https://api.presibo.com/counter/index.php', {  // Adjust URL if needed, e.g., full https://api.presibo.com/counter
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        pageName: pageName,
-                        count: counter,
-                        userEmail: Email,
-                        userIp: userIp,
-                        timeSpent: timeSpent,
-                        currentTime: currentTime.toISOString(),
-                    }),
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-               // console.log('Server response:', data, 'onloadcount');
-                
-            } catch (error) {
-                //console.log('Failed to update session counter', error, 'onloadcount');
-                
-                // Optional: Retry logic – e.g., retry once after delay
-                // setTimeout(() => onloadcount(), 2000);
-            }
-
-            // Schedule next call if still tracking
-            if (isTracking) {
-                setTimeout(() => onloadcount(), 1000);
-            }
-        }
-
-        // Initialize on page load
-        window.addEventListener('load', fetchUserIp);
-
-        // Stop tracking on page unload (optional, to send final update)
-        window.addEventListener('beforeunload', () => {
-            stopTracking();
-            // Could send a final PUT request here to end session, but async beforeunload is tricky
-        });
-
-        // Handle visibility change (pause/resume on tab switch, optional)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-               // console.log('Page hidden, pausing tracking', 'Visibility');
-                // stopTracking(); // Uncomment to pause
-            } else {
-                //console.log('Page visible, resuming tracking', 'Visibility');
-                // startTracking(); // Uncomment to resume
-            }
-        });
-
-     // Header elements
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const notificationBtn = document.getElementById('notification-btn');
-    const notificationDropdown = document.getElementById('notification-dropdown');
-    const notificationList = document.getElementById('notification-list');
-    const notificationCount = document.getElementById('notification-count');
-    const profileBtn = document.getElementById('profile-btn');
-    const profileDropdown = document.getElementById('profile-dropdown');
-
-    </script>
 </body>
 </html>
