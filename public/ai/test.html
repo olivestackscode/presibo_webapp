@@ -479,7 +479,7 @@ function addSubscriptionErrorMessage(text) {
 ===================================================== */
 async function shareViaEmail(message) {
   const cleanMessage = cleanMessageHTML(message); // clean HTML
-  const fullMessage = `You asked: ${text}\n\nAI Response: ${message}`;
+  const fullMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
   //const fullMessage = `${chatInput.value}:<br>${message}`;
 
   
@@ -557,6 +557,7 @@ async function sendMessage() {
   const text = chatInput.value.trim();
   
   if (!text) return;
+  const lastUserMessage = text;
 
   if (!isSubscribed && remaining <= 0) {
     addSubscriptionErrorMessage('Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.');
