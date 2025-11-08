@@ -479,7 +479,7 @@ function addSubscriptionErrorMessage(text) {
 ===================================================== */
 async function shareViaEmail(message) {
   const cleanMessage = cleanMessageHTML(message); // clean HTML
-  const fullMessage = `You asked: ${chatInput.value}\n\nAI Response: ${message}`;
+  const fullMessage = `You asked: ${text}\n\nAI Response: ${message}`;
   //const fullMessage = `${chatInput.value}:<br>${message}`;
 
   
@@ -555,6 +555,7 @@ async function callAI(message) {
 ===================================================== */
 async function sendMessage() {
   const text = chatInput.value.trim();
+  
   if (!text) return;
 
   if (!isSubscribed && remaining <= 0) {
