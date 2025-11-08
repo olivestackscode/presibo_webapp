@@ -42,6 +42,41 @@
   outline: none;
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50;
 }
+
+ .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }    
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
