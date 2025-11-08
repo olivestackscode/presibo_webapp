@@ -8,11 +8,12 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-.input { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; }
+.input { width: 100%; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; }
 .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
 .dialog-overlay.active { display: flex; }
-.dialog-content { background: white; border-radius: 0.5rem; max-width: 28rem; width: 100%; padding: 1.5rem; }
+.dialog-content { background: white; border-radius: 0.5rem; max-width: 28rem; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1rem; }
 .bg-purple-600 {background: linear-gradient(135deg, #8b5cf6, #7c3aed);}
+.label { display: block; margin-top: 0.5rem; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; }
 </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 font-sans">
@@ -37,12 +38,12 @@
 
 <!-- Booking Modal -->
 <div id="booking-modal" class="dialog-overlay">
-  <div class="dialog-content bg-white p-6 rounded-xl shadow-xl max-w-md mx-auto">
-    <h2 class="text-lg font-semibold mb-4">Schedule Home Visit</h2>
-    <div id="booking-modal-content" class="text-sm text-gray-700 mb-4"></div>
-    <div class="flex gap-2">
-      <button id="booking-modal-action" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex-grow">Pay & Submit</button>
-      <button class="modal-close border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex-grow">Close</button>
+  <div class="dialog-content bg-white rounded-xl shadow-xl mx-auto">
+    <h2 class="text-lg font-semibold mb-2">Schedule Home Visit</h2>
+    <div id="booking-modal-content" class="text-sm text-gray-700 mb-2"></div>
+    <div class="flex gap-2 mb-2">
+      <button id="booking-modal-action" class="bg-purple-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 flex-grow">Pay & Submit</button>
+      <button class="modal-close border border-gray-300 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100 flex-grow">Close</button>
     </div>
   </div>
 </div>
@@ -51,7 +52,6 @@
 let doctors = [];
 let isSubscribed = false;
 
-// Fetch doctors and render cards
 async function fetchDoctors() {
   try {
     const res = await fetch('https://presibo-wl.vercel.app/doctors.json');
@@ -70,22 +70,20 @@ async function fetchDoctors() {
   }
 }
 
-// Render doctor cards
 function renderDoctors(list) {
   const container = document.getElementById('doctorsList');
   container.innerHTML = list.map(d => `
-    <div class="bg-white rounded-xl p-4 shadow hover:shadow-lg transition">
-      <img src="https://presibo-wl.vercel.app/photos/${d.thumbnail}.jpg" class="w-16 h-16 rounded-full mb-2 object-cover" alt="${d.name}">
+    <div class="bg-white rounded-xl p-3 shadow hover:shadow-lg transition">
+      <img src="https://presibo-wl.vercel.app/photos/${d.thumbnail}.jpg" class="w-16 h-16 rounded-full mb-1 object-cover" alt="${d.name}">
       <h3 class="font-semibold text-lg">${d.name}</h3>
       <p class="text-sm text-gray-600 mb-1">${d.specialization}</p>
       <p class="text-sm text-gray-600 mb-1">${d.location}</p>
-      <p class="text-sm text-gray-600 mb-2">${d.experience} years experience</p>
-      <button onclick="openBookingModal('${d.id}')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full">Schedule Home Visit</button>
+      <p class="text-sm text-gray-600 mb-1">${d.experience} years experience</p>
+      <button onclick="openBookingModal('${d.id}')" class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 w-full mt-1 text-sm">Schedule Home Visit</button>
     </div>
   `).join('');
 }
 
-// Open modal to schedule home visit
 function openBookingModal(doctorId) {
   const doctor = doctors.find(d => d.id == doctorId);
   const modal = document.getElementById('booking-modal');
@@ -94,43 +92,14 @@ function openBookingModal(doctorId) {
   modalContent.innerHTML = `
     <p><strong>Doctor:</strong> ${doctor.name}</p>
     <p><strong>Specialization:</strong> ${doctor.specialization}</p>
-    <label class="block mt-2">
-      <span>Full Name:</span>
-      <input type="text" id="user-name" class="input" placeholder="Your full name" required />
-    </label>
-    <label class="block mt-2">
-      <span>Sex:</span>
-      <select id="user-sex" class="input" required>
-        <option value="">Select sex</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>
-    </label>
-    <label class="block mt-2">
-      <span>Age:</span>
-      <input type="number" id="user-age" class="input" placeholder="Your age" min="0" required />
-    </label>
-    <label class="block mt-2">
-      <span>Notes (optional):</span>
-      <textarea id="user-notes" class="input" placeholder="Any relevant notes or symptoms"></textarea>
-    </label>
-    <label class="block mt-2">
-      <span>Email:</span>
-      <input type="email" id="user-email" class="input" placeholder="name@gmail.com" required />
-    </label>
-    <label class="block mt-2">
-      <span>Date:</span>
-      <input type="date" id="visit-date" class="input" required />
-    </label>
-    <label class="block mt-2">
-      <span>Time:</span>
-      <input type="time" id="visit-time" class="input" required />
-    </label>
-    <label class="block mt-2">
-      <span>Home Address:</span>
-      <input type="text" id="home-address" class="input" placeholder="Enter your full address" required />
-    </label>
+    <label class="label">Full Name:</label><input type="text" id="user-name" class="input" placeholder="Your full name" required />
+    <label class="label">Sex:</label><select id="user-sex" class="input" required><option value="">Select sex</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+    <label class="label">Age:</label><input type="number" id="user-age" class="input" placeholder="Your age" min="0" required />
+    <label class="label">Notes (optional):</label><textarea id="user-notes" class="input" placeholder="Any relevant notes or symptoms"></textarea>
+    <label class="label">Email:</label><input type="email" id="user-email" class="input" placeholder="you@example.com" required />
+    <label class="label">Date:</label><input type="date" id="visit-date" class="input" required />
+    <label class="label">Time:</label><input type="time" id="visit-time" class="input" required />
+    <label class="label">Home Address:</label><input type="text" id="home-address" class="input" placeholder="Enter your full address" required />
   `;
 
   modal.classList.add('active');
@@ -147,11 +116,10 @@ function openBookingModal(doctorId) {
 
     if (!name || !sex || !age || !email || !date || !time || !address) return;
 
-    // Paystack payment integration
     const handler = PaystackPop.setup({
       key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
       email,
-      amount: 2500000, // ₦25,000
+      amount: 2500000,
       currency: "NGN",
       onSuccess: async function(ref) {
         isSubscribed = true;
@@ -173,24 +141,19 @@ function openBookingModal(doctorId) {
           if(result.status === 'success'){
             modal.classList.remove('active');
             document.getElementById('confirmation').classList.remove('hidden');
-            startCountdown(3*60*60); // 3 hours
+            startCountdown(3*60*60);
           }
-        } catch(err) {
-          console.error(err);
-        }
-      },
-      onCancel: function() { /* payment cancelled */ }
+        } catch(err) { console.error(err); }
+      }
     });
     handler.openIframe();
   }
 }
 
-// Close modal
 document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', () => {
   document.getElementById('booking-modal').classList.remove('active');
 }));
 
-// Countdown timer
 function startCountdown(seconds) {
   const countdownEl = document.getElementById('countdown');
   let remaining = seconds;
