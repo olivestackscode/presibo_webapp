@@ -736,6 +736,15 @@ closeNotification.addEventListener('click', () => {
 });
 
 
+// Profile dropdown & mobile menu
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    
 </script>
 
 </body>
