@@ -25,15 +25,14 @@
       box-shadow: 0 0 35px rgba(59,130,246,0.7);
     }
     .drop-zone {
-      position: relative;
       min-height: 800px;
       border: 2px dashed rgba(56,189,248,0.4);
       border-radius: 1rem;
       padding: 1rem;
       transition: background 0.3s ease;
-      overflow-y: auto;
-      overflow-x: hidden;
-      max-height: 80vh;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
     }
     .drop-zone.dragover {
       background: rgba(56,189,248,0.1);
@@ -41,7 +40,6 @@
     }
     .draggable {
       cursor: grab;
-      margin-bottom: 0.8rem;
     }
     .frequency-select {
       background: rgba(255,255,255,0.1);
@@ -50,38 +48,7 @@
       border-radius: 0.5rem;
       padding: 0.3rem 0.6rem;
     }
-    .flow-item {
-      position: absolute;
-      cursor: pointer;
-      z-index: 10;
-      width: 90%;
-      left: 5%;
-    }
-    svg.connector {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .connector-line {
-      stroke: rgba(59,130,246,0.8);
-      stroke-width: 2;
-      fill: none;
-      stroke-dasharray: 6;
-      animation: dash 1.5s linear infinite;
-    }
-    @keyframes dash {
-      to {
-        stroke-dashoffset: -12;
-      }
-    }
     @media (max-width: 768px) {
-      .layout-container {
-        flex-direction: column;
-      }
       .left-panel, .right-panel {
         width: 100%;
       }
@@ -90,38 +57,31 @@
 </head>
 <body class="flex flex-col items-center text-center px-4 py-8">
 
-  <div class="mb-8">
-    <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-3">Presibo Flow AI</h1>
-    <p class="text-gray-300 max-w-2xl text-lg">
-      Drag items from the left panel to build your personalized health flow.
-    </p>
-  </div>
+  <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-6">Presibo Flow AI</h1>
+  <p class="text-gray-300 max-w-2xl text-lg mb-8">Create your personalized health flow by dragging items into your workflow panel.</p>
 
-  <!-- Two-column layout -->
-  <div class="flex w-full max-w-6xl gap-6 layout-container">
-
+  <div class="flex flex-col sm:flex-row gap-6 w-full max-w-6xl">
     <!-- Left Panel: Available Flow Items -->
-    <div class="left-panel w-1/3 flex flex-col">
-      <div class="glow-card bg-gradient-to-br from-blue-500 to-blue-700 p-4 rounded-xl draggable" draggable="true" data-item="Exercise & Activity Reminders">Exercise & Activity Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-indigo-500 to-indigo-700 p-4 rounded-xl draggable" draggable="true" data-item="Sleep Tracking & Smart Sleep Reminders">Sleep Tracking & Smart Sleep Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-cyan-500 to-cyan-700 p-4 rounded-xl draggable" draggable="true" data-item="Hydration Alerts">Hydration Alerts</div>
-      <div class="glow-card bg-gradient-to-br from-green-500 to-green-700 p-4 rounded-xl draggable" draggable="true" data-item="Healthy Meal & Breakfast Suggestions">Healthy Meal & Breakfast Suggestions</div>
-      <div class="glow-card bg-gradient-to-br from-pink-500 to-pink-700 p-4 rounded-xl draggable" draggable="true" data-item="Medication & Supplement Tracking">Medication & Supplement Tracking</div>
-      <div class="glow-card bg-gradient-to-br from-purple-500 to-purple-700 p-4 rounded-xl draggable" draggable="true" data-item="Vital Signs Monitoring">Vital Signs Monitoring</div>
-      <div class="glow-card bg-gradient-to-br from-teal-500 to-teal-700 p-4 rounded-xl draggable" draggable="true" data-item="Regular Health Checkup Reminders">Regular Health Checkup Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-amber-500 to-yellow-700 p-4 rounded-xl draggable" draggable="true" data-item="Doctor Appointment Scheduling & Follow-ups">Doctor Appointment Scheduling & Follow-ups</div>
-      <div class="glow-card bg-gradient-to-br from-rose-500 to-rose-700 p-4 rounded-xl draggable" draggable="true" data-item="Stress & Mental Health Management">Stress & Mental Health Management</div>
-      <div class="glow-card bg-gradient-to-br from-sky-500 to-blue-700 p-4 rounded-xl draggable" draggable="true" data-item="AI-Powered Health Insights & Risk Prediction">AI-Powered Health Insights & Risk Prediction</div>
+    <div class="left-panel flex flex-col gap-4 w-full sm:w-1/3">
+      <div class="glow-card bg-blue-500 p-4 rounded-xl draggable" draggable="true" data-item="Exercise & Activity Reminders">Exercise & Activity Reminders</div>
+      <div class="glow-card bg-indigo-500 p-4 rounded-xl draggable" draggable="true" data-item="Sleep Tracking & Smart Sleep Reminders">Sleep Tracking & Smart Sleep Reminders</div>
+      <div class="glow-card bg-cyan-500 p-4 rounded-xl draggable" draggable="true" data-item="Hydration Alerts">Hydration Alerts</div>
+      <div class="glow-card bg-green-500 p-4 rounded-xl draggable" draggable="true" data-item="Healthy Meal & Breakfast Suggestions">Healthy Meal & Breakfast Suggestions</div>
+      <div class="glow-card bg-pink-500 p-4 rounded-xl draggable" draggable="true" data-item="Medication & Supplement Tracking">Medication & Supplement Tracking</div>
+      <div class="glow-card bg-purple-500 p-4 rounded-xl draggable" draggable="true" data-item="Vital Signs Monitoring">Vital Signs Monitoring</div>
+      <div class="glow-card bg-teal-500 p-4 rounded-xl draggable" draggable="true" data-item="Regular Health Checkup Reminders">Regular Health Checkup Reminders</div>
+      <div class="glow-card bg-amber-500 p-4 rounded-xl draggable" draggable="true" data-item="Doctor Appointment Scheduling & Follow-ups">Doctor Appointment Scheduling & Follow-ups</div>
+      <div class="glow-card bg-rose-500 p-4 rounded-xl draggable" draggable="true" data-item="Stress & Mental Health Management">Stress & Mental Health Management</div>
+      <div class="glow-card bg-sky-500 p-4 rounded-xl draggable" draggable="true" data-item="AI-Powered Health Insights & Risk Prediction">AI-Powered Health Insights & Risk Prediction</div>
     </div>
 
     <!-- Right Panel: Drop Zone -->
-    <div class="right-panel w-2/3">
+    <div class="right-panel flex-1">
       <div id="flowPanel" class="drop-zone">
-        <svg id="connectorSVG" class="connector"></svg>
-        <p class="text-gray-400 italic">Drag and drop items here to build your health workflow...</p>
+        <p class="text-gray-400 italic col-span-full">Drag and drop items here to build your health workflow...</p>
       </div>
 
-      <button id="saveFlow" class="mt-4 px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">
+      <button id="saveFlow" class="mt-4 px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card mr-2">
         Save Flow
       </button>
 
@@ -129,7 +89,6 @@
         Export Flow
       </button>
     </div>
-
   </div>
 
   <footer class="mt-12 text-gray-500 text-xs">© 2025 Powered by Presibo Health</footer>
@@ -137,9 +96,6 @@
   <script>
     const draggables = document.querySelectorAll('.draggable');
     const dropZone = document.getElementById('flowPanel');
-    const connectorSVG = document.getElementById('connectorSVG');
-    let flowCount = 0;
-    const flowItems = [];
 
     // Drag and Drop
     draggables.forEach(item => {
@@ -161,12 +117,7 @@
 
       const itemName = e.dataTransfer.getData('text/plain');
       const itemEl = document.createElement('div');
-      itemEl.className = 'bg-gray-800 text-white p-3 rounded-lg mb-3 flex justify-between items-center glow-card flow-item';
-      itemEl.style.position = 'absolute';
-      const marginTop = 20;
-      const itemHeight = 80;
-      itemEl.style.top = `${marginTop + flowCount * itemHeight}px`;
-      itemEl.style.left = '20px';
+      itemEl.className = 'bg-gray-800 text-white p-3 rounded-lg flex justify-between items-center glow-card flow-item';
       itemEl.innerHTML = `
         <span>${itemName}</span>
         <select class="frequency-select ml-2">
@@ -177,9 +128,6 @@
         </select>
       `;
       dropZone.appendChild(itemEl);
-      flowItems.push(itemEl);
-      flowCount++;
-      drawConnections();
     });
 
     document.getElementById('saveFlow').addEventListener('click', () => {
@@ -190,26 +138,6 @@
       }
       alert('✅ Flow Saved:\n' + items.join('\n'));
     });
-
-    function drawConnections() {
-      connectorSVG.innerHTML = '';
-      for (let i = 0; i < flowItems.length - 1; i++) {
-        const a = flowItems[i].getBoundingClientRect();
-        const b = flowItems[i + 1].getBoundingClientRect();
-        const containerRect = dropZone.getBoundingClientRect();
-        const x1 = a.left + a.width / 2 - containerRect.left;
-        const y1 = a.bottom - containerRect.top;
-        const x2 = b.left + b.width / 2 - containerRect.left;
-        const y2 = b.top - containerRect.top;
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M${x1},${y1} C${x1},${y1+40} ${x2},${y2-40} ${x2},${y2}`);
-        path.classList.add('connector-line');
-        connectorSVG.appendChild(path);
-      }
-    }
-
-    window.addEventListener('resize', drawConnections);
   </script>
 </body>
 </html>
