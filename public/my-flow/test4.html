@@ -26,7 +26,7 @@
     }
     .drop-zone {
       position: relative;
-      min-height: 900px;
+      min-height: 900px; /* Expanded workspace */
       border: 2px dashed rgba(56,189,248,0.4);
       border-radius: 1rem;
       padding: 1rem;
@@ -50,10 +50,9 @@
       padding: 0.3rem 0.6rem;
     }
     .flow-item {
-      position: absolute;
+      position: relative;
       cursor: pointer;
       z-index: 10;
-      width: 200px;
     }
     svg.connector {
       position: absolute;
@@ -71,14 +70,17 @@
       stroke-dasharray: 6;
       animation: dash 1.5s linear infinite;
     }
-    @keyframes dash { to { stroke-dashoffset: -12; } }
+    @keyframes dash {
+      to { stroke-dashoffset: -12; }
+    }
 
-    /* Layout */
+    /* Layout: left flow items + panel */
     .layout {
       display: flex;
       gap: 1.5rem;
       width: 100%;
       max-width: 1400px;
+      margin: 0 auto;
     }
     .flow-items-left {
       width: 280px;
@@ -90,7 +92,7 @@
       flex: 1;
     }
 
-    /* Mobile */
+    /* Mobile Optimization */
     @media (max-width: 768px) {
       .layout { flex-direction: column; }
       .flow-items-left { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
@@ -138,6 +140,7 @@
   </style>
 </head>
 <body class="px-4 py-8">
+
   <div class="mb-8 text-center">
     <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-3">Presibo Flow AI</h1>
     <p class="text-gray-300 max-w-2xl text-lg mx-auto">
@@ -188,7 +191,7 @@
       <span class="text-white font-bold">Presibo AI Chat</span>
       <button id="closeChat" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✖</button>
     </div>
-    <iframe src="https://app.presibo.com/ai/chat" title="Presibo AI Chat"></iframe>
+    <iframe src="https://app.presibo.com/ai" title="Presibo AI Chat"></iframe>
   </div>
 
   <script>
@@ -219,17 +222,9 @@
       const itemName = e.dataTransfer.getData('text/plain');
       const itemEl = document.createElement('div');
       itemEl.className = 'bg-gray-800 text-white p-3 rounded-lg mb-3 flex justify-between items-center glow-card flow-item';
-
-      const colWidth = 220;
-      const rowHeight = 120;
-      const cols = 3;
-
-      const col = flowCount % cols;
-      const row = Math.floor(flowCount / cols);
-
-      itemEl.style.top = `${40 + row * rowHeight}px`;
-      itemEl.style.left = `${40 + col * colWidth}px`;
-
+      itemEl.style.position = 'absolute';
+      itemEl.style.top = `${80 + flowCount * 120}px`;
+      itemEl.style.left = `${40 + (flowCount % 3) * 220}px`;
       itemEl.innerHTML = `
         <span>${itemName}</span>
         <select class="frequency-select ml-2">
@@ -239,14 +234,13 @@
           <option value="monthly">Monthly</option>
         </select>
       `;
-
       dropZone.appendChild(itemEl);
       flowItems.push(itemEl);
       flowCount++;
       drawConnections();
     });
 
-    // Save & Export Flow
+    // Save & Export
     document.getElementById('saveFlow').addEventListener('click', () => {
       const items = Array.from(dropZone.querySelectorAll('.flow-item span')).map(el => el.textContent);
       if (!items.length) { alert('Please drag actions into your health flow first.'); return; }
@@ -263,7 +257,7 @@
       dlAnchor.click();
     });
 
-    // Draw Animated Connections
+    // Draw connections
     function drawConnections() {
       connectorSVG.innerHTML = '';
       for (let i = 0; i < flowItems.length - 1; i++) {
@@ -284,7 +278,7 @@
 
     window.addEventListener('resize', drawConnections);
 
-    // Chat Popup
+    // Chat popup
     const chatBtn = document.getElementById('chatBtn');
     const chatPopup = document.getElementById('chatPopup');
     const closeChat = document.getElementById('closeChat');
@@ -292,5 +286,6 @@
     chatBtn.addEventListener('click', () => { chatPopup.style.display = 'block'; });
     closeChat.addEventListener('click', () => { chatPopup.style.display = 'none'; });
   </script>
+
 </body>
 </html>
