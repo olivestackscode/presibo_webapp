@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Personal Health Assistant - Presibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.paystack.co/v1/inline.js" async></script>
+
+
+  <!-- Favicon Meta Tags - Using online placeholder -->
+  <link rel="icon" href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" type="image/png">
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P">
+  <meta name="msapplication-TileImage" content="https://via.placeholder.com/144x144/008753/FFFFFF?text=P">
+
+  <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+<meta property="og:title" content="Presibo AI — Your Personal Health Assistant">
+<meta property="og:description" content="Experience AI-driven healthcare like never before. Get personalized insights, predictive health analytics, and intelligent recommendations—all powered by Presibo AI.">
+<meta name="description" content="Presibo AI is your personal health assistant, using artificial intelligence to analyze, track, and improve your well-being through smart health insights and predictions.">
+<meta property="og:image" content="https://presibo.com/assets/presibo-ai-preview.jpg">
+<meta property="og:url" content="https://presibo.com/ai">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Presibo AI — Your Personal Health Assistant">
+<meta name="twitter:description" content="AI-powered health monitoring and insights designed to help you stay ahead of your wellness goals.">
+
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Presibo Personal AI Health Assistant">
+  <meta name="twitter:description" content="Personalized health reports and analytics: Visualize vitals, meals, and get AI predictions on Presibo.">
+  <meta name="twitter:image" content="https://via.placeholder.com/192x192/008753/FFFFFF?text=P">
+  <meta name="twitter:image:alt" content="Presibo Logo">
+  <meta name="twitter:site" content="@PresiboHealth">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  
+  <style>
+    .scroll-area { height: 500px; overflow-y: auto; padding-right: 1rem; }
+    .dialog-overlay { position: fixed; top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000; }
+    .dialog-overlay.active { display:flex; }
+    .dialog-content { background:white;border-radius:.5rem;max-width:28rem;width:100%;padding:1.5rem;}
+    .input { width:100%; padding:.75rem; border:1px solid #e5e7eb; border-radius:.5rem; outline:none; }
+    .animate-bounce { animation: bounce 1s infinite; }
+    .bg-purple-600 {background: linear-gradient(135deg, #8b5cf6, #7c3aed);}
+    @keyframes bounce { 0%,100%{ transform:translateY(0);}50%{ transform:translateY(-5px);} }
+
+    .aiLink {
+  display: inline-block;
+  padding: 1px 10px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.aiLink:hover {
+  background-color: #3e8e41;
+}
+
+.aiLink:active {
+  background-color: #2e6e31;
+}
+
+.aiLink:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4CAF50;
+}
+
+ .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+    }
+    .notification-dropdown.active {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background-color: #f9fafb;
+    }
+    .menu-link {
+      @apply text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-medium;
+    }
+    .menu-link.active {
+      @apply bg-naija-green text-white;
+    }    
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+  <!-- Header with Menu Bar -->
+
+  <div class="max-w-7xl mx-auto space-y-4">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="p-6 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+         <!-- <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-12 h-12 object-contain">-->
+          <h1 class="text-xl font-semibold text-gray-900"></h1>
+        </div>
+        <div class="text-right">
+          <div id="usageStatus" class="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-sm">
+            <div class="text-blue-800 font-medium">Free Consultations</div>
+            <div class="text-xs text-blue-600" id="usageRemaining">3 of 3 remaining</div>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-6 text-gray-600">
+        Get instant health guidance for common Nigerian health concerns. Chat about symptoms and get personalized doctor recommendations.
+      </div>
+    </div>
+
+    <!-- Quick Questions -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="font-semibold mb-3">Quick Questions:</h3>
+      <div class="flex flex-wrap gap-2">
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="I have high blood pressure symptoms">I have high blood pressure symptoms</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Blood sugar levels concern">Blood sugar levels concern</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Frequent headaches and fatigue">Frequent headaches and fatigue</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Chest pain or discomfort">Chest pain or discomfort</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Diabetes management questions">Diabetes management questions</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Get Health Assessment">Get Health Assessment</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Track my vitals">Track my vitals</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Recommend healthy meals for me">Recommend healthy meals for me</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="I need a doctor now">I need a doctor now</button>
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Help me schedle a medical appointment">Help me schedle a medical appointment</button>
+        
+        <button class="quick-question border border-gray-200 text-xs px-3 py-1 rounded-lg hover:bg-gray-100" data-question="Find hospitals near me">Find hospitals near me</button>
+        
+        
+    
+        
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Chat -->
+      <div class="lg:col-span-2">
+        <div class="bg-white shadow rounded-lg flex flex-col min-h-[500px]">
+          <div class="p-6"><h2 class="text-lg font-semibold">Conversations</h2></div>
+          <div class="flex-1 px-6">
+            <div id="chatArea" class="scroll-area">
+              <!-- messages render here -->
+            </div>
+          </div>
+          <div class="separator h-px bg-gray-100"></div>
+          <div class="p-6 flex gap-2">
+            <input id="chatInput" class="input flex-1" placeholder="Type your health question here..." />
+            <button id="sendButton" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="bg-white shadow rounded-lg p-4">
+          <h3 class="font-semibold mb-3">Suggested Questions</h3>
+          <div class="space-y-2">
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="What are symptoms of high blood pressure?">What are symptoms of high blood pressure?</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="How to manage diabetes effectively?">How to manage diabetes effectively?</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="What causes frequent headaches?">What causes frequent headaches?</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Find doctors around me">Find doctors around me</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Get Health Assessment">Get Health Assessment</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Track my vitals">Track my vitals</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Recommend healthy meals for me">Recommend healthy meals for me</button>
+            <button class="quick-question w-full text-left border border-gray-200 text-sm px-3 py-2 rounded-lg hover:bg-gray-100" data-question="Find hospitals near me">Find hospitals near me</button>
+            
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Recommendations (hidden until we have results) -->
+    <div id="doctorRecommendations" class="hidden">
+      <div class="bg-white shadow rounded-lg mt-4">
+        <div class="p-6">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            Recommended Healthcare Providers
+          </h2>
+        </div>
+        <div id="doctorList" class="p-6 pt-0 grid gap-4"></div>
+      </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div id="subscriptionModal" class="dialog-overlay">
+      <div class="dialog-content">
+        <div class="flex items-center gap-2 mb-4">
+          <h2 class="text-lg font-semibold">AI Chat Subscription</h2>
+        </div>
+        <div class="space-y-4">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-green-600 mb-2">₦1,000</div>
+            <div class="text-sm text-gray-600">per week</div>
+          </div>
+          <div class="space-y-2">
+            <button id="subscribeNow" class="w-full bg-purple-600 text-white py-2 rounded-lg">Subscribe for ₦1,000/week</button>
+            <button id="closeModal" class="w-full border border-gray-200 py-2 rounded-lg">Maybe Later</button>
+          </div>
+          <div class="text-xs text-gray-500 text-center">Secure payment powered by Paystack.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Share via Email Modal -->
+<div id="emailShareModal" class="dialog-overlay">
+  <div class="dialog-content">
+    <h2 class="text-lg font-semibold mb-4">Share Chat via Email</h2>
+    <div class="mb-4">
+      <label for="recipientEmail" class="block text-sm font-medium text-gray-700 mb-1">Recipient Email</label>
+      <input type="email" id="recipientEmail" class="input w-full" placeholder="Enter email address" required />
+    </div>
+    <div class="flex gap-2">
+      <button id="sendEmailBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex-1">Send</button>
+      <button id="closeEmailModal" class="border border-gray-200 px-4 py-2 rounded-lg flex-1">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" class="dialog-overlay">
+  <div class="dialog-content text-center">
+    <p id="notificationMessage" class="text-gray-900 text-sm"></p>
+    <button id="closeNotification" class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">OK</button>
+  </div>
+</div>
+
+  <script>
+/* =====================================================
+   CONFIG / STATE
+===================================================== */
+const userEmail = sessionStorage.getItem('email');
+const AI_API = 'https://api.presibo.com/ai/openrouter.php';
+const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
+const EMAIL_API = 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
+let freeLimit = 5;
+let remaining = freeLimit;
+let isSubscribed = false
+let AIMsgtoSend = 'null';
+let lastUserMessage = '';    
+
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+const chatArea = document.getElementById('chatArea');
+const chatInput = document.getElementById('chatInput');
+const sendButton = document.getElementById('sendButton');
+const doctorRecommendations = document.getElementById('doctorRecommendations');
+const doctorList = document.getElementById('doctorList');
+const usageStatus = document.getElementById('usageStatus');
+const usageRemaining = document.getElementById('usageRemaining');
+const subscriptionModal = document.getElementById('subscriptionModal');
+const subscribeNow = document.getElementById('subscribeNow');
+const closeModal = document.getElementById('closeModal');
+
+/* =====================================================
+   INITIAL WELCOME MESSAGE
+===================================================== */
+addAIMessage("Hello! I'm your Personal AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?", false);
+
+/* =====================================================
+   HELPERS
+===================================================== */
+function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
+
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function createMessageElement({ type, content, timestamp = new Date(), isSubscriptionError = false }) {
+  const wrapper = document.createElement('div');
+  wrapper.className = `flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-3`;
+
+  const bubbleColor = type === 'user'
+    ? 'bg-blue-600 text-white'
+    : isSubscriptionError
+      ? 'bg-red-50 border border-red-200 text-red-800'
+      : 'bg-gray-100 text-gray-900';
+
+  wrapper.innerHTML = `
+    <div class="flex gap-2 max-w-[80%] ${type === 'user' ? 'flex-row-reverse' : 'flex-row'}">
+      <div class="${type === 'user'
+        ? 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center'
+        : 'w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center'}">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          ${type === 'user'
+            ? '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>'
+            : '<path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2zm0 18a8 8 0 01-5.03-1.75l-.6 2.68 2.68-.6A8 8 0 1112 20z"></path>'
+          }
+        </svg>
+      </div>
+      <div class="rounded-lg p-3 ${bubbleColor}">
+        <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
+        ${isSubscriptionError
+          ? `<div class="mt-3 pt-3 border-t border-red-200">
+              <button class="subscribe-now w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">
+                Subscribe
+              </button>
+              <span class="text-xs text-red-600 mt-2 block">
+                You've used all ${freeLimit} free consultations. Subscribe for unlimited access.
+              </span>
+            </div>` : ''}
+        <div class="text-xs opacity-70 mt-1">${new Date(timestamp).toLocaleTimeString()}</div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const btn = wrapper.querySelector('.subscribe-now');
+    if (btn) btn.addEventListener('click', () => subscriptionModal.classList.add('active'));
+  }, 0);
+
+  return wrapper;
+}
+
+/* =====================================================
+   MESSAGE HANDLERS
+===================================================== */
+function addUserMessage(text) {
+  const el = createMessageElement({ type: 'user', content: text });
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+function addAIMessage(text, includeShareButtons = true) {
+  const cleanText = removeFormatting(text);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(cleanText, 'text/html');
+
+  const el = createMessageElement({ type: 'ai', content: '' });
+  el.querySelector('.text-sm').append(...doc.body.childNodes);
+
+  if (includeShareButtons) {
+    // Add share buttons below AI message
+    const shareDiv = document.createElement('div');
+    shareDiv.className = "flex gap-3 mt-2";
+    shareDiv.innerHTML = `
+      <button class="share-email text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">Share via Email</button>
+      <button class="share-whatsapp text-sm bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">Share via WhatsApp</button>
+    `;
+    el.querySelector('.text-sm').after(shareDiv);
+
+    // Share button handlers
+    shareDiv.querySelector('.share-email').addEventListener('click', () => shareViaEmail(cleanText));
+    shareDiv.querySelector('.share-whatsapp').addEventListener('click', () => shareViaWhatsApp(cleanText));
+  }
+
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+function addSubscriptionErrorMessage(text) {
+  const el = createMessageElement({ type: 'error', content: text, isSubscriptionError: true });
+  chatArea.appendChild(el);
+  scrollToBottom();
+}
+
+/* =====================================================
+   SHARE FUNCTIONS
+===================================================== */
+async function shareViaEmail(message) {
+  const cleanMessage = cleanMessageHTML(message); // clean HTML
+  const fullMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${message}`;
+  //const fullMessage = `${chatInput.value}:<br>${message}`;
+
+  
+
+  // Show modal to enter recipient email
+  showEmailModal();
+
+  // Handle send button
+  sendEmailBtn.onclick = async () => {
+    const recipient = recipientEmailInput.value.trim();
+    if (!recipient) return showNotification("Please enter a valid email.");
+
+    hideEmailModal(); // hide modal while sending
+
+    try {
+      const res = await fetch(EMAIL_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: "send",
+          type: "custom",
+          email: recipient,
+          title: `Your Presibo AI Chat: ${lastUserMessage}`,
+          message: fullMessage
+        })
+      });
+
+      const data = await res.json();
+      showNotification('Chat shared via email!');
+      console.log("Email API response:", data);
+    } catch (err) {
+      console.error("Email API error:", err);
+      showNotification('Failed to share via email.');
+    }
+  };
+}
+
+
+//formatlinks for whatsapp
+function renderTextWithLinks(inputHTML) {
+  // Create a temporary element to parse the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = inputHTML;
+
+  // Replace each <a> tag with plain text "Text: url"
+  tempDiv.querySelectorAll('a').forEach(link => {
+    const text = link.textContent.trim();
+    const url = link.href.replace(/^https?:\/\//, ''); // remove https://
+    const plain = `${text}: ${url}`;
+    link.replaceWith(plain);
+  });
+
+  // Return the text content with formatting preserved
+  return tempDiv.innerText;
+}
+
+    
+function shareViaWhatsApp(message) {
+ 
+
+const aiResponse = message;
+
+console.log(renderTextWithLinks(aiResponse)); 
+const encoded = encodeURIComponent(`You asked: ${lastUserMessage}\n\nAI Response: ${renderTextWithLinks(aiResponse)}`);
+   //const fullencodedMessage = `You asked: ${lastUserMessage}\n\nAI Response: ${encoded}`;
+  const url = `https://wa.me/?text=${encoded}`;
+  console.log("📲 Opening WhatsApp share:", url);
+  window.open(url, '_blank');
+}
+
+/* =====================================================
+   AI CALL
+===================================================== */
+async function callAI(message) {
+  try {
+    console.log("🤖 Sending to AI API:", message);
+    const res = await fetch(AI_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+    console.log("✅ AI API response:", data);
+    if (data.status === 'success' && typeof data.reply === 'string') {
+      return { ok: true, reply: data.reply };
+    } else {
+      throw new Error('Invalid AI response format');
+    }
+  } catch (err) {
+    console.error("❌ AI API Error:", err);
+    return { ok: false, error: err.message };
+  }
+}
+
+/* =====================================================
+   MESSAGE SEND FLOW
+===================================================== */
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  
+  if (!text) return;
+  lastUserMessage = text;
+
+  if (!isSubscribed && remaining <= 0) {
+    addSubscriptionErrorMessage('Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.');
+    subscriptionModal.classList.add('active');
+    return;
+  }
+
+  addUserMessage(text);
+  chatInput.value = '';
+
+  // Show typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'flex justify-start mb-3';
+  typingEl.innerHTML = `<div class="flex gap-2"><div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2z"></path></svg>
+  </div><div class="bg-gray-100 rounded-lg p-3"><div class="flex gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div></div></div></div>`;
+  chatArea.appendChild(typingEl);
+  scrollToBottom();
+
+  sendButton.disabled = true;
+  const aiResult = await callAI(text);
+  AIMsgtoSend = aiResult;
+  sendButton.disabled = false;
+  typingEl.remove();
+
+  if (!aiResult.ok) {
+    addAIMessage('AI is busy right now. Please try again later.');
+    return;
+  }
+
+  addAIMessage(aiResult.reply);
+}
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+sendButton.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+
+        // Quick Question Buttons - click to auto-send
+// Quick Question Buttons - click to auto-send
+document.querySelectorAll('.quick-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    chatInput.value = btn.dataset.question; // use existing chatInput variable
+    setTimeout(() => {
+      sendMessage();
+    }, 120);
+  });
+});
+
+/* =====================================================
+   UTILS (LINK / CLEAN TEXT)
+===================================================== */
+function wordToLink(element) {
+  const text = element.innerHTML;
+  const regex = /"Book Appointment"/gi;
+  element.innerHTML = text.replace(regex, `<a href="https://app.presibo.com/doctors" target="_blank">Book Appointment</a>`);
+}
+
+function makeArrayClickable(element) {
+  const spans = element.querySelectorAll('span');
+  spans.forEach(span => {
+    const content = span.textContent;
+    if (content.startsWith('[') && content.endsWith(']')) {
+      const link = document.createElement('a');
+      link.href = content.slice(1, -1);
+      link.textContent = content;
+      span.replaceWith(link);
+    }
+  });
+}
+
+function removeFormatting(text) {
+  return text.replace(/[*#]/g, '');
+}
+
+/* =====================================================
+   INIT
+===================================================== */
+(function init() {
+  usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
+})();
+
+
+// Utility to clean HTML
+function cleanMessageHTML(input) {
+  if (!input) return '';
+
+  // Create a temporary DOM element
+  const div = document.createElement('div');
+  div.innerHTML = input;
+
+  // Remove all script and style tags
+  div.querySelectorAll('script, style').forEach(el => el.remove());
+
+  // Optionally, allow only basic formatting tags
+  const allowedTags = ['b', 'i', 'u', 'em', 'strong', 'br', 'p', 'ul', 'ol', 'li'];
+  const elements = div.querySelectorAll('*');
+  elements.forEach(el => {
+    if (!allowedTags.includes(el.tagName.toLowerCase())) {
+      el.replaceWith(el.textContent); // strip disallowed tags but keep text
+    }
+  });
+
+  // Convert multiple line breaks or spacing
+  return div.innerHTML.replace(/\n\s*\n/g, '<br>');
+}
+
+// Modal elements
+const emailShareModal = document.getElementById('emailShareModal');
+const recipientEmailInput = document.getElementById('recipientEmail');
+const sendEmailBtn = document.getElementById('sendEmailBtn');
+const closeEmailModal = document.getElementById('closeEmailModal');
+
+// Show modal function
+function showEmailModal() {
+  recipientEmailInput.value = ''; // clear previous value
+  emailShareModal.classList.add('active');
+}
+
+// Hide modal function
+function hideEmailModal() {
+  emailShareModal.classList.remove('active');
+}
+
+// Close button
+closeEmailModal.addEventListener('click', hideEmailModal);
+
+
+const notificationModal = document.getElementById('notificationModal');
+const notificationMessage = document.getElementById('notificationMessage');
+const closeNotification = document.getElementById('closeNotification');
+
+function showNotification(message) {
+  notificationMessage.textContent = message;
+  notificationModal.classList.add('active');
+}
+
+closeNotification.addEventListener('click', () => {
+  notificationModal.classList.remove('active');
+});
+
+
+// Profile dropdown & mobile menu
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    
+</script>
+
+</body>
+</html>
