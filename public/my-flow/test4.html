@@ -1,4 +1,7 @@
-#chatBtn {
+<!-- Floating Chat Icon & Popup -->
+<style>
+  /* Chat button */
+  #chatBtn {
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -37,3 +40,24 @@
     height: 100%;
     border: none;
   }
+</style>
+
+<!-- HTML -->
+<div id="chatBtn">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9z" />
+  </svg>
+</div>
+
+<div id="chatPopup">
+  <iframe src="https://app.presibo.com/ai" title="Presibo AI Chat"></iframe>
+</div>
+
+<script>
+  const chatBtn = document.getElementById('chatBtn');
+  const chatPopup = document.getElementById('chatPopup');
+
+  chatBtn.addEventListener('click', () => {
+    chatPopup.style.display = chatPopup.style.display === 'block' ? 'none' : 'block';
+  });
+</script>
