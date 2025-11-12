@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Presibo Flow Builder — Connect Health Modules</title>
+  <meta name="description" content="Presibo Flow Builder — drag modules and connect them with glowing animated lines. Mobile friendly." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg-1:#061224;
+      --bg-2:#0b1b36;
+      --card:#071834;
+      --accent-start:#60a5fa;
+      --accent-end:#3b82f6;
+      --accent2-start:#34d399;
+      --accent2-end:#06b6d4;
+      --glow: 0 12px 40px rgba(59,130,246,0.18);
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(135deg,var(--bg-1),var(--bg-2));
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+    }
+
+    /* Layout */
+    .app {
+      height:100vh;
+      display:flex;
+      gap:20px;
+      padding:24px;
+      box-sizing:border-box;
+    }
+    .library {
+      width:360px;
+      min-width:240px;
+      max-width:420px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:16px;
+      box-shadow: var(--glow);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .library h3{font-size:18px;margin:0 0 6px 0}
+    .library .list {
+      overflow:auto;
+      max-height:calc(100vh - 200px);
+      padding-right:6px;
+    }
+
+    .canvas {
+      flex:1;
+      position:relative;
+      border-radius:12px;
+      background: radial-gradient(1200px 400px at 10% 10%, rgba(59,130,246,0.06), transparent 8%),
+                  linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      overflow:auto;
+      padding:24px;
+      min-width:320px;
+    }
+
+    /* workspace inner area */
+    .workspace {
+      position:relative;
+      width:1800px; /* large virtual canvas to allow dragging around */
+      height:1200px;
+      background-image:
+        linear-gradient( rgba(255,255,255,0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+      background-size: 40px 40px;
+      border-radius:8px;
+    }
+
+    /* modules */
+    .module {
+      position:absolute;
+      width:260px;
+      min-height:72px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03));
+      border-radius:12px;
+      padding:12px 12px 12px 14px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      cursor:grab;
+      user-select:none;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      transition:transform .12s ease;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .module:active{cursor:grabbing}
+    .module .title{font-weight:700;font-size:13px}
+    .module .meta{font-size:12px;color:rgba(230,238,248,0.7)}
+    .module .controls{display:flex;gap:6px;align-items:center; margin-top:6px}
+
+    /* ports */
+    .port {
+      position:absolute;
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--accent-start),var(--accent-end));
+      box-shadow:0 6px 18px rgba(59,130,246,0.18), inset 0 -2px 6px rgba(255,255,255,0.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:10px;
+      transform:translate(-50%,-50%);
+      border:2px solid rgba(0,0,0,0.25);
+      touch-action:none;
+    }
+    .port.input { left:-6px; top:50%; background:linear-gradient(135deg,var(--accent2-start),var(--accent2-end)); }
+    .port.output { right:-6px; top:50%; }
+
+    /* svg layer sits at top of workspace */
+    #svg-layer {
+      position:absolute;
+      inset:0;
+      pointer-events:none; /* paths clickable via handler overlay */
+      overflow:visible;
+    }
+
+    /* connection path styling */
+    .conn {
+      fill:none;
+      stroke-width:4;
+      stroke-linecap:round;
+      filter: drop-shadow(0 6px 18px rgba(59,130,246,0.25));
+      stroke: url(#gradStroke);
+      pointer-events:stroke; /* make stroke clickable in modern browsers */
+    }
+    .conn.clickable{cursor:pointer; pointer-events:auto;}
+    .conn .trail{opacity:0.25;}
+
+    /* animated dash moving */
+    .flow-anim {
+      stroke-dasharray: 240;
+      stroke-dashoffset: 240;
+      animation: dash 2s linear infinite;
+    }
+    @keyframes dash {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* small UI */
+    .btn {
+      background:linear-gradient(90deg,var(--accent-start),var(--accent-end));
+      border-radius:8px;
+      padding:8px 12px;
+      color:white;
+      font-weight:600;
+      font-size:13px;
+      border:none;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .muted { color: rgba(230,238,248,0.6); font-size:13px; }
+    .lib-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+      border-radius:10px; padding:12px; margin-bottom:10px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* mobile adjustments */
+    @media (max-width:900px){
+      .app { flex-direction:column; padding:12px; }
+      .library { width:100%; max-width:none; order:2; display:flex; flex-direction:row; gap:12px; overflow:auto; padding:12px; }
+      .library .list{display:flex; gap:10px; max-height:none; padding:0}
+      .canvas { order:1; height:66vh; }
+      .workspace { width:1200px; height:900px; }
+      .module { width:200px }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- left library -->
+    <aside class="library">
+      <div class="flex items-center justify-between">
+        <h3>Actions Library</h3>
+        <div class="flex gap-2">
+          <button id="exportBtn" class="btn" title="Export flow JSON">Export</button>
+          <button id="clearBtn" class="btn" style="background:linear-gradient(90deg,var(--accent2-start),var(--accent2-end))">Clear</button>
+        </div>
+      </div>
+
+      <p class="muted">Drag modules into the canvas, then connect output → input. Tap path to remove. Move modules to update connections.</p>
+
+      <div class="list mt-2">
+        <!-- library items; draggable clones will be created -->
+        <div class="lib-card" data-type="Exercise & Activity Reminders">
+          <div>
+            <div style="font-weight:700">🏃 Exercise & Activity</div>
+            <div class="muted">Smartwatch nudges, step goals</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Sleep Tracking & Smart Sleep Reminders">
+          <div>
+            <div style="font-weight:700">😴 Sleep Tracking</div>
+            <div class="muted">Bedtime & relaxation routines</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Hydration Alerts">
+          <div>
+            <div style="font-weight:700">💧 Hydration Alerts</div>
+            <div class="muted">Smart bottle reminders</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Healthy Meal & Breakfast Suggestions">
+          <div>
+            <div style="font-weight:700">🍳 Healthy Meals</div>
+            <div class="muted">AI meal suggestions</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Medication & Supplement Tracking">
+          <div>
+            <div style="font-weight:700">💊 Medication Tracking</div>
+            <div class="muted">Pill reminders & adherence</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Vital Signs Monitoring">
+          <div>
+            <div style="font-weight:700">❤️ Vital Signs</div>
+            <div class="muted">BP, HR, glucose monitoring</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Regular Health Checkup Reminders">
+          <div>
+            <div style="font-weight:700">🩺 Checkup Reminders</div>
+            <div class="muted">Schedule screenings</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Doctor Appointment Scheduling & Follow-ups">
+          <div>
+            <div style="font-weight:700">👩‍⚕️ Scheduling</div>
+            <div class="muted">Book & follow-up</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="Stress & Mental Health Management">
+          <div>
+            <div style="font-weight:700">🧘 Mental Health</div>
+            <div class="muted">Guided meditations</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+
+        <div class="lib-card" data-type="AI-Powered Health Insights & Risk Prediction">
+          <div>
+            <div style="font-weight:700">🤖 AI Insights</div>
+            <div class="muted">Risk predictions</div>
+          </div>
+          <button class="btn add-lib">Add</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- canvas -->
+    <section class="canvas">
+      <div class="workspace" id="workspace">
+
+        <!-- SVG connection layer -->
+        <svg id="svg-layer" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gradStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#60a5fa"/>
+              <stop offset="50%" stop-color="#3b82f6"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- connections will be added here -->
+        </svg>
+
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /***********************
+     * Flow Builder JS
+     ***********************/
+    (function(){
+      const workspace = document.getElementById('workspace');
+      const svgLayer = document.getElementById('svg-layer');
+      const addButtons = document.querySelectorAll('.add-lib');
+      const exportBtn = document.getElementById('exportBtn');
+      const clearBtn = document.getElementById('clearBtn');
+
+      let moduleCounter = 0;
+      let connectionCounter = 0;
+      const modules = {};    // id -> module meta {el, ports, x,y,w,h}
+      const connections = []; // {id, from:moduleId, to:moduleId, pathEl}
+
+      // temp drawing state
+      let isDrawing = false;
+      let drawFrom = null; // {moduleId, portEl}
+      let tempPath = null;
+
+      // Helper: create module element
+      function createModule(type, x=100, y=100){
+        moduleCounter++;
+        const id = 'm' + moduleCounter;
+        const el = document.createElement('div');
+        el.className = 'module';
+        el.dataset.id = id;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.innerHTML = `
+          <div class="title">${type}</div>
+          <div class="meta">Drag to reposition • Tap ports to connect</div>
+          <div class="controls">
+            <div class="muted">Frequency:</div>
+            <select class="frequency-select" data-field="frequency">
+              <option value="">—select—</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <button class="btn remove" style="padding:6px 8px; margin-left:auto; background:rgba(255,255,255,0.06); font-weight:600">Remove</button>
+          </div>
+          <div class="port input" data-port="input" title="Input port"></div>
+          <div class="port output" data-port="output" title="Output port"></div>
+        `;
+
+        workspace.appendChild(el);
+
+        // compute initial bounding
+        const rect = el.getBoundingClientRect();
+        const workspaceRect = workspace.getBoundingClientRect();
+        const meta = { id, el, x, y, w: rect.width, h: rect.height };
+        modules[id] = meta;
+
+        // add behavior: pointer drag to move
+        makeModuleDraggable(el, meta);
+
+        // port handlers
+        const inputPort = el.querySelector('.port.input');
+        const outputPort = el.querySelector('.port.output');
+
+        inputPort.addEventListener('pointerdown', e => {
+          e.stopPropagation();
+          // input port: only accept drops; if drawing currently, finalize if possible
+          if(isDrawing && drawFrom && drawFrom.moduleId !== id){
+            // finalize connection
+            finalizeConnection(drawFrom.moduleId, id);
+          }
+        });
+
+        outputPort.addEventListener('pointerdown', e => {
+          e.stopPropagation();
+          // start drawing from this module's output
+          startDrawFrom(id, outputPort, e);
+        });
+
+        // remove button
+        el.querySelector('.remove').addEventListener('click', () => {
+          removeModule(id);
+        });
+
+        // return id
+        return id;
+      }
+
+      // add module from library button
+      addButtons.forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          const type = btn.closest('.lib-card').dataset.type;
+          // place roughly centered in workspace view
+          const x = Math.max(60, 200 + Math.random()*400);
+          const y = Math.max(60, 120 + Math.random()*300);
+          createModule(type, x, y);
+        });
+      });
+
+      // make module draggable (pointer events)
+      function makeModuleDraggable(el, meta){
+        let offsetX=0, offsetY=0;
+        let dragging=false;
+
+        el.addEventListener('pointerdown', (e)=>{
+          // don't start move when clicking on ports or controls
+          if(e.target.closest('.port') || e.target.closest('.remove') || e.target.closest('select')) return;
+          dragging=true;
+          el.setPointerCapture(e.pointerId);
+          const rect = el.getBoundingClientRect();
+          const wsRect = workspace.getBoundingClientRect();
+          offsetX = e.clientX - rect.left;
+          offsetY = e.clientY - rect.top;
+          el.style.transition = 'none';
+          el.style.transform = 'scale(1.02)';
+        });
+
+        el.addEventListener('pointermove', (e)=>{
+          if(!dragging) return;
+          const wsRect = workspace.getBoundingClientRect();
+          // compute new position relative to workspace
+          const newX = Math.max(8, e.clientX - wsRect.left - offsetX);
+          const newY = Math.max(8, e.clientY - wsRect.top - offsetY);
+          meta.x = newX;
+          meta.y = newY;
+          el.style.left = newX + 'px';
+          el.style.top = newY + 'px';
+          // update connections visually
+          updateAllConnectionsForModule(meta.id);
+        });
+
+        el.addEventListener('pointerup', (e)=>{
+          dragging=false;
+          el.releasePointerCapture(e.pointerId);
+          el.style.transform = '';
+          el.style.transition = '';
+        });
+
+        // for touchend outside
+        el.addEventListener('pointercancel', ()=>{
+          dragging=false;
+          el.style.transform = '';
+        });
+      }
+
+      // start drawing a temporary path from an output port
+      function startDrawFrom(moduleId, portEl, ev){
+        isDrawing = true;
+        drawFrom = { moduleId, portEl };
+        // create temporary path
+        tempPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+        tempPath.setAttribute('stroke','url(#gradStroke)');
+        tempPath.setAttribute('stroke-width','4');
+        tempPath.setAttribute('fill','none');
+        tempPath.setAttribute('class','conn flow-anim'); // animated
+        svgLayer.appendChild(tempPath);
+        // attach global pointermove/up to workspace
+        const onMove = (e) => {
+          const pt = getPointerPosInWorkspace(e);
+          const fromPos = getPortCenter(moduleId, 'output');
+          const d = makeCurvePath(fromPos.x, fromPos.y, pt.x, pt.y);
+          tempPath.setAttribute('d', d);
+        };
+        const onUp = (e) => {
+          // if released on an input port of a module, finalize; else remove temp
+          const upEl = document.elementFromPoint(e.clientX, e.clientY);
+          const inputPort = upEl && upEl.closest && upEl.closest('.port.input');
+          if(inputPort){
+            const toModuleEl = inputPort.closest('.module');
+            const toModuleId = toModuleEl && toModuleEl.dataset.id;
+            if(toModuleId && toModuleId !== moduleId){
+              finalizeConnection(moduleId, toModuleId);
+            } else {
+              // invalid connect to same module, remove
+            }
+          }
+          cleanupTempDraw();
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+        };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+      }
+
+      // finalize connection: create persistent path and store metadata
+      function finalizeConnection(fromId, toId){
+        // prevent duplicate same connection
+        if(connections.some(c => c.from === fromId && c.to === toId)) return;
+        connectionCounter++;
+        const connId = 'c' + connectionCounter;
+        const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('id', connId);
+        path.setAttribute('class','conn clickable flow-anim');
+        path.setAttribute('stroke-linecap','round');
+        path.setAttribute('stroke','url(#gradStroke)');
+        path.setAttribute('fill','none');
+        // store
+        const conn = { id: connId, from: fromId, to: toId, pathEl: path };
+        connections.push(conn);
+        svgLayer.appendChild(path);
+        // draw immediately
+        updateConnectionPath(conn);
+        // enable click to remove
+        path.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          removeConnection(connId);
+        });
+      }
+
+      // remove module and associated connections
+      function removeModule(id){
+        // remove element
+        const meta = modules[id];
+        if(!meta) return;
+        meta.el.remove();
+        delete modules[id];
+        // remove any connections referencing it
+        const toRemove = connections.filter(c=> c.from===id || c.to===id).map(c=>c.id);
+        toRemove.forEach(removeConnection);
+      }
+
+      function removeConnection(connId){
+        const idx = connections.findIndex(c=>c.id===connId);
+        if(idx === -1) return;
+        const conn = connections[idx];
+        if(conn.pathEl) conn.pathEl.remove();
+        connections.splice(idx,1);
+      }
+
+      function cleanupTempDraw(){
+        isDrawing=false;
+        drawFrom=null;
+        if(tempPath){ tempPath.remove(); tempPath=null; }
+      }
+
+      // update path for a single connection (bezier curve)
+      function updateConnectionPath(conn){
+        const fromPos = getPortCenter(conn.from, 'output');
+        const toPos   = getPortCenter(conn.to, 'input');
+        if(!fromPos || !toPos) return;
+        const d = makeCurvePath(fromPos.x, fromPos.y, toPos.x, toPos.y);
+        conn.pathEl.setAttribute('d', d);
+      }
+
+      // update all connections related to a module
+      function updateAllConnectionsForModule(moduleId){
+        connections.forEach(c=>{
+          if(c.from === moduleId || c.to === moduleId) updateConnectionPath(c);
+        });
+      }
+
+      // compute port center coordinates relative to svg/workspace
+      function getPortCenter(moduleId, which){ // which = 'input'|'output'
+        const meta = modules[moduleId];
+        if(!meta) return null;
+        const el = meta.el;
+        const port = el.querySelector(`.port.${which}`);
+        if(!port) return null;
+        // element position relative to workspace container
+        const wsRect = workspace.getBoundingClientRect();
+        const portRect = port.getBoundingClientRect();
+        const x = portRect.left - wsRect.left + portRect.width/2;
+        const y = portRect.top - wsRect.top + portRect.height/2;
+        return { x, y };
+      }
+
+      // create a smooth cubic bezier path between points
+      function makeCurvePath(x1,y1,x2,y2){
+        const dx = Math.abs(x2 - x1);
+        const curvature = Math.min(400, Math.max(60, dx * 0.5));
+        const hx1 = x1 + curvature;
+        const hx2 = x2 - curvature;
+        return `M ${x1},${y1} C ${hx1},${y1} ${hx2},${y2} ${x2},${y2}`;
+      }
+
+      // get pointer position in workspace coordinates
+      function getPointerPosInWorkspace(e){
+        const wsRect = workspace.getBoundingClientRect();
+        return { x: e.clientX - wsRect.left, y: e.clientY - wsRect.top };
+      }
+
+      // Export flow JSON
+      exportBtn.addEventListener('click', ()=>{
+        const modulesData = Object.values(modules).map(m=>{
+          const freq = m.el.querySelector('[data-field="frequency"]').value || null;
+          return { id: m.id, title: m.el.querySelector('.title').textContent, x: Math.round(m.x), y: Math.round(m.y), frequency: freq };
+        });
+        const conns = connections.map(c=>({ id: c.id, from: c.from, to: c.to }));
+        const payload = { modules: modulesData, connections: conns, exportedAt: new Date().toISOString() };
+        // download as JSON file
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'presibo-flow.json';
+        document.body.appendChild(a); a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      // Clear canvas
+      clearBtn.addEventListener('click', ()=>{
+        // remove modules
+        Object.values(modules).forEach(m=> m.el.remove());
+        Object.keys(modules).forEach(k=> delete modules[k]);
+        // remove connections
+        connections.forEach(c=> c.pathEl.remove());
+        connections.length = 0;
+      });
+
+      // Update positions/resizing on window resize for accuracy
+      window.addEventListener('resize', ()=>{
+        Object.values(connections).forEach(c => updateConnectionPath(c));
+      });
+
+      // initial demo modules
+      createModule('Exercise & Activity Reminders', 120, 80);
+      createModule('Vital Signs Monitoring', 520, 140);
+      createModule('Doctor Appointment Scheduling & Follow-ups', 920, 300);
+
+      // click on canvas clears temp selection
+      workspace.addEventListener('pointerdown', (e)=>{
+        // if clicked empty, remove any temp path
+        if(e.target === workspace || e.target === svgLayer || e.target.closest('.canvas')){
+          cleanupTempDraw();
+        }
+      });
+
+      // make svg paths responsive on scroll inside canvas (if scroll occurs)
+      const canvasEl = document.querySelector('.canvas');
+      canvasEl.addEventListener('scroll', ()=>{
+        connections.forEach(updateConnectionPath);
+      });
+
+      // helper: recompute all connections (useful after bulk changes)
+      function updateAllConnections(){
+        connections.forEach(updateConnectionPath);
+      }
+
+      // Expose minimal debug for console
+      window.PresiboFlow = {
+        createModule, modules, connections, updateAllConnections
+      };
+
+      // periodically update (in case fonts change sizing etc)
+      setInterval(updateAllConnections, 450);
+
+      // touch-friendly: prevent default double-tap zoom on mobile
+      document.addEventListener('touchstart', ()=>{}, {passive:true});
+    })();
+  </script>
+</body>
+</html>
