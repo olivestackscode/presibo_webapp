@@ -41,7 +41,6 @@
       background: linear-gradient(135deg, #22c55e, #16a34a);
       border-radius: 1rem;
       font-weight: bold;
-      text-white;
       color: white;
       box-shadow: 0 0 20px rgba(34,197,94,0.5);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -50,6 +49,8 @@
       transform: scale(1.05);
       box-shadow: 0 0 30px rgba(34,197,94,0.7);
     }
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
       .glow-card {
         width: 100%;
@@ -69,7 +70,13 @@
         font-size: 1.25rem;
         line-height: 1.4;
       }
+      .btn-create-flow {
+        position: static;
+        display: block;
+        margin: 1.5rem auto 2rem auto;
+      }
     }
+
     @media (max-width: 480px) {
       .glow-card {
         padding: 1.5rem;
@@ -89,12 +96,12 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen text-center px-4 py-8">
 
-  <!-- Create Flow+ Button -->
-  <a href="my-flow" class="btn-create-flow">Create Flow+</a>
-
-  <div class="mb-8 sm:mb-16">
+  <div class="mb-8 sm:mb-16 w-full max-w-2xl">
     <h1 class="text-4xl sm:text-6xl font-extrabold glow-text mb-4">Presibo AI</h1>
     <p class="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto subtitle">Smarter Healthcare Workflows for Everyone</p>
+    
+    <!-- Create Flow+ Button -->
+    <a href="my-flow" class="btn-create-flow">Create Flow+</a>
   </div>
 
   <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 w-full max-w-md sm:max-w-none">
