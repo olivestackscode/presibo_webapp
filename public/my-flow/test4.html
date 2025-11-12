@@ -105,13 +105,54 @@
         flex-wrap: wrap;
       }
     }
+
+
+    #chatBtn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to bottom right, #3b82f6, #06b6d4);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: transform 0.2s ease;
+  }
+  #chatBtn:hover {
+    transform: scale(1.1);
+  }
+
+  /* Chat popup */
+  #chatPopup {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 360px;
+    height: 480px;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    display: none;
+    z-index: 999;
+    border: 2px solid #3b82f6;
+  }
+  #chatPopup iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
   </style>
 </head>
 <body class="flex flex-col items-center text-center px-4 py-8">
   <div class="mb-8">
     <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-3">Presibo Flow AI</h1>
     <p class="text-gray-300 max-w-2xl text-lg">
-      Create your personalized health flow by dragging items into your workflow panel.
+      Create your personalized health flow
     </p>
   </div>
 
@@ -144,6 +185,11 @@
   </div>
 
   <footer class="mt-12 text-gray-500 text-xs">© 2025 Powered by Presibo Health</footer>
+
+
+  <div id="chatPopup">
+  <iframe src="https://app.presibo.com/ai" title="Presibo AI Chat"></iframe>
+</div>
 
   <script>
     const draggables = document.querySelectorAll('.draggable');
@@ -219,6 +265,15 @@
         connectorSVG.appendChild(path);
       }
     }
+
+    //chat popup
+
+      const chatBtn = document.getElementById('chatBtn');
+  const chatPopup = document.getElementById('chatPopup');
+
+  chatBtn.addEventListener('click', () => {
+    chatPopup.style.display = chatPopup.style.display === 'block' ? 'none' : 'block';
+  });
 
     window.addEventListener('resize', drawConnections);
   </script>
