@@ -44,6 +44,37 @@
       color: #38bdf8;
     }
 
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: rgba(15,23,42,0.95);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0;
+      z-index: 999;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content a {
+      color: #e2e8f0;
+      padding: 0.6rem 1rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .dropdown-content a:hover {
+      background: rgba(56,189,248,0.2);
+      color: #38bdf8;
+    }
+
     .drop-zone {
       position: relative;
       min-height: 900px;
@@ -174,11 +205,20 @@
   <!-- Navigation -->
   <nav class="w-full flex justify-between items-center px-6 py-4">
     <h1 class="text-2xl font-bold glow-text">Presibo Flow AI</h1>
-    <div class="flex gap-6 text-sm sm:text-base">
+    <div class="flex gap-6 text-sm sm:text-base items-center">
       <a href="https://app.presibo.com/dashboard" target="_blank" class="nav-link">Dashboard</a>
       <a href="https://app.presibo.com/panels" target="_blank" class="nav-link">Panels</a>
-      <a href="https://app.presibo.com/doctors" target="_blank" class="nav-link">Doctors</a>
-      <a href="https://app.presibo.com/visit" target="_blank" class="nav-link">Schedule Visit</a>
+
+      <!-- Doctors Dropdown -->
+      <div class="dropdown">
+        <a href="#" class="nav-link">Doctors ▼</a>
+        <div class="dropdown-content">
+          <a href="https://app.presibo.com/visit" target="_blank">Home Visit</a>
+          <a href="https://app.presibo.com/instant-call" target="_blank">Instant Call</a>
+        </div>
+      </div>
+
+      <a href="https://app.presibo.com/flow" target="_blank" class="nav-link">Flow Builder</a>
     </div>
   </nav>
 
