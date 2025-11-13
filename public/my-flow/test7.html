@@ -249,7 +249,17 @@
       </div>
       <div class="flex justify-center gap-4 mt-4">
         <button id="saveFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">Save Flow</button>
-        <button id="exportFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-green-600 to-green-400 font-bold glow-card">Export Flow</button>
+        <button id="exportFlowBtn.onclick = () => { exportPopup.style.display = exportPopup.style.display === 'block' ? 'none' : 'block'; };
+
+    document.getElementById('exportEmail').onclick = () => {
+      const subject = encodeURIComponent("My Health Flow Plan");
+      const body = encodeURIComponent("Here’s my health automation flow from Presibo AI.");
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    };
+    document.getElementById('exportWhatsApp').onclick = () => {
+      const text = encodeURIComponent("Here’s my health flow automation from Presibo AI 💙");
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    };Flow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-green-600 to-green-400 font-bold glow-card">Export Flow</button>
       </div>
     </div>
   </div>
@@ -281,12 +291,20 @@
     <iframe src="https://app.presibo.com/login" title="Presibo Login"></iframe>
   </div>
 
+  <div id="exportPopup">
+    <h3>Export Your Flow</h3>
+    <button class="export-btn email" id="exportEmail">📧 Export via Email</button>
+    <button class="export-btn whatsapp" id="exportWhatsApp">💬 Export via WhatsApp</button>
+  </div>
+
   <script>
     const draggables = document.querySelectorAll('.draggable');
     const dropZone = document.getElementById('flowPanel');
     const connectorSVG = document.getElementById('connectorSVG');
     const chatBtn = document.getElementById('chatBtn');
     const loginBtn = document.getElementById('loginBtn');
+    const exportPopup = document.getElementById('exportPopup');
+    const exportFlowBtn = document.getElementById('exportFlow');
     const chatPopup = document.getElementById('chatPopup');
     const loginPopup = document.getElementById('loginPopup');
     const closeChat = document.getElementById('closeChat');
@@ -365,6 +383,18 @@
     });
     closeChat.addEventListener('click', () => chatPopup.style.display = 'none');
     closeLogin.addEventListener('click', () => loginPopup.style.display = 'none');
+
+    exportFlowBtn.onclick = () => { exportPopup.style.display = exportPopup.style.display === 'block' ? 'none' : 'block'; };
+
+    document.getElementById('exportEmail').onclick = () => {
+      const subject = encodeURIComponent("My Health Flow Plan");
+      const body = encodeURIComponent("Here’s my health automation flow from Presibo AI.");
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    };
+    document.getElementById('exportWhatsApp').onclick = () => {
+      const text = encodeURIComponent("Here’s my health flow automation from Presibo AI 💙");
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    };
   </script>
 </body>
 </html> 
