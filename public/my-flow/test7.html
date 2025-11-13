@@ -249,17 +249,7 @@
       </div>
       <div class="flex justify-center gap-4 mt-4">
         <button id="saveFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">Save Flow</button>
-        <button id="exportFlowBtn.onclick = () => { exportPopup.style.display = exportPopup.style.display === 'block' ? 'none' : 'block'; };
-
-    document.getElementById('exportEmail').onclick = () => {
-      const subject = encodeURIComponent("My Health Flow Plan");
-      const body = encodeURIComponent("Here’s my health automation flow from Presibo AI.");
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    };
-    document.getElementById('exportWhatsApp').onclick = () => {
-      const text = encodeURIComponent("Here’s my health flow automation from Presibo AI 💙");
-      window.open(`https://wa.me/?text=${text}`, '_blank');
-    };Flow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-green-600 to-green-400 font-bold glow-card">Export Flow</button>
+        <button id="exportFlowBtn.onclick = () => { exportPopup.style.display = exportPopup.style.display === 'block' ? 'none' : 'block'; }; class="px-6 py-3 rounded-xl bg-gradient-to-br from-green-600 to-green-400 font-bold glow-card">Export Flow</button>
       </div>
     </div>
   </div>
@@ -395,6 +385,9 @@
       const text = encodeURIComponent("Here’s my health flow automation from Presibo AI 💙");
       window.open(`https://wa.me/?text=${text}`, '_blank');
     };
+
+
+    
   </script>
 </body>
 </html> 
