@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Presibo AI — Health Flow Builder</title>
+  <title>Presibo Flow AI — Health Flow Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -43,7 +43,7 @@
       cursor: grab;
     }
     .frequency-select {
-      background: #020617;
+      background: rgba(255,255,255,0.1);
       border: none;
       color: white;
       border-radius: 0.5rem;
@@ -70,31 +70,18 @@
       stroke-dasharray: 6;
       animation: dash 1.5s linear infinite;
     }
-    @keyframes dash { to { stroke-dashoffset: -12; } }
-
-    .layout {
-      display: flex;
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -12;
+      }
     }
-    .flow-items-left {
-      width: 280px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .main-panel { flex: 1; }
 
-    /* Chat */
-    #chatBtn {
+    /* Floating buttons */
+    #chatBtn, #loginBtn {
       position: fixed;
       bottom: 24px;
-      right: 24px;
       width: 60px;
       height: 60px;
-      background: linear-gradient(to bottom right, #3b82f6, #06b6d4);
       border-radius: 50%;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       cursor: pointer;
@@ -104,119 +91,106 @@
       z-index: 1000;
       transition: transform 0.2s ease;
     }
-    #chatBtn:hover { transform: scale(1.1); }
+    #chatBtn { right: 24px; background: linear-gradient(to bottom right, #3b82f6, #06b6d4); }
+    #loginBtn { right: 100px; background: linear-gradient(to bottom right, #10b981, #059669); }
+    #chatBtn:hover, #loginBtn:hover { transform: scale(1.1); }
 
-    #chatPopup {
+    /* Popups */
+    .popup {
       position: fixed;
       bottom: 100px;
       right: 24px;
-      width: 360px;
-      height: 480px;
+      width: 380px;
+      height: 520px;
       border-radius: 1rem;
       overflow: hidden;
       box-shadow: 0 4px 30px rgba(0,0,0,0.4);
       display: none;
-      z-index: 1001;
+      z-index: 999;
       border: 2px solid #3b82f6;
-      background: #0a192f;
     }
-    #chatPopup iframe {
+    .popup iframe {
       width: 100%;
-      height: calc(100% - 40px);
+      height: 100%;
       border: none;
     }
 
-    /* Login Button */
-    .login-btn {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      background: linear-gradient(to right, #3b82f6, #06b6d4);
-      padding: 0.5rem 1rem;
-      border-radius: 0.75rem;
-      font-weight: bold;
-      box-shadow: 0 0 20px rgba(56,189,248,0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .login-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(56,189,248,0.6);
-    }
-
     @media (max-width: 768px) {
-      .layout { flex-direction: column; }
-      .flow-items-left { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
-      .flow-item { width: 90%; left: 5% !important; }
-      .login-btn {
-        position: static;
-        margin: 1rem auto;
-        display: inline-block;
-      }
+      .drop-zone { min-height: 800px; }
+      #chatBtn, #loginBtn { bottom: 18px; width: 50px; height: 50px; }
     }
   </style>
 </head>
-<body class="px-4 py-8 relative">
+<body class="flex flex-col px-4 py-8">
 
-  <!-- Login Button -->
-  <a href="https://app.presibo.com/login" class="login-btn">Login</a>
+  <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-8 text-center">Presibo Flow AI</h1>
 
-  <div class="mb-8 text-center">
-    <h1 class="text-4xl sm:text-5xl font-extrabold glow-text mb-3">Presibo AI</h1>
-    <p class="text-gray-300 max-w-2xl text-lg mx-auto">
-      Create your personalized health flow by dragging items into your workflow panel.
-    </p>
-  </div>
+  <!-- Main Layout -->
+  <div class="flex flex-col lg:flex-row gap-8 w-full justify-center">
 
-  <div class="layout">
-    <!-- Left stacked flow items -->
-    <div class="flow-items-left">
-      <div class="glow-card bg-gradient-to-br from-blue-500 to-blue-700 p-4 rounded-xl draggable" draggable="true" data-item="Exercise & Activity Reminders">Exercise & Activity Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-indigo-500 to-indigo-700 p-4 rounded-xl draggable" draggable="true" data-item="Sleep Tracking & Smart Sleep Reminders">Sleep Tracking & Smart Sleep Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-cyan-500 to-cyan-700 p-4 rounded-xl draggable" draggable="true" data-item="Hydration Alerts">Hydration Alerts</div>
-      <div class="glow-card bg-gradient-to-br from-green-500 to-green-700 p-4 rounded-xl draggable" draggable="true" data-item="Healthy Meal & Breakfast Suggestions">Healthy Meal & Breakfast Suggestions</div>
-      <div class="glow-card bg-gradient-to-br from-pink-500 to-pink-700 p-4 rounded-xl draggable" draggable="true" data-item="Medication & Supplement Tracking">Medication & Supplement Tracking</div>
-      <div class="glow-card bg-gradient-to-br from-purple-500 to-purple-700 p-4 rounded-xl draggable" draggable="true" data-item="Vital Signs Monitoring">Vital Signs Monitoring</div>
-      <div class="glow-card bg-gradient-to-br from-teal-500 to-teal-700 p-4 rounded-xl draggable" draggable="true" data-item="Regular Health Checkup Reminders">Regular Health Checkup Reminders</div>
-      <div class="glow-card bg-gradient-to-br from-amber-500 to-yellow-700 p-4 rounded-xl draggable" draggable="true" data-item="Doctor Appointment Scheduling & Follow-ups">Doctor Appointment Scheduling & Follow-ups</div>
-      <div class="glow-card bg-gradient-to-br from-rose-500 to-rose-700 p-4 rounded-xl draggable" draggable="true" data-item="Stress & Mental Health Management">Stress & Mental Health Management</div>
-      <div class="glow-card bg-gradient-to-br from-sky-500 to-blue-700 p-4 rounded-xl draggable" draggable="true" data-item="AI-Powered Health Insights & Risk Prediction">AI-Powered Health Insights & Risk Prediction</div>
+    <!-- Available Flow Items (Left Column) -->
+    <div class="w-full lg:w-1/3 flex flex-col gap-4">
+      <h2 class="text-2xl font-bold mb-4 glow-text text-center">Available Flow Items</h2>
+      <div class="flex flex-col gap-4 items-center">
+        <div class="glow-card bg-gradient-to-br from-blue-500 to-blue-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Exercise & Activity Reminders">Exercise & Activity Reminders</div>
+        <div class="glow-card bg-gradient-to-br from-indigo-500 to-indigo-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Sleep Tracking & Smart Sleep Reminders">Sleep Tracking & Smart Sleep Reminders</div>
+        <div class="glow-card bg-gradient-to-br from-cyan-500 to-cyan-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Hydration Alerts">Hydration Alerts</div>
+        <div class="glow-card bg-gradient-to-br from-green-500 to-green-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Healthy Meal & Breakfast Suggestions">Healthy Meal & Breakfast Suggestions</div>
+        <div class="glow-card bg-gradient-to-br from-pink-500 to-pink-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Medication & Supplement Tracking">Medication & Supplement Tracking</div>
+        <div class="glow-card bg-gradient-to-br from-purple-500 to-purple-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Vital Signs Monitoring">Vital Signs Monitoring</div>
+        <div class="glow-card bg-gradient-to-br from-teal-500 to-teal-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Regular Health Checkup Reminders">Regular Health Checkup Reminders</div>
+        <div class="glow-card bg-gradient-to-br from-amber-500 to-yellow-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Doctor Appointment Scheduling & Follow-ups">Doctor Appointment Scheduling & Follow-ups</div>
+        <div class="glow-card bg-gradient-to-br from-rose-500 to-rose-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Stress & Mental Health Management">Stress & Mental Health Management</div>
+        <div class="glow-card bg-gradient-to-br from-sky-500 to-blue-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="AI-Powered Health Insights & Risk Prediction">AI-Powered Health Insights & Risk Prediction</div>
+      </div>
     </div>
 
-    <!-- User Flow Panel -->
-    <div class="main-panel">
+    <!-- Flow Panel (Right Column) -->
+    <div class="w-full lg:w-2/3">
       <div id="flowPanel" class="drop-zone">
         <svg id="connectorSVG" class="connector"></svg>
-        <p class="text-gray-400 italic">Drag and drop items here to build your health workflow...</p>
+        <p class="text-gray-400 italic text-center">Drag and drop items here to build your health workflow...</p>
       </div>
-
-      <div class="flex gap-4 mt-4 justify-center">
+      <div class="flex justify-center gap-4 mt-4">
         <button id="saveFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">Save Flow</button>
-        <button id="exportFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">Export Flow</button>
+        <button id="exportFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-green-600 to-green-400 font-bold glow-card">Export Flow</button>
       </div>
     </div>
   </div>
 
   <footer class="mt-12 text-gray-500 text-xs text-center">© 2025 Powered by Presibo Health</footer>
 
-  <!-- Floating Chat Icon & Popup -->
+  <!-- Floating Buttons -->
   <div id="chatBtn">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9z" />
     </svg>
   </div>
 
-  <div id="chatPopup">
-    <div id="chatHeader" style="background: #3b82f6; padding: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-      <span class="text-white font-bold">Presibo AI Chat</span>
-      <button id="closeChat" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">✖</button>
-    </div>
-    <iframe src="https://app.presibo.com/ai/chat" title="Presibo AI Chat"></iframe>
+  <div id="loginBtn">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A4 4 0 018 17h8a4 4 0 012.879 1.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  </div>
+
+  <!-- Chat Popup -->
+  <div id="chatPopup" class="popup">
+    <iframe src="https://app.presibo.com/ai" title="Presibo AI Chat"></iframe>
+  </div>
+
+  <!-- Login Popup -->
+  <div id="loginPopup" class="popup">
+    <iframe src="https://app.presibo.com/login" title="Presibo Login"></iframe>
   </div>
 
   <script>
     const draggables = document.querySelectorAll('.draggable');
     const dropZone = document.getElementById('flowPanel');
     const connectorSVG = document.getElementById('connectorSVG');
+    const chatBtn = document.getElementById('chatBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const chatPopup = document.getElementById('chatPopup');
+    const loginPopup = document.getElementById('loginPopup');
     let flowCount = 0;
     const flowItems = [];
 
@@ -230,9 +204,7 @@
       e.preventDefault();
       dropZone.classList.add('dragover');
     });
-
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-
     dropZone.addEventListener('drop', e => {
       e.preventDefault();
       dropZone.classList.remove('dragover');
@@ -241,7 +213,7 @@
       const itemEl = document.createElement('div');
       itemEl.className = 'bg-gray-800 text-white p-3 rounded-lg mb-3 flex justify-between items-center glow-card flow-item';
       itemEl.style.position = 'absolute';
-      itemEl.style.top = `${80 + flowCount * 120}px`;
+      itemEl.style.top = `${80 + Math.floor(flowCount / 3) * 120}px`;
       itemEl.style.left = `${40 + (flowCount % 3) * 220}px`;
       itemEl.innerHTML = `
         <span>${itemName}</span>
@@ -260,18 +232,8 @@
 
     document.getElementById('saveFlow').addEventListener('click', () => {
       const items = Array.from(dropZone.querySelectorAll('.flow-item span')).map(el => el.textContent);
-      if (!items.length) return alert('Please drag actions into your health flow first.');
+      if (items.length === 0) return alert('Please drag actions into your health flow first.');
       alert('✅ Flow Saved:\n' + items.join('\n'));
-    });
-
-    document.getElementById('exportFlow').addEventListener('click', () => {
-      const items = Array.from(dropZone.querySelectorAll('.flow-item span')).map(el => el.textContent);
-      if (!items.length) return alert('No items to export.');
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
-      const dlAnchor = document.createElement('a');
-      dlAnchor.setAttribute("href", dataStr);
-      dlAnchor.setAttribute("download", "health_flow.json");
-      dlAnchor.click();
     });
 
     function drawConnections() {
@@ -284,22 +246,23 @@
         const y1 = a.bottom - containerRect.top;
         const x2 = b.left + b.width / 2 - containerRect.left;
         const y2 = b.top - containerRect.top;
-
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', `M${x1},${y1} C${x1},${y1+50} ${x2},${y2-50} ${x2},${y2}`);
         path.classList.add('connector-line');
         connectorSVG.appendChild(path);
       }
     }
-
     window.addEventListener('resize', drawConnections);
 
-    const chatBtn = document.getElementById('chatBtn');
-    const chatPopup = document.getElementById('chatPopup');
-    const closeChat = document.getElementById('closeChat');
-    chatBtn.addEventListener('click', () => { chatPopup.style.display = 'block'; });
-    closeChat.addEventListener('click', () => { chatPopup.style.display = 'none'; });
+    // Toggle chat & login popups
+    chatBtn.addEventListener('click', () => {
+      chatPopup.style.display = chatPopup.style.display === 'block' ? 'none' : 'block';
+      loginPopup.style.display = 'none';
+    });
+    loginBtn.addEventListener('click', () => {
+      loginPopup.style.display = loginPopup.style.display === 'block' ? 'none' : 'block';
+      chatPopup.style.display = 'none';
+    });
   </script>
-
 </body>
 </html>
