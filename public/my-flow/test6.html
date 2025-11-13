@@ -14,187 +14,90 @@
       min-height: 100vh;
     }
 
-    .glow-text {
-      text-shadow: 0 0 12px rgba(56,189,248,0.5), 0 0 24px rgba(56,189,248,0.4);
-    }
-    .glow-card {
-      box-shadow: 0 0 25px rgba(59,130,246,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glow-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 35px rgba(59,130,246,0.7);
-    }
+    .glow-text { text-shadow: 0 0 12px rgba(56,189,248,0.5), 0 0 24px rgba(56,189,248,0.4); }
+    .glow-card { box-shadow: 0 0 25px rgba(59,130,246,0.3); transition: transform 0.3s, box-shadow 0.3s; }
+    .glow-card:hover { transform: scale(1.05); box-shadow: 0 0 35px rgba(59,130,246,0.7); }
 
     nav {
       background: rgba(15,23,42,0.9);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(56,189,248,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
     }
+    .nav-link { color: #e2e8f0; font-weight: 500; transition: color 0.2s; padding: 0.5rem 1rem; display: inline-block; }
+    .nav-link:hover { color: #38bdf8; }
 
-    .nav-link {
-      color: #e2e8f0;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .nav-link:hover {
-      color: #38bdf8;
-    }
-
-    /* Dropdown Menu */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
+    /* Dropdown */
+    .dropdown { position: relative; display: inline-block; margin-left: 1rem; }
     .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: rgba(15,23,42,0.95);
-      min-width: 180px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      border-radius: 0.5rem;
-      padding: 0.5rem 0;
-      z-index: 999;
+      display: none; position: absolute; background: rgba(15,23,42,0.95);
+      min-width: 180px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      border-radius: 0.5rem; padding: 0.5rem 0; z-index: 999;
     }
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
+    .dropdown:hover .dropdown-content { display: block; }
     .dropdown-content a {
-      color: #e2e8f0;
-      padding: 0.6rem 1rem;
-      text-decoration: none;
-      display: block;
-      font-size: 0.9rem;
+      color: #e2e8f0; padding: 0.6rem 1rem; display: block; font-size: 0.9rem;
       transition: background 0.2s;
     }
-    .dropdown-content a:hover {
-      background: rgba(56,189,248,0.2);
-      color: #38bdf8;
-    }
+    .dropdown-content a:hover { background: rgba(56,189,248,0.2); color: #38bdf8; }
 
+    /* Flow area */
     .drop-zone {
-      position: relative;
-      min-height: 900px;
+      position: relative; min-height: 900px;
       border: 2px dashed rgba(56,189,248,0.4);
-      border-radius: 1rem;
-      padding: 1rem;
-      transition: background 0.3s ease;
-      overflow-y: auto;
-      overflow-x: hidden;
-      max-height: 80vh;
-    }
-    .drop-zone.dragover {
-      background: rgba(56,189,248,0.1);
-      border-color: rgba(56,189,248,0.8);
+      border-radius: 1rem; padding: 1rem;
+      overflow-y: auto; max-height: 80vh;
     }
 
-    .draggable {
-      cursor: grab;
-    }
-
-    .frequency-select {
-      background: #020617;
-      border: none;
-      color: white;
-      border-radius: 0.5rem;
-      padding: 0.3rem 0.6rem;
-    }
-
-    .flow-item {
-      position: relative;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    svg.connector {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .connector-line {
-      stroke: rgba(59,130,246,0.8);
-      stroke-width: 2;
-      fill: none;
-      stroke-dasharray: 6;
-      animation: dash 1.5s linear infinite;
-    }
-
-    @keyframes dash {
-      to { stroke-dashoffset: -12; }
-    }
-
+    /* Floating Buttons */
     #chatBtn, #loginBtn {
-      position: fixed;
-      bottom: 24px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      transition: transform 0.2s ease;
+      position: fixed; bottom: 24px; width: 60px; height: 60px;
+      border-radius: 50%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      cursor: pointer; display: flex; justify-content: center; align-items: center;
+      z-index: 1000; transition: transform 0.2s;
     }
-    #chatBtn { right: 24px; background: linear-gradient(to bottom right, #3b82f6, #06b6d4); }
-    #loginBtn { right: 100px; background: linear-gradient(to bottom right, #10b981, #059669); }
+    #chatBtn { right: 24px; background: linear-gradient(to bottom right,#3b82f6,#06b6d4); }
+    #loginBtn { right: 100px; background: linear-gradient(to bottom right,#10b981,#059669); }
     #chatBtn:hover, #loginBtn:hover { transform: scale(1.1); }
 
+    /* Popups */
     .popup {
-      position: fixed;
-      bottom: 100px;
-      right: 24px;
-      width: 380px;
-      height: 520px;
-      border-radius: 1rem;
-      overflow: hidden;
-      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
-      display: none;
-      z-index: 999;
-      border: 2px solid #3b82f6;
-      background: #0f172a;
-      transition: all 0.3s ease;
+      position: fixed; bottom: 100px; right: 24px; width: 380px; height: 520px;
+      border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+      display: none; z-index: 999; border: 2px solid #3b82f6; background: #0f172a;
+      transition: all 0.3s;
     }
-    .popup iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .popup iframe { width: 100%; height: 100%; border: none; }
+    .close-popup {
+      position: absolute; top: 8px; right: 10px; background: crimson; color: white;
+      border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem;
+      cursor: pointer; z-index: 1001;
     }
 
-    .close-popup {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      background: crimson;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      z-index: 1001;
+    /* Export Popup */
+    #exportPopup {
+      width: 320px; height: 220px; padding: 1.5rem;
+      display: none; bottom: 150px; right: 30px;
+      background: rgba(15,23,42,0.98); border: 2px solid #38bdf8;
+      box-shadow: 0 0 30px rgba(56,189,248,0.3); border-radius: 1rem;
+      position: fixed; z-index: 1000;
     }
+    #exportPopup h3 { font-size: 1.2rem; margin-bottom: 1rem; text-align: center; }
+    .export-btn {
+      width: 100%; padding: 0.8rem; margin-top: 0.5rem; border-radius: 0.6rem;
+      font-weight: bold; border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .export-btn.email { background: linear-gradient(to right,#3b82f6,#06b6d4); color: white; }
+    .export-btn.whatsapp { background: linear-gradient(to right,#22c55e,#15803d); color: white; }
+    .export-btn:hover { opacity: 0.9; }
 
     @media (max-width: 768px) {
-      .drop-zone { min-height: 800px; }
       #chatBtn, #loginBtn { bottom: 18px; width: 50px; height: 50px; }
       .popup {
-        width: 95%;
-        height: 80vh;
-        bottom: auto;
-        top: 10%;
-        right: 2.5%;
-        border-radius: 1rem;
+        width: 95%; height: 80vh; bottom: auto; top: 10%; right: 2.5%;
+      }
+      #exportPopup {
+        width: 90%; right: 5%; bottom: 20%; text-align: center;
       }
     }
   </style>
@@ -202,24 +105,21 @@
 
 <body class="flex flex-col px-4 py-8">
 
-  <!-- Navigation -->
+  <!-- Navbar -->
   <nav class="w-full flex justify-between items-center px-6 py-4">
     <h1 class="text-2xl font-bold glow-text">Presibo AI</h1>
-      
-    
-    <!-- Dashboard Dropdown -->
-    
-   <div class="dropdown">
-        <a href="https://app.presibo.com/doctors" class="nav-link">Dashboard ▼</a>
+
+    <div class="flex items-center">
+      <div class="dropdown">
+        <a href="#" class="nav-link">Dashboard ▼</a>
         <div class="dropdown-content">
-          <a href="/" target="_blank">Canvas</a>
+          <a href="/">Canvas</a>
           <a href="https://app.presibo.com/ai" target="_blank">Chat</a>
         </div>
+      </div>
 
-
-      <!-- Doctors Dropdown -->
       <div class="dropdown">
-        <a href="https://app.presibo.com/doctors" class="nav-link">Doctors ▼</a>
+        <a href="#" class="nav-link">Doctors ▼</a>
         <div class="dropdown-content">
           <a href="https://app.presibo.com/visit" target="_blank">Home Visit</a>
           <a href="https://app.presibo.com/#" target="_blank">Instant Call</a>
@@ -228,7 +128,7 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <div class="flex flex-col lg:flex-row gap-8 w-full justify-center mt-8">
     <div class="w-full lg:w-1/3 flex flex-col gap-4">
       <h2 class="text-2xl font-bold mb-4 glow-text text-center">Available Flow Items</h2>
@@ -237,19 +137,13 @@
         <div class="glow-card bg-gradient-to-br from-indigo-500 to-indigo-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Sleep Tracking & Smart Sleep Reminders">Sleep Tracking & Smart Sleep Reminders</div>
         <div class="glow-card bg-gradient-to-br from-cyan-500 to-cyan-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Hydration Alerts">Hydration Alerts</div>
         <div class="glow-card bg-gradient-to-br from-green-500 to-green-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Healthy Meal & Breakfast Suggestions">Healthy Meal & Breakfast Suggestions</div>
-        <div class="glow-card bg-gradient-to-br from-pink-500 to-pink-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Medication & Supplement Tracking">Medication & Supplement Tracking</div>
-        <div class="glow-card bg-gradient-to-br from-purple-500 to-purple-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Vital Signs Monitoring">Vital Signs Monitoring</div>
-        <div class="glow-card bg-gradient-to-br from-teal-500 to-teal-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Regular Health Checkup Reminders">Regular Health Checkup Reminders</div>
-        <div class="glow-card bg-gradient-to-br from-amber-500 to-yellow-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Doctor Appointment Scheduling & Follow-ups">Doctor Appointment Scheduling & Follow-ups</div>
-        <div class="glow-card bg-gradient-to-br from-rose-500 to-rose-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="Stress & Mental Health Management">Stress & Mental Health Management</div>
-        <div class="glow-card bg-gradient-to-br from-sky-500 to-blue-700 p-4 rounded-xl w-11/12 draggable" draggable="true" data-item="AI-Powered Health Insights & Risk Prediction">AI-Powered Health Insights & Risk Prediction</div>
       </div>
     </div>
 
     <div class="w-full lg:w-2/3">
       <div id="flowPanel" class="drop-zone">
         <svg id="connectorSVG" class="connector"></svg>
-        <p class="text-gray-400 italic text-center">Drag and drop items here to build your health workflow...</p>
+        <p class="text-gray-400 italic text-center">Drag and drop items here...</p>
       </div>
       <div class="flex justify-center gap-4 mt-4">
         <button id="saveFlow" class="px-6 py-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 font-bold glow-card">Save Flow</button>
@@ -273,102 +167,70 @@
     </svg>
   </div>
 
-  <!-- Chat Popup -->
+  <!-- Popups -->
   <div id="chatPopup" class="popup">
     <button class="close-popup" id="closeChat">×</button>
-    <iframe src="https://app.presibo.com/ai/chat" title="Presibo AI Chat"></iframe>
+    <iframe src="https://app.presibo.com/ai" title="Presibo AI Chat"></iframe>
   </div>
 
-  <!-- Login Popup -->
   <div id="loginPopup" class="popup">
     <button class="close-popup" id="closeLogin">×</button>
     <iframe src="https://app.presibo.com/login" title="Presibo Login"></iframe>
   </div>
 
+  <div id="exportPopup">
+    <h3>Export Your Flow</h3>
+    <button class="export-btn email" id="exportEmail">📧 Export via Email</button>
+    <button class="export-btn whatsapp" id="exportWhatsApp">💬 Export via WhatsApp</button>
+  </div>
+
   <script>
     const draggables = document.querySelectorAll('.draggable');
     const dropZone = document.getElementById('flowPanel');
-    const connectorSVG = document.getElementById('connectorSVG');
     const chatBtn = document.getElementById('chatBtn');
     const loginBtn = document.getElementById('loginBtn');
     const chatPopup = document.getElementById('chatPopup');
     const loginPopup = document.getElementById('loginPopup');
+    const exportPopup = document.getElementById('exportPopup');
+    const exportFlowBtn = document.getElementById('exportFlow');
     const closeChat = document.getElementById('closeChat');
     const closeLogin = document.getElementById('closeLogin');
-    let flowCount = 0;
-    const flowItems = [];
 
-    draggables.forEach(item => {
-      item.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('text/plain', item.getAttribute('data-item'));
-      });
-    });
+    let flowCount = 0; const flowItems = [];
 
-    dropZone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
+    draggables.forEach(item => item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', item.dataset.item)));
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 
     dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
+      e.preventDefault(); dropZone.classList.remove('dragover');
       const itemName = e.dataTransfer.getData('text/plain');
-      const itemEl = document.createElement('div');
-      itemEl.className = 'bg-gray-800 text-white p-3 rounded-lg mb-3 flex justify-between items-center glow-card flow-item';
-      itemEl.style.position = 'absolute';
-      itemEl.style.top = `${80 + Math.floor(flowCount / 3) * 120}px`;
-      itemEl.style.left = `${40 + (flowCount % 3) * 220}px`;
-      itemEl.innerHTML = `
-        <span>${itemName}</span>
-        <select class="frequency-select ml-2">
-          <option value="">Frequency</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-        </select>
-      `;
-      dropZone.appendChild(itemEl);
-      flowItems.push(itemEl);
-      flowCount++;
-      drawConnections();
+      const el = document.createElement('div');
+      el.className = 'bg-gray-800 p-3 rounded-lg mb-3 glow-card flow-item';
+      el.innerHTML = `<span>${itemName}</span>`;
+      el.style.position = 'absolute'; el.style.top = `${80 + flowCount * 60}px`; el.style.left = '50px';
+      dropZone.appendChild(el);
+      flowItems.push(el); flowCount++;
     });
 
-    document.getElementById('saveFlow').addEventListener('click', () => {
-      const items = Array.from(dropZone.querySelectorAll('.flow-item span')).map(el => el.textContent);
-      if (items.length === 0) return alert('Please drag actions into your health flow first.');
-      alert('✅ Flow Saved:\n' + items.join('\n'));
-    });
+    // Popups
+    chatBtn.onclick = () => { chatPopup.style.display = chatPopup.style.display === 'block' ? 'none' : 'block'; loginPopup.style.display = 'none'; };
+    loginBtn.onclick = () => { loginPopup.style.display = loginPopup.style.display === 'block' ? 'none' : 'block'; chatPopup.style.display = 'none'; };
+    closeChat.onclick = () => chatPopup.style.display = 'none';
+    closeLogin.onclick = () => loginPopup.style.display = 'none';
 
-    function drawConnections() {
-      connectorSVG.innerHTML = '';
-      for (let i = 0; i < flowItems.length - 1; i++) {
-        const a = flowItems[i].getBoundingClientRect();
-        const b = flowItems[i + 1].getBoundingClientRect();
-        const containerRect = dropZone.getBoundingClientRect();
-        const x1 = a.left + a.width / 2 - containerRect.left;
-        const y1 = a.bottom - containerRect.top;
-        const x2 = b.left + b.width / 2 - containerRect.left;
-        const y2 = b.top - containerRect.top;
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M${x1},${y1} C${x1},${y1+50} ${x2},${y2-50} ${x2},${y2}`);
-        path.classList.add('connector-line');
-        connectorSVG.appendChild(path);
-      }
-    }
-    window.addEventListener('resize', drawConnections);
+    exportFlowBtn.onclick = () => { exportPopup.style.display = exportPopup.style.display === 'block' ? 'none' : 'block'; };
 
-    // Popup logic
-    chatBtn.addEventListener('click', () => {
-      chatPopup.style.display = chatPopup.style.display === 'block' ? 'none' : 'block';
-      loginPopup.style.display = 'none';
-    });
-    loginBtn.addEventListener('click', () => {
-      loginPopup.style.display = loginPopup.style.display === 'block' ? 'none' : 'block';
-      chatPopup.style.display = 'none';
-    });
-    closeChat.addEventListener('click', () => chatPopup.style.display = 'none');
-    closeLogin.addEventListener('click', () => loginPopup.style.display = 'none');
+    document.getElementById('exportEmail').onclick = () => {
+      const subject = encodeURIComponent("My Health Flow Plan");
+      const body = encodeURIComponent("Here’s my health automation flow from Presibo AI.");
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    };
+    document.getElementById('exportWhatsApp').onclick = () => {
+      const text = encodeURIComponent("Here’s my health flow automation from Presibo AI 💙");
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    };
   </script>
 </body>
 </html>
