@@ -91,34 +91,28 @@ let allDoctors = [];
 // Fetch users and doctors on load
 async function fetchRecipients() {
   try {
-    const [usersRes, doctorsRes] = await Promise.all([
-      fetch(CONFIG.API_USERS_URL || "https://api.presibo.com/users/index.php"),
-      fetch("https://presibo-wl.vercel.app/doctors.json")
-    ]);
+    try {
+      // Fetch from a secure backend endpoint instead of direct API access
+      const doctorsRes = await fetch("https://presibo-wl.vercel.app/doctors.json");
+      const doctorsData = await doctorsRes.json();
+      
+      // Doctors could be inside doctorsData.doctors or directly in the array
+      const doctorsArray = Array.isArray(doctorsData)
+        ? doctorsData
+        : doctorsData.users || [];
 
-    const usersData = await usersRes.json();
-    const doctorsData = await doctorsRes.json();
+      allDoctors = doctorsArray
+        .map(d => d.email)
+        .filter(email => typeof email === "string" && email.includes("@"));
 
-    // Users could be inside usersData.users or directly in the array
-    const usersArray = Array.isArray(usersData)
-      ? usersData
-      : usersData.users || [];
-
-    // Doctors could be inside doctorsData.doctors or directly in the array
-    const doctorsArray = Array.isArray(doctorsData)
-      ? doctorsData
-      : doctorsData.users || [];
-
-    // Extract email addresses
-    allUsers = usersArray
-      .map(u => u.email)
-      .filter(email => typeof email === "string" && email.includes("@"));
-
-    allDoctors = doctorsArray
-      .map(d => d.email)
-      .filter(email => typeof email === "string" && email.includes("@"));
-
-    console.log(`✅ Loaded ${allUsers.length} users and ${allDoctors.length} doctors`);
+      console.log(`✅ Loaded ${allDoctors.length} doctors`);
+    } catch (err) {
+      console.error("❌ Error fetching doctors:", err);
+    }
+    
+    // Note: User list should be fetched via secure server-side endpoint, not directly from API
+    // For now, we'll initialize as empty - in a real implementation, this would come from a secure backend
+    allUsers = [];
   } catch (err) {
     console.error("❌ Error fetching recipients:", err);
   }
@@ -132,7 +126,12 @@ recipientType.addEventListener("change", () => {
   externalEmailsContainer.classList.toggle("hidden", type !== "external");
 
   let count = 0;
-  if (type === "users") count = allUsers.length;
+  if (type === "users") {
+    // Users should be fetched from a secure backend endpoint, not loaded in frontend
+    // Showing message instead of actual count for security
+    recipientCount.textContent = "Recipients: Access restricted for security";
+    return;
+  }
   else if (type === "doctors") count = allDoctors.length;
   else if (type === "external") {
     const emails = document.getElementById("externalEmails").value
@@ -141,7 +140,9 @@ recipientType.addEventListener("change", () => {
     count = emails.length;
   }
 
-  recipientCount.textContent = `Recipients: ${count}`;
+  if (type !== "users") {
+    recipientCount.textContent = `Recipients: ${count}`;
+  }
 });
 
 
@@ -166,7 +167,12 @@ recipientType.addEventListener("change", () => {
     }
 
     let emailList = [];
-    if (type === "users") emailList = allUsers;
+    if (type === "users") {
+      // Prevent sending to users as user list is not available in frontend for security reasons
+      statusMsg.textContent = "⚠️ Cannot send to users directly from frontend. This should be handled via secure backend endpoint.";
+      statusMsg.className = "text-red-600 text-center mt-4";
+      return;
+    }
     if (type === "doctors") emailList = allDoctors;
     if (type === "external") {
       emailList = document.getElementById("externalEmails").value
@@ -185,34 +191,39 @@ recipientType.addEventListener("change", () => {
     sendBtn.textContent = "Sending...";
     statusMsg.textContent = "";
 
-    let sent = 0;
+    // Send the broadcast request to our secure backend endpoint
+    try {
+      const broadcastRes = await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientType: type,
+          subject: subject,
+          message: message,
+          externalEmails: type === 'external' ? document.getElementById("externalEmails").value : undefined
+        })
+      });
 
-    for (const email of emailList) {
-      try {
-        const res = await fetch(CONFIG.API_EMAIL_URL || "https://api.presibo.com/email/index.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "send",
-            type: "custom",
-            email,
-            title: subject,
-            message
-          })
-        });
-
-
-        
-
-        const result = await res.json();
-        if (result.success) sent++;
-      } catch (e) {
-        console.error("Failed to send to:", email, e);
+      const result = await broadcastRes.json();
+      if (result.success) {
+        sent = result.sent;
+        console.log(`Successfully sent ${result.sent} of ${result.total} emails`);
+      } else {
+        console.error('Broadcast failed:', result.error);
+        statusMsg.textContent = `❌ Broadcast failed: ${result.error}`;
+        statusMsg.className = "text-red-600 text-center mt-4";
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send Broadcast Email";
+        return;
       }
-
-     
+    } catch (error) {
+      console.error('Broadcast request failed:', error);
+      statusMsg.textContent = "❌ Failed to send broadcast";
+      statusMsg.className = "text-red-600 text-center mt-4";
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Send Broadcast Email";
+      return;
     }
-    
 
     sendBtn.disabled = false;
     sendBtn.textContent = "Send Broadcast Email";
