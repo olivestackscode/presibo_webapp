@@ -6,6 +6,7 @@
   <title>AI Personal Health Assistant - Presibo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://js.paystack.co/v1/inline.js" async></script>
+    <script src="/assets/js/config.js"></script>
 
 
   <!-- Favicon Meta Tags - Using online placeholder -->
@@ -349,9 +350,11 @@
    CONFIG / STATE
 ===================================================== */
 const userEmail = sessionStorage.getItem('email');
-const AI_API = 'https://api.presibo.com/ai/openrouter.php';
-const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
-const EMAIL_API = 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
+
+// Load API endpoints from centralized config
+const AI_API = CONFIG.API_AI_URL || 'https://api.presibo.com/ai/open.php';
+const DOCTORS_API = CONFIG.API_DOCTORS_URL || 'https://api.presibo.com/doctors/index.php';
+const EMAIL_API = CONFIG.API_EMAIL_URL || 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
 let freeLimit = 5;
 let remaining = freeLimit;
 let isSubscribed = false

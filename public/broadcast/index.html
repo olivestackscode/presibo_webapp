@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Presibo Broadcast Email</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/config.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
 
@@ -91,7 +92,7 @@ let allDoctors = [];
 async function fetchRecipients() {
   try {
     const [usersRes, doctorsRes] = await Promise.all([
-      fetch("https://api.presibo.com/users/index.php"),
+      fetch(CONFIG.API_USERS_URL || "https://api.presibo.com/users/index.php"),
       fetch("https://presibo-wl.vercel.app/doctors.json")
     ]);
 
@@ -188,7 +189,7 @@ recipientType.addEventListener("change", () => {
 
     for (const email of emailList) {
       try {
-        const res = await fetch("https://api.presibo.com/email/index.php", {
+        const res = await fetch(CONFIG.API_EMAIL_URL || "https://api.presibo.com/email/index.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

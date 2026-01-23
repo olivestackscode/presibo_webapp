@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       API_POST_URL: process.env.API_POST_URL || 'https://api.presibo.com/post/index.php',
       API_EMAIL_URL: process.env.API_EMAIL_URL || 'https://api.presibo.com/email/index.php',
       API_RESET_TOKEN_URL: process.env.API_RESET_TOKEN_URL || 'https://api.presibo.com/tokens/reset-token.php',
-      API_AI_URL: process.env.API_AI_URL || 'https://api.presibo.com/ai/open.php',
+      API_AI_URL: process.env.API_AI_URL || 'https://api.presibo.com/ai/openrouter.php',
       API_DOCTORS_URL: process.env.API_DOCTORS_URL || 'https://api.presibo.com/doctors/index.php',
       
       // Internal API Routes

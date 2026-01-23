@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Presibo Personal Health Assessment</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/config.js"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -91,7 +92,7 @@
       console.log("📤 Sending payload to AI API:", payload);
 
       try {
-        const res = await fetch("https://api.presibo.com/ai/open.php", {
+        const res = await fetch(CONFIG.API_AI_URL || "https://api.presibo.com/ai/open.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -147,7 +148,7 @@
       console.log("📧 Sending email via Presibo API:", { email, first_name, subject, message });
 
       try {
-        const response = await fetch("https://api.presibo.com/email/index.php", {
+        const response = await fetch(CONFIG.API_EMAIL_URL || "https://api.presibo.com/email/index.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -173,7 +174,11 @@
     // Share to WhatsApp
     function shareToWhatsApp() {
       const text = encodeURIComponent(
-        `🩺 Presibo AI Health Assessment Result:\n\n${resultText.textContent}\n\nGet yours at presibo.com`
+        `🩺 Presibo AI Health Assessment Result:
+
+${resultText.textContent}
+
+Get yours at presibo.com`
       );
       const url = `https://wa.me/?text=${text}`;
       console.log("📱 Opening WhatsApp share:", url);
