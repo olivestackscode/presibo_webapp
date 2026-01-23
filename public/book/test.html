@@ -49,6 +49,7 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/config.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -529,7 +530,7 @@
     submitBtn.disabled = true;
 
     try {
-      const response = await fetch("https://api.presibo.com/appointments/new.php", {
+      const response = await fetch(CONFIG.API_BASE_URL + "/appointments/new.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

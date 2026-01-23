@@ -125,7 +125,7 @@ function openBookingModal(doctorId) {
       onSuccess: async function(ref) {
         isSubscribed = true;
         try {
-          const res = await fetch('https://api.presibo.com/appointments/new.php', {
+          const res = await fetch(CONFIG.API_BASE_URL + '/appointments/new.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

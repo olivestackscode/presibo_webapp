@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Presibo - Find Your Doctor</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/config.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
@@ -137,7 +138,7 @@
       try {
         const doctor = doctors.find(d => d.id == doctorId);
 
-        const userRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
+        const userRes = await fetch(`${CONFIG.API_DB_URL || 'https://api.presibo.com/db/index.php'}?action=get_user&email=${encodeURIComponent(email)}`);
         const userData = await userRes.json();
         //const user = userData[0] || {};
         const user = userData.users?.[0] || {};
@@ -185,7 +186,7 @@ modalContent.innerHTML = `
       phone: userPhone
     };
 
-    const response = await fetch("https://api.presibo.com/appointments/new.php", {
+    const response = await fetch(CONFIG.API_BASE_URL + "/appointments/new.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(bookingData),
