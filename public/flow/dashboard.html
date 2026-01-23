@@ -107,10 +107,11 @@
   </footer>
 
   <!-- SCRIPTS -->
+  <script src="/assets/js/config.js"></script>
   <script>
     // API connection helper
     async function callApi(endpoint, data = {}, method = 'POST') {
-      const baseUrl = "https://api.presibo.com/doctors/index.php";
+      const baseUrl = CONFIG.API_DOCTORS_URL;
       let url = baseUrl + endpoint;
 
       // Append query params for GET

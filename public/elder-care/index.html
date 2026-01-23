@@ -404,6 +404,7 @@
     </div>
   </div>
 
+  <script src="/assets/js/config.js"></script>
   <script>
     // Get User Email from sessionStorage
     const userEmail = sessionStorage.getItem('email');
@@ -436,7 +437,7 @@
       }
 
       const paystack = window.PaystackPop.setup({
-        key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // Replace with your actual Paystack public key if needed
+        key: CONFIG.PAYSTACK_PUBLIC_KEY, // Replace with your actual Paystack public key if needed
         email: userEmail,
         amount: price * 100, // Convert to kobo
         currency: 'NGN',

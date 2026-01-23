@@ -126,6 +126,7 @@
   
 
 
+<script src="/assets/js/config.js"></script>
 <script>
     let email = sessionStorage.getItem('email') || null;
     const searchInput = document.getElementById('searchInput');
@@ -147,7 +148,7 @@
       try {
         const hospital = hospitals.find(d => d.id == hospitalId);
 
-        const userRes = await fetch(`https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}`);
+        const userRes = await fetch(`${CONFIG.API_DB_URL}?action=get_user&email=${encodeURIComponent(email)}`);
         const userData = await userRes.json();
         //const user = userData[0] || {};
         const user = userData.users?.[0] || {};
@@ -243,7 +244,7 @@ modalContent.innerHTML = `
     async function fetchHospitals() {
       hospitalsList.innerHTML = `<div class="text-center py-8 text-gray-500">Loading hospitals...</div>`;
       try {
-        const data = await fetchJSON('https://api.presibo.com/hospitals/index.php');
+        const data = await fetchJSON(`${CONFIG.API_BASE_URL}/hospitals/index.php`);
         hospitals = data.users.map(user => ({
           id: user.id,
           name: user.name || user.fullname || 'Unnamed Hospital',

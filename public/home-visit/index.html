@@ -48,6 +48,7 @@
   </div>
 </div>
 
+<script src="/assets/js/config.js"></script>
 <script>
 let doctors = [];
 let isSubscribed = false;
@@ -117,7 +118,7 @@ function openBookingModal(doctorId) {
     if (!name || !sex || !age || !email || !date || !time || !address) return;
 
     const handler = PaystackPop.setup({
-      key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+      key: CONFIG.PAYSTACK_PUBLIC_KEY,
       email,
       amount: 2500000,
       currency: "NGN",

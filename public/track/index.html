@@ -212,11 +212,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+  <script src="/assets/js/config.js"></script>
   <script>
     // ✅ Presibo AI Integration
     async function callPresiboAI(payload) {
       try {
-        const res = await fetch('https://api.presibo.com/ai/open.php', {
+        const res = await fetch(CONFIG.API_AI_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -259,6 +260,13 @@
       document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
       bpModal.hide();
       e.target.reset();
+      
+      // ✅ Load doctors based on blood pressure reading
+      const vitalsData = {
+        blood_pressure: { systolic: parseInt(s), diastolic: parseInt(d) },
+        timestamp: new Date().toISOString()
+      };
+      loadDoctors(vitalsData);
     });
 
     // ✅ Handle Blood Sugar
@@ -271,6 +279,13 @@
       document.getElementById('recentReadings').insertAdjacentHTML('afterbegin',html);
       bsModal.hide();
       e.target.reset();
+      
+      // ✅ Load doctors based on blood sugar reading
+      const vitalsData = {
+        blood_sugar: parseInt(val),
+        timestamp: new Date().toISOString()
+      };
+      loadDoctors(vitalsData);
     });
 
     // ✅ Handle Meals
@@ -293,21 +308,132 @@
       showPopup("🧠 "+cleanRes);
     }
 
-    // ✅ Load doctors from API
-    async function loadDoctors(){
+    // ✅ Load doctors from API based on user vitals
+    async function loadDoctors(vitalsData = null){
       try{
-        const res=await fetch('https://api.presibo.com/doctors/index.php');
-        const doctors=await res.json();
         const container=document.getElementById('doctorList');
+        container.innerHTML='<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Finding recommended doctors...</p></div>';
+        
+        // Prepare request payload with vitals data if available
+        const payload = {
+          action: 'get_recommended_doctors',
+          vitals: vitalsData || {}
+        };
+        
+        const res=await fetch(CONFIG.API_DOCTORS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const doctors=await res.json();
         container.innerHTML='';
-        doctors.forEach(doc=>{
+        
+        // Display 3-5 recommended doctors
+        const recommendedDoctors = doctors.slice(0, 5);
+        
+        if (recommendedDoctors.length === 0) {
+          container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No doctors recommended now. Add your vital readings to get personalized doctor recommendations.</p></div>';
+          return;
+        }
+        
+        recommendedDoctors.forEach((doc, index) => {
           const col=document.createElement('div');
-          col.className='col-md-6';
-          col.innerHTML=`<div class="p-4 bg-white shadow rounded-lg"><h5>Dr. ${doc.firstname} ${doc.lastname}</h5><p>${doc.specialization} - ${doc.location} (${doc.years} yrs)</p><p>Reason: ${doc.reason}</p><p>Call: <a href="tel:${doc.phone}">${doc.phone}</a></p></div>`;
+          col.className='col-md-6 col-lg-4';
+          
+          // Determine urgency/recommendation level based on vitals
+          let recommendationLevel = doc.recommendation_level || 'normal';
+          let badgeClass = 'bg-success';
+          let badgeText = 'Recommended';
+          
+          if (recommendationLevel === 'urgent') {
+            badgeClass = 'bg-danger';
+            badgeText = 'Urgent Care';
+          } else if (recommendationLevel === 'high') {
+            badgeClass = 'bg-warning';
+            badgeText = 'High Priority';
+          }
+          
+          col.innerHTML=`
+            <div class="p-4 bg-white shadow rounded-lg h-100">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="mb-0">Dr. ${doc.firstname} ${doc.lastname}</h5>
+                <span class="badge ${badgeClass}">${badgeText}</span>
+              </div>
+              <p class="mb-2"><strong>${doc.specialization}</strong></p>
+              <p class="mb-2 text-muted small">${doc.location} • ${doc.years} years experience</p>
+              ${doc.reason ? `<p class="mb-3 text-info small"><i class="fas fa-lightbulb me-1"></i> ${doc.reason}</p>` : ''}
+              <div class="d-grid gap-2">
+                <a href="tel:${doc.phone}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-phone-alt me-1"></i> Call Now
+                </a>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showDoctorDetails(${index})">
+                  View Details
+                </button>
+              </div>
+            </div>
+          `;
           container.appendChild(col);
         });
-      }catch(err){console.error(err);}
+        
+        // Store doctors data for detail view
+        window.doctorData = recommendedDoctors;
+      }catch(err){
+        console.error('Error loading doctors:', err);
+        
+        // If no vitals data was provided (initial load), show empty state
+        if (!vitalsData) {
+          document.getElementById('doctorList').innerHTML = '<div class="col-12 text-center"><p class="text-muted">No doctors recommended now. Add your vital readings to get personalized doctor recommendations.</p></div>';
+        } else {
+          // For actual errors when vitals were provided, show error message
+          document.getElementById('doctorList').innerHTML = '<div class="col-12 text-center"><p class="text-danger">Failed to load doctor recommendations. Please try again later.</p></div>';
+        }
+      }
     }
+    
+    // ✅ Show detailed doctor information
+    function showDoctorDetails(index) {
+      const doctor = window.doctorData[index];
+      if (!doctor) return;
+      
+      const modalContent = `
+        <div class="text-center mb-4">
+          <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+            ${doctor.firstname.charAt(0)}${doctor.lastname.charAt(0)}
+          </div>
+          <h4>Dr. ${doctor.firstname} ${doctor.lastname}</h4>
+          <p class="text-muted">${doctor.specialization}</p>
+        </div>
+        
+        <div class="row text-start">
+          <div class="col-md-6 mb-3">
+            <p><strong><i class="fas fa-map-marker-alt me-2"></i> Location:</strong><br>${doctor.location}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p><strong><i class="fas fa-calendar-alt me-2"></i> Experience:</strong><br>${doctor.years} years</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p><strong><i class="fas fa-phone me-2"></i> Phone:</strong><br><a href="tel:${doctor.phone}">${doctor.phone}</a></p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p><strong><i class="fas fa-envelope me-2"></i> Email:</strong><br>${doctor.email || 'Not available'}</p>
+          </div>
+        </div>
+        
+        ${doctor.bio ? `<div class="mb-3"><strong>About:</strong><p class="mt-2">${doctor.bio}</p></div>` : ''}
+        
+        ${doctor.reason ? `
+          <div class="alert alert-info">
+            <h6><i class="fas fa-lightbulb me-2"></i> Why this doctor is recommended:</h6>
+            <p class="mb-0">${doctor.reason}</p>
+          </div>
+        ` : ''}
+      `;
+      
+      showPopup(`Doctor Details`, modalContent);
+    }
+    
+    // ✅ Initial load
     loadDoctors();
 
 

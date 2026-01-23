@@ -318,9 +318,10 @@
     <p id="toast-description" class="text-sm"></p>
   </div>
 
+<script src="/assets/js/config.js"></script>
 <script>
-  // API Configuration - Plain direct URL
-  const API_URL = 'https://api.presibo.com/users/index.php';
+  // API Configuration loaded from config.js
+  const API_URL = CONFIG.API_USERS_URL;
 
   // Toast Notification
   function showToast(title, description, variant = 'default') {
@@ -470,7 +471,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   signupButton.disabled = true;
 
   try {
-    const response = await fetch('https://api.presibo.com/post/index.php?action=signup', {
+    const response = await fetch(`${CONFIG.API_POST_URL}?action=signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -486,7 +487,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
       sessionStorage.setItem('email', signupData.email); // Store for session
       //prepare and send email to uers
       //UserEmail = sessionStorage.setItem('email', signupData.email);
-      fetch("https://api.presibo.com/email/index.php", {
+      fetch(CONFIG.API_EMAIL_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -647,7 +648,6 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
                 // startTracking(); // Uncomment to resume
             }
         });
-  
 </script>
 </body>
 </html>

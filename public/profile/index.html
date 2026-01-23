@@ -418,6 +418,7 @@
     </div>
   </div>
 
+<script src="/assets/js/config.js"></script>
 <script>
     // Global user data
     let user = null;
@@ -685,7 +686,7 @@ async function fetchUserData() {
       };
 
       try {
-        const response = await fetch('https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(email)}', {
+        const response = await fetch(`${CONFIG.API_DB_URL}?action=get_user&email=${encodeURIComponent(email)}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -758,7 +759,7 @@ async function fetchUserData() {
 
         // Paystack integration
         const handler = PaystackPop.setup({
-          key: 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+          key: CONFIG.PAYSTACK_PUBLIC_KEY,
           email: user.email,
           amount: Math.round(amount * 100),
           ref: data.paymentReference,
