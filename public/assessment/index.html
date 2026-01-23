@@ -95,7 +95,7 @@
 
     // Configuration
     const userEmail = sessionStorage.getItem('email');
-    let freeLimit = 2; // 2 free assessments
+    let freeLimit = 0; // No free assessments - charge per use
     let remaining = freeLimit;
     let isSubscribed = false;
 
@@ -119,7 +119,7 @@
         usageDiv.parentNode.insertBefore(usageDisplay, usageDiv);
       }
       
-      usageDisplay.textContent = `Free Assessments Remaining: ${remaining} of ${freeLimit}`;
+      usageDisplay.textContent = '₦1,000 per assessment';
     }
     
     // Show payment modal
@@ -145,10 +145,10 @@
           <div class="space-y-4">
             <div class="text-center">
               <div class="text-3xl font-bold text-green-600 mb-2">₦1,000</div>
-              <div class="text-sm text-gray-600">one-time payment</div>
+              <div class="text-sm text-gray-600">per assessment</div>
             </div>
             <div class="space-y-2">
-              <button id="subscribeNow" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">Subscribe for ₦1,000</button>
+              <button id="subscribeNow" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">Pay ₦1,000 for this Assessment</button>
               <button id="closeModal" class="w-full border border-gray-200 py-2 rounded-lg hover:bg-gray-50">Maybe Later</button>
             </div>
             <div class="text-xs text-gray-500 text-center">Secure payment powered by Paystack.</div>
@@ -166,6 +166,9 @@
         document.body.removeChild(modal);
       });
     }
+    
+    // Variables to store assessment data
+    let currentAssessmentData = null;
     
     // Handle subscription click
     function handleSubscribeClick() {
@@ -192,13 +195,14 @@
           const modal = document.querySelector('.dialog-overlay');
           if (modal) document.body.removeChild(modal);
           
-          // Mark as subscribed and reset usage
-          isSubscribed = true;
-          remaining = freeLimit; // Reset to full free limit for subscribed users
-          updateUsageDisplay();
+          // Process the stored assessment data
+          if (currentAssessmentData) {
+            processAssessment(currentAssessmentData.name, currentAssessmentData.email, currentAssessmentData.symptoms);
+            currentAssessmentData = null; // Clear stored data
+          }
           
           // Add success message
-          alert('Thank you for subscribing! You now have unlimited access to health assessments.', false);
+          alert('Payment successful! Processing your health assessment...', false);
         },
         onClose: function() {
           alert('Transaction was not completed, window closed.');
@@ -211,45 +215,10 @@
       handler.openIframe();
     }
     
-    updateUsageDisplay();
-
-    async function analyzeHealth() {
-      const name = document.getElementById("first_name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const symptoms = document.getElementById("symptoms").value.trim();
-
-      // Check if user is logged in
-      if (!isLoggedIn()) {
-        showLoginPrompt();
-        return;
-      }
-
-      if (!symptoms) {
-        alert("Please describe your symptoms.");
-        return;
-      }
-
-      // Check if user has exceeded free limit
-      if (!isSubscribed && remaining <= 0) {
-        showPaymentModal();
-        return;
-      }
-
+    // Process assessment after successful payment
+    async function processAssessment(name, email, symptoms) {
       analyzeBtn.textContent = "Analyzing...";
       analyzeBtn.disabled = true;
-
-      // Decrease remaining count if not subscribed
-      if (!isSubscribed) {
-        remaining--;
-        updateUsageDisplay();
-        
-        // Check if this was the last free assessment
-        if (remaining <= 0) {
-          setTimeout(() => {
-            showPaymentModal();
-          }, 1000);
-        }
-      }
 
       const payload = {
         message: `Analyze this user's symptoms and provide a helpful health insight:\n${symptoms}`,
@@ -290,6 +259,37 @@
 
       analyzeBtn.textContent = "Analyze with Presibo AI";
       analyzeBtn.disabled = false;
+    }
+    
+    updateUsageDisplay();
+
+    async function analyzeHealth() {
+      const name = document.getElementById("first_name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const symptoms = document.getElementById("symptoms").value.trim();
+
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        showLoginPrompt();
+        return;
+      }
+
+      if (!symptoms) {
+        alert("Please describe your symptoms.");
+        return;
+      }
+
+      // Store the assessment data to be used after payment
+      currentAssessmentData = {
+        name: name,
+        email: email,
+        symptoms: symptoms
+      };
+
+      // Show payment modal and return
+      // We'll make the API call after successful payment
+      showPaymentModal();
+      return;
     }
 
     // Save result locally
