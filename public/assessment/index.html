@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Presibo Personal Health Assessment</title>
   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script src="/assets/js/config.js"></script>
   <style>
     body {
@@ -61,25 +62,194 @@
   </div>
 
   <script>
+    // Check if user is logged in
+    function isLoggedIn() {
+      return !!sessionStorage.getItem('email') || localStorage.getItem('isLoggedIn') === 'true';
+    }
+
+    // Show login prompt if not logged in
+    function showLoginPrompt() {
+      if (!isLoggedIn()) {
+        const loginPrompt = document.createElement('div');
+        loginPrompt.className = 'mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-center';
+        loginPrompt.innerHTML = `
+          <div class="text-sm text-yellow-800 mb-2">⚠️ Warning: You are not logged in. Please log in to continue using AI services.</div>
+          <button id="loginToContinueBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+            Login to Continue
+          </button>
+        `;
+        
+        const formDiv = document.querySelector('.space-y-4');
+        formDiv.parentNode.insertBefore(loginPrompt, formDiv.nextSibling);
+        
+        document.getElementById('loginToContinueBtn').addEventListener('click', () => {
+          window.location.href = '/login';
+        });
+      }
+    }
+
+    // Check authentication on page load
+    window.addEventListener('load', () => {
+      showLoginPrompt();
+    });
+
+    // Configuration
+    const userEmail = sessionStorage.getItem('email');
+    let freeLimit = 2; // 2 free assessments
+    let remaining = freeLimit;
+    let isSubscribed = false;
+
+    // DOM Elements
     const analyzeBtn = document.getElementById("analyzeBtn");
     const saveBtn = document.getElementById("saveBtn");
     const emailBtn = document.getElementById("emailBtn");
     const whatsappBtn = document.getElementById("whatsappBtn");
     const resultDiv = document.getElementById("result");
     const resultText = document.getElementById("resultText");
+    
+    // Update usage display
+    function updateUsageDisplay() {
+      const usageDiv = document.querySelector('.space-y-4');
+      let usageDisplay = document.getElementById('usageDisplay');
+      
+      if (!usageDisplay) {
+        usageDisplay = document.createElement('div');
+        usageDisplay.id = 'usageDisplay';
+        usageDisplay.className = 'mt-2 text-center text-sm text-blue-600 font-medium';
+        usageDiv.parentNode.insertBefore(usageDisplay, usageDiv);
+      }
+      
+      usageDisplay.textContent = `Free Assessments Remaining: ${remaining} of ${freeLimit}`;
+    }
+    
+    // Show payment modal
+    function showPaymentModal() {
+      const modal = document.createElement('div');
+      modal.className = 'dialog-overlay active';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.right = '0';
+      modal.style.bottom = '0';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '1000';
+      
+      modal.innerHTML = `
+        <div class="dialog-content bg-white rounded-lg max-w-md w-full p-6" style="background:white;border-radius:.5rem;max-width:28rem;width:100%;padding:1.5rem;">
+          <div class="flex items-center gap-2 mb-4">
+            <h2 class="text-lg font-semibold">AI Assessment Payment</h2>
+          </div>
+          <div class="space-y-4">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-600 mb-2">₦1,000</div>
+              <div class="text-sm text-gray-600">one-time payment</div>
+            </div>
+            <div class="space-y-2">
+              <button id="subscribeNow" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">Subscribe for ₦1,000</button>
+              <button id="closeModal" class="w-full border border-gray-200 py-2 rounded-lg hover:bg-gray-50">Maybe Later</button>
+            </div>
+            <div class="text-xs text-gray-500 text-center">Secure payment powered by Paystack.</div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Handle subscription
+      document.getElementById('subscribeNow').addEventListener('click', handleSubscribeClick);
+      
+      // Close modal
+      document.getElementById('closeModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+    }
+    
+    // Handle subscription click
+    function handleSubscribeClick() {
+      // Get user email from session/local storage
+      const email = userEmail || localStorage.getItem('userEmail') || prompt('Please enter your email for the transaction:');
+      
+      if (!email) {
+        alert('Email is required for payment processing');
+        return;
+      }
+      
+      // Initialize Paystack
+      const handler = PaystackPop.setup({
+        key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b', // Replace with actual Paystack public key
+        email: email,
+        amount: 100000, // 1000 naira in kobo
+        currency: 'NGN',
+        ref: ''+Math.floor((Math.random() * 1000000000) + 1), // Generate transaction reference
+        callback: function(response) {
+          // Payment complete! Implement success response here
+          alert('Payment successful! Transaction reference: ' + response.reference);
+          
+          // Remove modal
+          const modal = document.querySelector('.dialog-overlay');
+          if (modal) document.body.removeChild(modal);
+          
+          // Mark as subscribed and reset usage
+          isSubscribed = true;
+          remaining = freeLimit; // Reset to full free limit for subscribed users
+          updateUsageDisplay();
+          
+          // Add success message
+          alert('Thank you for subscribing! You now have unlimited access to health assessments.', false);
+        },
+        onClose: function() {
+          alert('Transaction was not completed, window closed.');
+          // Remove modal
+          const modal = document.querySelector('.dialog-overlay');
+          if (modal) document.body.removeChild(modal);
+        }
+      });
+      
+      handler.openIframe();
+    }
+    
+    updateUsageDisplay();
 
     async function analyzeHealth() {
       const name = document.getElementById("first_name").value.trim();
       const email = document.getElementById("email").value.trim();
       const symptoms = document.getElementById("symptoms").value.trim();
 
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        showLoginPrompt();
+        return;
+      }
+
       if (!symptoms) {
         alert("Please describe your symptoms.");
         return;
       }
 
+      // Check if user has exceeded free limit
+      if (!isSubscribed && remaining <= 0) {
+        showPaymentModal();
+        return;
+      }
+
       analyzeBtn.textContent = "Analyzing...";
       analyzeBtn.disabled = true;
+
+      // Decrease remaining count if not subscribed
+      if (!isSubscribed) {
+        remaining--;
+        updateUsageDisplay();
+        
+        // Check if this was the last free assessment
+        if (remaining <= 0) {
+          setTimeout(() => {
+            showPaymentModal();
+          }, 1000);
+        }
+      }
 
       const payload = {
         message: `Analyze this user's symptoms and provide a helpful health insight:\n${symptoms}`,
