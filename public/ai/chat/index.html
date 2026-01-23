@@ -276,11 +276,70 @@ const userEmail = sessionStorage.getItem('email');
 const AI_API = CONFIG.API_AI_URL || 'https://api.presibo.com/ai/openrouter.php';
 const DOCTORS_API = CONFIG.API_DOCTORS_URL || 'https://api.presibo.com/doctors/index.php';
 const EMAIL_API = CONFIG.API_EMAIL_URL || 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
-let freeLimit = 5;
+let freeLimit = 2; // Changed to 2 as requested
 let remaining = freeLimit;
-let isSubscribed = false
+let isSubscribed = false;
 let AIMsgtoSend = 'null';
 let lastUserMessage = '';    
+
+// Check if user is logged in
+function isLoggedIn() {
+  return !!userEmail || localStorage.getItem('isLoggedIn') === 'true';
+}
+
+// Show login prompt if not logged in
+function checkAuthentication() {
+  if (!isLoggedIn()) {
+    addAIMessage('Warning: You are not logged in. Please log in to continue using AI services.', false);
+    showLoginPrompt();
+    return false;
+  }
+  return true;
+}
+
+// Show login prompt
+function showLoginPrompt() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex justify-start mb-3';
+  
+  wrapper.innerHTML = `
+    <div class="flex gap-2 max-w-[80%] flex-row">
+      <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 00-7.35 16.83l-.68 3.04a1 1 0 001.17 1.17l3.04-.68A10 10 0 1012 2z"></path>
+        </svg>
+      </div>
+      <div class="rounded-lg p-3 bg-yellow-50 border border-yellow-200 text-yellow-800">
+        <div class="text-sm whitespace-pre-wrap leading-relaxed">Warning: You are not logged in. Please log in to continue using AI services.</div>
+        <div class="mt-3 pt-3 border-t border-yellow-200">
+          <button id="loginToContinueBtn" class="w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">
+            Login to Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  chatArea.appendChild(wrapper);
+  scrollToBottom();
+  
+  // Add event listener to login button
+  setTimeout(() => {
+    const loginBtn = document.getElementById('loginToContinueBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        window.location.href = '/login';
+      });
+    }
+  }, 0);
+}
+
+// Check authentication on page load
+window.addEventListener('load', () => {
+  if (!isLoggedIn()) {
+    showLoginPrompt();
+  }
+});
 
 /* =====================================================
    DOM ELEMENTS
@@ -514,14 +573,32 @@ async function sendMessage() {
   if (!text) return;
   lastUserMessage = text;
 
+  // Check if user is logged in
+  if (!checkAuthentication()) {
+    return;
+  }
+
+  // Check if user has exceeded free limit
   if (!isSubscribed && remaining <= 0) {
-    addSubscriptionErrorMessage('Your free AI Doc Consultation limit has been reached. Subscribe for ₦1,000/week to continue.');
-    subscriptionModal.classList.add('active');
+    showPaymentModal();
     return;
   }
 
   addUserMessage(text);
   chatInput.value = '';
+
+  // Decrease remaining count if not subscribed
+  if (!isSubscribed) {
+    remaining--;
+    updateUsageDisplay();
+    
+    // Check if this was the last free consultation
+    if (remaining <= 0) {
+      setTimeout(() => {
+        showPaymentModal();
+      }, 1000);
+    }
+  }
 
   // Show typing indicator
   const typingEl = document.createElement('div');
@@ -545,6 +622,76 @@ async function sendMessage() {
 
   addAIMessage(aiResult.reply);
 }
+
+// Update usage display
+function updateUsageDisplay() {
+  usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
+}
+
+// Show payment modal
+function showPaymentModal() {
+  subscriptionModal.classList.add('active');
+}
+
+// Initialize Paystack payment
+function initializePaystackPayment() {
+  const paystackBtn = document.getElementById('subscribeNow');
+  
+  if (paystackBtn) {
+    paystackBtn.removeEventListener('click', handleSubscribeClick); // Remove any existing listeners
+    paystackBtn.addEventListener('click', handleSubscribeClick);
+  }
+}
+
+// Handle subscription click
+function handleSubscribeClick() {
+  // Get user email from session/local storage
+  const email = userEmail || localStorage.getItem('userEmail') || prompt('Please enter your email for the transaction:');
+  
+  if (!email) {
+    alert('Email is required for payment processing');
+    return;
+  }
+  
+  // Initialize Paystack
+  const handler = PaystackPop.setup({
+    key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_test_your_paystack_public_key_here', // Replace with actual Paystack public key
+    email: email,
+    amount: 100000, // 1000 naira in kobo
+    currency: 'NGN',
+    ref: ''+Math.floor((Math.random() * 1000000000) + 1), // Generate transaction reference
+    callback: function(response) {
+      // Payment complete! Implement success response here
+      alert('Payment successful! Transaction reference: ' + response.reference);
+      
+      // Mark as subscribed and reset usage
+      isSubscribed = true;
+      remaining = freeLimit; // Reset to full free limit for subscribed users
+      updateUsageDisplay();
+      
+      // Close modal
+      subscriptionModal.classList.remove('active');
+      
+      // Add success message
+      addAIMessage('Thank you for subscribing! You now have unlimited access to the AI health assistant.', false);
+    },
+    onClose: function() {
+      alert('Transaction was not completed, window closed.');
+    }
+  });
+  
+  handler.openIframe();
+}
+
+// Close modal event listener - use existing closeModal variable
+if(closeModal) {
+  closeModal.addEventListener('click', () => {
+    subscriptionModal.classList.remove('active');
+  });
+}
+
+// Initialize Paystack payment
+initializePaystackPayment();
 
 /* =====================================================
    EVENT LISTENERS

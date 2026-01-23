@@ -250,6 +250,95 @@ function generateMockDoctors(vitals) {
   return doctors;
 }
 
+// API route for fetching doctors list
+app.get('/api/doctors/list', async (req, res) => {
+  try {
+    const response = await fetch('https://presibo-wl.vercel.app/doctors.json');
+    const data = await response.json();
+    
+    const doctorsArray = Array.isArray(data) ? data : data.users || [];
+    
+    const doctorEmails = doctorsArray
+      .map(doctor => ({
+        email: doctor.email,
+        name: doctor.firstname ? `${doctor.firstname} ${doctor.lastname || ''}`.trim() : doctor.fullname,
+        specialization: doctor.specialization
+      }))
+      .filter(item => item.email && typeof item.email === 'string' && item.email.includes('@'));
+
+    res.json(doctorEmails);
+  } catch (error) {
+    console.error('Doctors list API error:', error);
+    res.status(500).json({ error: 'Failed to fetch doctors list' });
+  }
+});
+
+// API route for broadcast emails
+app.post('/api/broadcast', express.json(), async (req, res) => {
+  const { recipientType, subject, message, externalEmails } = req.body;
+
+  if (!recipientType || !subject || !message) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    let emailList = [];
+    
+    if (recipientType === 'doctors') {
+      const response = await fetch('https://presibo-wl.vercel.app/doctors.json');
+      const data = await response.json();
+      const doctorsArray = Array.isArray(data) ? data : data.users || [];
+      
+      emailList = doctorsArray
+        .map(d => d.email)
+        .filter(email => typeof email === 'string' && email.includes('@'));
+    } else if (recipientType === 'external' && externalEmails) {
+      emailList = Array.isArray(externalEmails) 
+        ? externalEmails 
+        : externalEmails.split(',').map(e => e.trim()).filter(e => e.includes('@'));
+    }
+
+    if (emailList.length === 0) {
+      return res.status(400).json({ error: 'No valid email addresses found' });
+    }
+
+    // Send emails to the collected addresses
+    let sentCount = 0;
+    const errors = [];
+
+    for (const email of emailList) {
+      try {
+        const emailRes = await fetch(process.env.API_EMAIL_URL || 'https://api.presibo.com/email/index.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'send',
+            type: 'custom',
+            email,
+            title: subject,
+            message
+          })
+        });
+
+        const result = await emailRes.json();
+        if (result.success) sentCount++;
+      } catch (error) {
+        errors.push({ email, error: error.message });
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      sent: sentCount, 
+      total: emailList.length,
+      errors 
+    });
+  } catch (error) {
+    console.error('Broadcast API error:', error);
+    res.status(500).json({ error: 'Failed to send broadcast' });
+  }
+});
+
 // Generic catch-all for other API routes (you can expand this as needed)
 app.all('/api/*', async (req, res) => {
   // Log the request for debugging

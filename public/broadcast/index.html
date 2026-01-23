@@ -92,8 +92,8 @@ let allDoctors = [];
 async function fetchRecipients() {
   try {
     try {
-      // Fetch from a secure backend endpoint instead of direct API access
-      const doctorsRes = await fetch("https://presibo-wl.vercel.app/doctors.json");
+      // Fetch doctors from our secure backend endpoint instead of direct API access
+      const doctorsRes = await fetch('/api/doctors/list');
       const doctorsData = await doctorsRes.json();
       
       // Doctors could be inside doctorsData.doctors or directly in the array
@@ -108,6 +108,21 @@ async function fetchRecipients() {
       console.log(`✅ Loaded ${allDoctors.length} doctors`);
     } catch (err) {
       console.error("❌ Error fetching doctors:", err);
+      
+      // Fallback to direct API if secure endpoint fails (should be removed in production)
+      try {
+        const doctorsRes = await fetch("https://presibo-wl.vercel.app/doctors.json");
+        const doctorsData = await doctorsRes.json();
+        const doctorsArray = Array.isArray(doctorsData) ? doctorsData : doctorsData.users || [];
+        
+        allDoctors = doctorsArray
+          .map(d => d.email)
+          .filter(email => typeof email === "string" && email.includes("@"));
+          
+        console.log(`✅ Loaded ${allDoctors.length} doctors from fallback`);
+      } catch (fallbackErr) {
+        console.error("❌ Error fetching doctors from fallback:", fallbackErr);
+      }
     }
     
     // Note: User list should be fetched via secure server-side endpoint, not directly from API
