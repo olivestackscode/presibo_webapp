@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Presibo Broadcast Email</title>
   <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/config.js"></script>
 </head>
+
 <body class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
 
   <div class="max-w-4xl mx-auto">
@@ -20,7 +22,7 @@
         Compose Broadcast Message
       </div>
       <div class="p-6 space-y-6">
-        
+
         <!-- Recipient Selection -->
         <div>
           <label class="block mb-2 font-medium text-gray-700">Select Recipients *</label>
@@ -36,26 +38,30 @@
         <!-- External Emails Input -->
         <div id="externalEmailsContainer" class="hidden">
           <label class="block mb-2 font-medium text-gray-700">Email Addresses *</label>
-          <textarea id="externalEmails" class="w-full border-gray-300 rounded-md p-2 min-h-[80px]" placeholder="Enter email addresses separated by commas"></textarea>
+          <textarea id="externalEmails" class="w-full border-gray-300 rounded-md p-2 min-h-[80px]"
+            placeholder="Enter email addresses separated by commas"></textarea>
           <p class="text-xs text-gray-500">Separate multiple email addresses with commas</p>
         </div>
 
         <!-- Subject -->
         <div>
           <label class="block mb-2 font-medium text-gray-700">Subject *</label>
-          <input id="subject" type="text" class="w-full border-gray-300 rounded-md p-2" placeholder="Enter email subject...">
+          <input id="subject" type="text" class="w-full border-gray-300 rounded-md p-2"
+            placeholder="Enter email subject...">
         </div>
 
         <!-- Message -->
         <div>
           <label class="block mb-2 font-medium text-gray-700">Type your Message *</label>
-          <textarea id="message" class="w-full border-gray-300 rounded-md p-2 min-h-[200px]" placeholder="Type your message here..."></textarea>
+          <textarea id="message" class="w-full border-gray-300 rounded-md p-2 min-h-[200px]"
+            placeholder="Type your message here..."></textarea>
           <p class="text-xs text-gray-500">Your message will be formatted with Presibo's professional email template</p>
         </div>
 
         <!-- Send Button -->
         <div class="pt-4">
-          <button id="sendBtn" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium py-3 text-lg rounded-md hover:from-purple-700 hover:to-blue-700">
+          <button id="sendBtn"
+            class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium py-3 text-lg rounded-md hover:from-purple-700 hover:to-blue-700">
             Send Broadcast Email
           </button>
         </div>
@@ -78,174 +84,177 @@
     </div>
   </div>
 
-<script>
-  const recipientType = document.getElementById("recipientType");
-  const externalEmailsContainer = document.getElementById("externalEmailsContainer");
-  const recipientCount = document.getElementById("recipientCount");
-  const sendBtn = document.getElementById("sendBtn");
-  const statusMsg = document.getElementById("statusMsg");
+  <script>
+    const recipientType = document.getElementById("recipientType");
+    const externalEmailsContainer = document.getElementById("externalEmailsContainer");
+    const recipientCount = document.getElementById("recipientCount");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusMsg = document.getElementById("statusMsg");
 
-  let allUsers = [];
-let allDoctors = [];
+    let allUsers = [];
+    let allDoctors = [];
 
-// Fetch users and doctors on load
-async function fetchRecipients() {
-  try {
-    try {
-      // Fetch doctors from our secure backend endpoint instead of direct API access
-      const doctorsRes = await fetch('/api/doctors/list');
-      const doctorsData = await doctorsRes.json();
-      
-      // Doctors could be inside doctorsData.doctors or directly in the array
-      const doctorsArray = Array.isArray(doctorsData)
-        ? doctorsData
-        : doctorsData.users || [];
-
-      allDoctors = doctorsArray
-        .map(d => d.email)
-        .filter(email => typeof email === "string" && email.includes("@"));
-
-      console.log(`✅ Loaded ${allDoctors.length} doctors`);
-    } catch (err) {
-      console.error("❌ Error fetching doctors:", err);
-      
-      // Fallback to direct API if secure endpoint fails (should be removed in production)
+    // Fetch users and doctors on load
+    async function fetchRecipients() {
       try {
-        const doctorsRes = await fetch("https://presibo-wl.vercel.app/doctors.json");
-        const doctorsData = await doctorsRes.json();
-        const doctorsArray = Array.isArray(doctorsData) ? doctorsData : doctorsData.users || [];
-        
-        allDoctors = doctorsArray
-          .map(d => d.email)
-          .filter(email => typeof email === "string" && email.includes("@"));
-          
-        console.log(`✅ Loaded ${allDoctors.length} doctors from fallback`);
-      } catch (fallbackErr) {
-        console.error("❌ Error fetching doctors from fallback:", fallbackErr);
+        try {
+          // Fetch doctors from our secure backend endpoint instead of direct API access
+          const doctorsRes = await fetch('/api/doctors/list');
+          const doctorsData = await doctorsRes.json();
+
+          // Doctors could be inside doctorsData.doctors or directly in the array
+          const doctorsArray = Array.isArray(doctorsData)
+            ? doctorsData
+            : doctorsData.users || [];
+
+          allDoctors = doctorsArray
+            .map(d => d.email)
+            .filter(email => typeof email === "string" && email.includes("@"));
+
+          console.log(`✅ Loaded ${allDoctors.length} doctors`);
+        } catch (err) {
+          console.error("❌ Error fetching doctors:", err);
+
+          // Fallback to direct API if secure endpoint fails (should be removed in production)
+          try {
+            const doctorsRes = await fetch("https://presibo-wl.vercel.app/doctors.json");
+            const doctorsData = await doctorsRes.json();
+            const doctorsArray = Array.isArray(doctorsData) ? doctorsData : doctorsData.users || [];
+
+            allDoctors = doctorsArray
+              .map(d => d.email)
+              .filter(email => typeof email === "string" && email.includes("@"));
+
+            console.log(`✅ Loaded ${allDoctors.length} doctors from fallback`);
+          } catch (fallbackErr) {
+            console.error("❌ Error fetching doctors from fallback:", fallbackErr);
+          }
+        }
+
+        // User list fetch
+        try {
+          const usersRes = await fetch('/api/config');
+          const config = await usersRes.json();
+          const userListRes = await fetch(config.API_USERS_URL || 'https://api.presibo.com/users/index.php');
+          const userData = await userListRes.json();
+          const usersArray = Array.isArray(userData) ? userData : userData.users || userData.data || [];
+
+          allUsers = usersArray
+            .map(u => u.email)
+            .filter(email => typeof email === "string" && email.includes("@"));
+
+          console.log(`✅ Loaded ${allUsers.length} users`);
+        } catch (err) {
+          console.error("❌ Error fetching users:", err);
+        }
+      } catch (err) {
+        console.error("❌ Error fetching recipients:", err);
       }
     }
-    
-    // Note: User list should be fetched via secure server-side endpoint, not directly from API
-    // For now, we'll initialize as empty - in a real implementation, this would come from a secure backend
-    allUsers = [];
-  } catch (err) {
-    console.error("❌ Error fetching recipients:", err);
-  }
-}
 
-fetchRecipients();
+    fetchRecipients();
 
-recipientType.addEventListener("change", () => {
-  const type = recipientType.value;
+    recipientType.addEventListener("change", () => {
+      const type = recipientType.value;
 
-  externalEmailsContainer.classList.toggle("hidden", type !== "external");
+      externalEmailsContainer.classList.toggle("hidden", type !== "external");
 
-  let count = 0;
-  if (type === "users") {
-    // Users should be fetched from a secure backend endpoint, not loaded in frontend
-    // Showing message instead of actual count for security
-    recipientCount.textContent = "Recipients: Access restricted for security";
-    return;
-  }
-  else if (type === "doctors") count = allDoctors.length;
-  else if (type === "external") {
-    const emails = document.getElementById("externalEmails").value
-      .split(",")
-      .filter(e => e.includes("@"));
-    count = emails.length;
-  }
+      let count = 0;
+      if (type === "users") count = allUsers.length;
+      else if (type === "doctors") count = allDoctors.length;
+      else if (type === "external") {
+        const emails = document.getElementById("externalEmails").value
+          .split(",")
+          .filter(e => e.includes("@"));
+        count = emails.length;
+      }
 
-  if (type !== "users") {
-    recipientCount.textContent = `Recipients: ${count}`;
-  }
-});
+      if (type !== "users") {
+        recipientCount.textContent = `Recipients: ${count}`;
+      }
+    });
 
 
-  document.getElementById("externalEmails").addEventListener("input", () => {
-    if (recipientType.value === "external") {
-      const emails = document.getElementById("externalEmails").value
-        .split(",")
-        .filter(e => e.includes("@"));
-      recipientCount.textContent = `Recipients: ${emails.length}`;
-    }
-  });
+    document.getElementById("externalEmails").addEventListener("input", () => {
+      if (recipientType.value === "external") {
+        const emails = document.getElementById("externalEmails").value
+          .split(",")
+          .filter(e => e.includes("@"));
+        recipientCount.textContent = `Recipients: ${emails.length}`;
+      }
+    });
 
-  sendBtn.addEventListener("click", async () => {
-    const type = recipientType.value;
-    const subject = document.getElementById("subject").value.trim();
-    const message = document.getElementById("message").value.trim();
+    sendBtn.addEventListener("click", async () => {
+      const type = recipientType.value;
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
 
-    if (!type || !subject || !message) {
-      statusMsg.textContent = "⚠️ Please fill in all required fields.";
-      statusMsg.className = "text-red-600 text-center mt-4";
-      return;
-    }
+      if (!type || !subject || !message) {
+        statusMsg.textContent = "⚠️ Please fill in all required fields.";
+        statusMsg.className = "text-red-600 text-center mt-4";
+        return;
+      }
 
-    let emailList = [];
-    if (type === "users") {
-      // Prevent sending to users as user list is not available in frontend for security reasons
-      statusMsg.textContent = "⚠️ Cannot send to users directly from frontend. This should be handled via secure backend endpoint.";
-      statusMsg.className = "text-red-600 text-center mt-4";
-      return;
-    }
-    if (type === "doctors") emailList = allDoctors;
-    if (type === "external") {
-      emailList = document.getElementById("externalEmails").value
-        .split(",")
-        .map(e => e.trim())
-        .filter(e => e.includes("@"));
-    }
+      let emailList = [];
+      if (type === "users") emailList = allUsers;
+      if (type === "doctors") emailList = allDoctors;
+      if (type === "external") {
+        emailList = document.getElementById("externalEmails").value
+          .split(",")
+          .map(e => e.trim())
+          .filter(e => e.includes("@"));
+      }
 
-    if (emailList.length === 0) {
-      statusMsg.textContent = "⚠️ No valid email addresses found.";
-      statusMsg.className = "text-red-600 text-center mt-4";
-      return;
-    }
+      if (emailList.length === 0) {
+        statusMsg.textContent = "⚠️ No valid email addresses found.";
+        statusMsg.className = "text-red-600 text-center mt-4";
+        return;
+      }
 
-    sendBtn.disabled = true;
-    sendBtn.textContent = "Sending...";
-    statusMsg.textContent = "";
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Sending...";
+      statusMsg.textContent = "";
 
-    // Send the broadcast request to our secure backend endpoint
-    try {
-      const broadcastRes = await fetch('/api/broadcast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientType: type,
-          subject: subject,
-          message: message,
-          externalEmails: type === 'external' ? document.getElementById("externalEmails").value : undefined
-        })
-      });
+      // Send the broadcast request to our secure backend endpoint
+      try {
+        const broadcastRes = await fetch('/api/broadcast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientType: type,
+            subject: subject,
+            message: message,
+            externalEmails: type === 'external' ? document.getElementById("externalEmails").value : undefined
+          })
+        });
 
-      const result = await broadcastRes.json();
-      if (result.success) {
-        sent = result.sent;
-        console.log(`Successfully sent ${result.sent} of ${result.total} emails`);
-      } else {
-        console.error('Broadcast failed:', result.error);
-        statusMsg.textContent = `❌ Broadcast failed: ${result.error}`;
+        const result = await broadcastRes.json();
+        if (result.success) {
+          let sent = result.sent;
+          console.log(`Successfully sent ${result.sent} of ${result.total} emails`);
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Send Broadcast Email";
+          statusMsg.textContent = `✅ Successfully sent to ${sent} of ${emailList.length} recipients.`;
+          statusMsg.className = "text-green-600 text-center mt-4";
+        } else {
+          console.error('Broadcast failed:', result.error);
+          statusMsg.textContent = `❌ Broadcast failed: ${result.error}`;
+          statusMsg.className = "text-red-600 text-center mt-4";
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Send Broadcast Email";
+          return;
+        }
+      } catch (error) {
+        console.error('Broadcast request failed:', error);
+        statusMsg.textContent = "❌ Failed to send broadcast";
         statusMsg.className = "text-red-600 text-center mt-4";
         sendBtn.disabled = false;
         sendBtn.textContent = "Send Broadcast Email";
         return;
       }
-    } catch (error) {
-      console.error('Broadcast request failed:', error);
-      statusMsg.textContent = "❌ Failed to send broadcast";
-      statusMsg.className = "text-red-600 text-center mt-4";
-      sendBtn.disabled = false;
-      sendBtn.textContent = "Send Broadcast Email";
-      return;
-    }
-
-    sendBtn.disabled = false;
-    sendBtn.textContent = "Send Broadcast Email";
-    statusMsg.textContent = `✅ Successfully sent to ${sent} of ${emailList.length} recipients.`;
-    statusMsg.className = "text-green-600 text-center mt-4";
-  });
-</script>
+    });
+  </script>
 
 </body>
+
 </html>

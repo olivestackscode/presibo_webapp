@@ -253,7 +253,7 @@ function generateMockDoctors(vitals) {
 // API route for fetching doctors list
 app.get('/api/doctors/list', async (req, res) => {
   try {
-    const response = await fetch('https://presibo-wl.vercel.app/doctors.json');
+    const response = await fetch(process.env.API_DOCTORS_URL || 'https://presibo-wl.vercel.app/doctors.json');
     const data = await response.json();
     
     const doctorsArray = Array.isArray(data) ? data : data.users || [];
@@ -285,7 +285,7 @@ app.post('/api/broadcast', express.json(), async (req, res) => {
     let emailList = [];
     
     if (recipientType === 'doctors') {
-      const response = await fetch('https://presibo-wl.vercel.app/doctors.json');
+      const response = await fetch(process.env.API_DOCTORS_URL || 'https://presibo-wl.vercel.app/doctors.json');
       const data = await response.json();
       const doctorsArray = Array.isArray(data) ? data : data.users || [];
       
@@ -296,6 +296,21 @@ app.post('/api/broadcast', express.json(), async (req, res) => {
       emailList = Array.isArray(externalEmails) 
         ? externalEmails 
         : externalEmails.split(',').map(e => e.trim()).filter(e => e.includes('@'));
+    } else if (recipientType === 'users') {
+      try {
+        const response = await fetch(process.env.API_USERS_URL || 'https://api.presibo.com/users/index.php');
+        const data = await response.json();
+        const usersArray = Array.isArray(data) ? data : data.users || data.data || [];
+        
+        emailList = usersArray
+          .map(u => u.email)
+          .filter(email => typeof email === 'string' && email.includes('@'));
+        
+        console.log(`Fetched ${emailList.length} users for broadcast`);
+      } catch (userFetchError) {
+        console.error('Error fetching users for broadcast:', userFetchError);
+        return res.status(500).json({ error: 'Failed to fetch users for broadcast' });
+      }
     }
 
     if (emailList.length === 0) {
@@ -355,6 +370,11 @@ app.all('/api/*', async (req, res) => {
   } else {
     res.status(404).json({ error: 'API endpoint not implemented in local server' });
   }
+});
+
+// Explicit route for broadcast page
+app.get('/broadcast', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'broadcast', 'index.html'));
 });
 
 // Catch-all handler to serve the main index.html for client-side routing
