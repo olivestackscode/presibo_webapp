@@ -1,0 +1,29 @@
+{
+    "version": 2,
+    "rewrites": [
+        {
+            "source": "/api/config",
+            "destination": "/api/config.js"
+        },
+        {
+            "source": "/api/broadcast",
+            "destination": "/api/broadcast.js"
+        },
+        {
+            "source": "/api/doctors/list",
+            "destination": "/api/doctors/list.js"
+        },
+        {
+            "source": "/api/proxy",
+            "destination": "/api/proxy.js"
+        },
+        {
+            "source": "/broadcast",
+            "destination": "/broadcast/index.html"
+        },
+        {
+            "source": "/dashboard",
+            "destination": "/dashboard/index.html"
+        }
+    ]
+}
