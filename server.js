@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3000;
 
 // Serve static files from the 'public' directory
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // API route to serve configuration from environment variables
 app.get('/api/config', (req, res) => {
@@ -24,16 +23,16 @@ app.get('/api/config', (req, res) => {
     API_RESET_TOKEN_URL: process.env.API_RESET_TOKEN_URL || 'https://api.presibo.com/tokens/reset-token.php',
     API_AI_URL: process.env.API_AI_URL || 'https://api.presibo.com/ai/openrouter.php',
     API_DOCTORS_URL: process.env.API_DOCTORS_URL || 'http://localhost:3000/api/doctors/index.php',
-    
+
     // Internal API Routes
     API_WALLET_TOPUP_URL: process.env.API_WALLET_TOPUP_URL || '/api/wallet/top-up',
     API_AUTH_LOGOUT_URL: process.env.API_AUTH_LOGOUT_URL || '/api/auth/logout',
     API_VERIFY_PASSWORD_URL: process.env.API_VERIFY_PASSWORD_URL || '/api?action=verify_password',
     API_LOGOUT_URL: process.env.API_LOGOUT_URL || '/api?action=logout',
-    
+
     // Payment Keys - only exposing public keys (safe to expose to frontend)
     PAYSTACK_PUBLIC_KEY: process.env.PAYSTACK_PUBLIC_KEY || 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
-    
+
     // Security Settings
     NODE_ENV: process.env.NODE_ENV || 'production'
   };
@@ -50,7 +49,7 @@ app.post('/api/proxy', express.json(), async (req, res) => {
 
   try {
     const internalUrl = `https://api.presibo.com/users/index.php?action=${encodeURIComponent(action)}`;
-    
+
     // Make the actual fetch call
     const response = await fetch(internalUrl, {
       method: req.method,
@@ -88,9 +87,9 @@ app.post('/api/auth/logout', (req, res) => {
 // Doctors API route - simulates the real doctors API
 app.post('/api/doctors/index.php', (req, res) => {
   const { action, vitals } = req.body;
-  
+
   console.log('Doctors API called with:', { action, vitals });
-  
+
   if (action === 'get_recommended_doctors') {
     // Generate mock doctors based on vitals
     const doctors = generateMockDoctors(vitals);
@@ -103,11 +102,11 @@ app.post('/api/doctors/index.php', (req, res) => {
 // Helper function to generate mock doctors based on vitals
 function generateMockDoctors(vitals) {
   const doctors = [];
-  
+
   // Check blood pressure
   if (vitals && vitals.blood_pressure) {
     const { systolic, diastolic } = vitals.blood_pressure;
-    
+
     // Hypertensive crisis (>180/120) - urgent care
     if (systolic > 180 || diastolic > 120) {
       doctors.push({
@@ -122,7 +121,7 @@ function generateMockDoctors(vitals) {
         recommendation_level: 'urgent',
         bio: 'Board-certified emergency physician with 15 years of experience in critical care medicine.'
       });
-      
+
       doctors.push({
         firstname: 'Sarah',
         lastname: 'Hypertension',
@@ -150,7 +149,7 @@ function generateMockDoctors(vitals) {
         recommendation_level: 'high',
         bio: 'Clinical cardiologist with expertise in hypertension and heart disease prevention.'
       });
-      
+
       doctors.push({
         firstname: 'Patricia',
         lastname: 'Wellness',
@@ -180,11 +179,11 @@ function generateMockDoctors(vitals) {
       });
     }
   }
-  
+
   // Check blood sugar
   if (vitals && vitals.blood_sugar) {
     const sugarLevel = vitals.blood_sugar;
-    
+
     // Diabetic range (>126 mg/dL fasting)
     if (sugarLevel > 126) {
       doctors.push({
@@ -216,7 +215,7 @@ function generateMockDoctors(vitals) {
       });
     }
   }
-  
+
   // If no specific vitals, return general practitioners
   if (doctors.length === 0) {
     doctors.push(...[
@@ -246,7 +245,7 @@ function generateMockDoctors(vitals) {
       }
     ]);
   }
-  
+
   return doctors;
 }
 
@@ -255,9 +254,9 @@ app.get('/api/doctors/list', async (req, res) => {
   try {
     const response = await fetch(process.env.API_DOCTORS_URL || 'https://presibo-wl.vercel.app/doctors.json');
     const data = await response.json();
-    
+
     const doctorsArray = Array.isArray(data) ? data : data.users || [];
-    
+
     const doctorEmails = doctorsArray
       .map(doctor => ({
         email: doctor.email,
@@ -283,29 +282,29 @@ app.post('/api/broadcast', express.json(), async (req, res) => {
 
   try {
     let emailList = [];
-    
+
     if (recipientType === 'doctors') {
       const response = await fetch(process.env.API_DOCTORS_URL || 'https://presibo-wl.vercel.app/doctors.json');
       const data = await response.json();
       const doctorsArray = Array.isArray(data) ? data : data.users || [];
-      
+
       emailList = doctorsArray
         .map(d => d.email)
         .filter(email => typeof email === 'string' && email.includes('@'));
     } else if (recipientType === 'external' && externalEmails) {
-      emailList = Array.isArray(externalEmails) 
-        ? externalEmails 
+      emailList = Array.isArray(externalEmails)
+        ? externalEmails
         : externalEmails.split(',').map(e => e.trim()).filter(e => e.includes('@'));
     } else if (recipientType === 'users') {
       try {
         const response = await fetch(process.env.API_USERS_URL || 'https://api.presibo.com/users/index.php');
         const data = await response.json();
         const usersArray = Array.isArray(data) ? data : data.users || data.data || [];
-        
+
         emailList = usersArray
           .map(u => u.email)
           .filter(email => typeof email === 'string' && email.includes('@'));
-        
+
         console.log(`Fetched ${emailList.length} users for broadcast`);
       } catch (userFetchError) {
         console.error('Error fetching users for broadcast:', userFetchError);
@@ -342,11 +341,11 @@ app.post('/api/broadcast', express.json(), async (req, res) => {
       }
     }
 
-    res.json({ 
-      success: true, 
-      sent: sentCount, 
+    res.json({
+      success: true,
+      sent: sentCount,
       total: emailList.length,
-      errors 
+      errors
     });
   } catch (error) {
     console.error('Broadcast API error:', error);
@@ -358,12 +357,12 @@ app.post('/api/broadcast', express.json(), async (req, res) => {
 app.all('/api/*', async (req, res) => {
   // Log the request for debugging
   console.log(`Unhandled API request: ${req.method} ${req.path}`);
-  
+
   // For internal API routes that need to be proxied, return a mock response
   if (req.path.includes('/api?action=') || req.path.includes('/api/')) {
     // Mock response for various API actions
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Mock API response for local testing',
       timestamp: new Date().toISOString()
     });
@@ -377,6 +376,10 @@ app.get('/broadcast', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'broadcast', 'index.html'));
 });
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// SPA/Catch-all route
 // Catch-all handler to serve the main index.html for client-side routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
