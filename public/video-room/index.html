@@ -10,6 +10,7 @@
   
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -19,6 +20,16 @@
         }
       }
     }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
   </script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">

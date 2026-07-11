@@ -55,6 +55,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -71,6 +72,16 @@
         }
       }
     }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
   </script>
 
   <!-- Custom Styles -->
@@ -379,7 +390,7 @@
           <i class="fas fa-video text-xl mb-2 block"></i>
           <span class="text-sm font-medium">Pulse Workouts</span>
         </a>
-         <a href="https://presibo.com/fitness" class="bg-health-pink rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
+         <a href="/fitness" class="bg-health-pink rounded-xl p-4 text-white text-center hover:shadow-lg transition-shadow">
           <i class="fas fa-chart-line text-xl mb-2 block"></i>
           <span class="text-sm font-medium">Fitness</span>
         </a>

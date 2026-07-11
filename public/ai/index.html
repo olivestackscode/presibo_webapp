@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI Personal Health Assistant - Presibo</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   <script src="https://js.paystack.co/v1/inline.js" async></script>
     <script src="/assets/js/config.js"></script>
 
