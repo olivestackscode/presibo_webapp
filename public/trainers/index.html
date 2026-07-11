@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consult a Trainer - Presibo</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.paystack.co/v1/inline.js" async></script>
+  <script src="/assets/js/config.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script>
@@ -121,11 +123,25 @@
 
   <!-- Popup Modal -->
   <div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
-      <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
-      <h2 id="popupTitle" class="text-lg font-semibold mb-2 text-naija-green"></h2>
-      <p id="popupMessage" class="text-sm text-gray-600"></p>
-      <button id="popupBtn" class="mt-4 bg-naija-green text-white px-4 py-2 rounded hover:bg-naija-green/90 font-bold">OK</button>
+    <div class="bg-white rounded-xl shadow-xl p-6 w-96 text-center relative max-w-[90%] border border-gray-100">
+      <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold text-gray-400 hover:text-gray-600">&times;</span>
+      <h2 id="popupTitle" class="text-lg font-bold mb-2"></h2>
+      <p id="popupMessage" class="text-sm text-gray-600 mb-2"></p>
+      
+      <!-- Top-up Options Container (Shows only on insufficient balance) -->
+      <div id="topupOptionsContainer" class="hidden mt-4 border-t pt-4 text-left">
+        <div class="text-xs font-bold text-gray-500 mb-2 tracking-wide uppercase">Select Top Up Amount:</div>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <button class="topup-option-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2.5 text-sm font-semibold transition-colors" data-amount="500">₦500</button>
+          <button class="topup-option-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2.5 text-sm font-semibold transition-colors" data-amount="1000">₦1,000</button>
+          <button class="topup-option-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2.5 text-sm font-semibold transition-colors" data-amount="5000">₦5,000</button>
+        </div>
+        <div class="text-[10px] text-gray-400 text-center flex items-center justify-center gap-1">
+          <i class="fas fa-lock text-[9px]"></i> Secure payment powered by Paystack
+        </div>
+      </div>
+
+      <button id="popupBtn" class="mt-4 bg-naija-green text-white px-6 py-2.5 rounded-lg hover:bg-naija-green/90 font-bold transition-all w-full">OK</button>
     </div>
   </div>
 
@@ -247,18 +263,69 @@
       btn.addEventListener('click', closeBookingModal)
     );
 
+    // Paystack Topup Handler
+    function handleTopup(amount) {
+      if (!window.PaystackPop) {
+        alert("Payment system is loading, please try again in a moment.");
+        return;
+      }
+      
+      const userEmail = email || "patient@presibo.com";
+      const handler = PaystackPop.setup({
+        key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+        email: userEmail,
+        amount: amount * 100, // Convert to kobo
+        currency: 'NGN',
+        ref: 'topup_trainer_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          let currentBalance = parseInt(localStorage.getItem('cached_wallet_balance') || '0');
+          currentBalance += amount;
+          localStorage.setItem('cached_wallet_balance', currentBalance);
+          alert(`Successfully topped up ₦${amount}! Current wallet balance: ₦${currentBalance}`);
+          window.location.reload();
+        },
+        onClose: function() {
+          console.log('Payment closed');
+        }
+      });
+      handler.openIframe();
+    }
+
+    // Bind Topup option buttons
+    document.querySelectorAll('.topup-option-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const amount = parseInt(e.target.dataset.amount);
+        handleTopup(amount);
+      });
+    });
+
     function showPopup(title, message) {
       const modal = document.getElementById('popupModal');
-      document.getElementById('popupTitle').textContent = title;
-      document.getElementById('popupMessage').textContent = message;
+      const popupTitle = document.getElementById('popupTitle');
+      const popupMessage = document.getElementById('popupMessage');
+      const closeBtn = document.getElementById('popupClose');
+      const okBtn = document.getElementById('popupBtn');
+      const topupContainer = document.getElementById('topupOptionsContainer');
+
+      popupTitle.textContent = title;
+      popupMessage.textContent = message;
+      
+      if (title === "Insufficient Balance") {
+        topupContainer.classList.remove('hidden');
+        okBtn.classList.add('hidden');
+      } else {
+        topupContainer.classList.add('hidden');
+        okBtn.classList.remove('hidden');
+      }
+      
       modal.classList.remove('hidden');
 
       function closePopup() {
         modal.classList.add('hidden');
       }
 
-      document.getElementById('popupClose').onclick = closePopup;
-      document.getElementById('popupBtn').onclick = closePopup;
+      closeBtn.onclick = closePopup;
+      okBtn.onclick = closePopup;
     }
 
     // Dropdowns
