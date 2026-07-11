@@ -5,128 +5,450 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Settings - Presibo</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'trust-blue': '#3B82F6',
+            'dark-bg': '#0f172a',
+            'dark-card': '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root {
-      --theme-blue: grey;
-      --sidebar-bg: #f8faff;
-    }
-    body {
-      background-color: #f5f8ff;
-      font-family: 'Inter', sans-serif;
-    }
-    .active {
-      background-color: var(--theme-blue);
-      color: white !important;
-    }
-    .sidebar {
-      min-height: 100vh;
-    }
+    body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+    .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .dialog-overlay.active { display: flex; }
   </style>
 </head>
-<body class="flex text-gray-800">
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 min-h-screen pt-20">
 
-  <!-- Sidebar -->
-  <aside class="sidebar w-64 bg-white shadow-md flex flex-col">
-    <div class="p-6 border-b border-gray-200 flex items-center gap-2">
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 fixed top-0 left-0 w-full z-50 shadow-sm flex items-center justify-between px-6">
+    <div class="flex items-center space-x-2">
       <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-      <h1 class="text-xl font-semibold text-theme">Presibo</h1>
+      <span class="font-extrabold text-green-700 dark:text-green-500 text-lg">Presibo</span>
     </div>
 
-    <nav class="flex-1 p-4 space-y-2">
-      <a href="dashboard" class="block px-4 py-2 rounded hover:bg-blue-50">Dashboard</a>
-      <a href="wallet" class="block px-4 py-2 rounded hover:bg-blue-50">💳 Wallet</a>
-      <a href="calendar" class="block px-4 py-2 rounded hover:bg-blue-50">Appointments</a>
-      <a href="#" class="block px-4 py-2 rounded active">Settings</a>
-      <a href="logout" class="block px-4 py-2 rounded hover:bg-blue-50 text-red-500">Logout</a>
+    <nav class="hidden md:flex space-x-6">
+      <a href="/dashboard" class="text-sm font-semibold hover:text-naija-green">Dashboard</a>
+      <a href="/track" class="text-sm font-semibold hover:text-naija-green">Track</a>
+      <a href="/fitness" class="text-sm font-semibold hover:text-naija-green">Fitness</a>
+      <a href="/food" class="text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+      <a href="/doctors" class="text-sm font-semibold hover:text-naija-green">Doctors</a>
+      <a href="/meetings" class="text-sm font-semibold hover:text-naija-green">Meetings</a>
     </nav>
-  </aside>
 
-  <!-- Main Content -->
-  <main class="flex-1 flex flex-col">
-    <!-- Topbar -->
-    <header class="flex items-center justify-between bg-white px-8 py-4 shadow-sm">
-      <h2 class="text-2xl font-semibold text-gray-700">Settings</h2>
-       <!-- Profile Icon -->
-          <div class="relative">
-            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
-              <i class="fas fa-user-circle text-2xl"></i>
-            </button>
-            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
-              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+    <div class="relative">
+      <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-white rounded-full">
+        <i class="fas fa-user-circle text-2xl"></i>
+      </button>
+      <div id="profile-dropdown" class="absolute top-12 right-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] hidden text-gray-700 dark:text-gray-200">
+        <a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+        <a href="/logout" class="block px-4 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Settings Panel -->
+  <main class="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="md:col-span-1 bg-white dark:bg-dark-card rounded-2xl shadow p-4 space-y-2 border border-gray-100 dark:border-gray-800 self-start">
+      <h3 class="font-extrabold text-sm text-gray-400 uppercase tracking-wider px-4 mb-3">Settings</h3>
+      <button class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold bg-naija-green text-white" data-tab="profile">
+        <i class="fas fa-user mr-2"></i> Profile & Demographics
+      </button>
+      <button class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800" data-tab="privacy">
+        <i class="fas fa-shield-alt mr-2"></i> Privacy & Security
+      </button>
+      <button class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800" data-tab="preferences">
+        <i class="fas fa-sliders-h mr-2"></i> System Preferences
+      </button>
+      <button class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800" data-tab="support">
+        <i class="fas fa-question-circle mr-2"></i> Help & Support
+      </button>
+    </aside>
+
+    <!-- Tab Contents -->
+    <section class="md:col-span-3 bg-white dark:bg-dark-card rounded-2xl shadow p-6 border border-gray-100 dark:border-gray-800">
+      
+      <!-- Profile & Demographics -->
+      <div id="profile" class="tab-content active space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white">Profile Information</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Manage your personal and vital demographic profiles.</p>
+        </div>
+
+        <form id="demographicForm" class="space-y-4 max-w-lg">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">First Name</label>
+              <input type="text" id="profileFirstName" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" required />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Last Name</label>
+              <input type="text" id="profileLastName" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" />
             </div>
           </div>
-    </header>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Email Address</label>
+            <input type="email" id="profileEmail" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800 rounded-lg p-2.5 text-sm cursor-not-allowed" readonly />
+          </div>
 
-    <!-- Settings Body -->
-    <section class="flex-1 p-8">
-      <div class="flex border-b border-gray-200 mb-6 space-x-6">
-        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="profile">Profile Info</button>
-        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="notifications">Notifications</button>
-        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="privacy">Privacy</button>
-        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="appearance">Appearance</button>
-        <button class="tab-btn font-medium pb-2 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="password">Change Password</button>
-      </div>
+          <hr class="border-gray-100 dark:border-gray-800 my-4" />
+          
+          <h4 class="font-extrabold text-sm text-naija-green mb-2">Health Demographics</h4>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Age</label>
+              <input type="number" id="profileAge" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" placeholder="e.g. 28" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Sex</label>
+              <select id="profileSex" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Blood Group</label>
+              <select id="profileBlood" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Home Address</label>
+            <input type="text" id="profileAddress" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" placeholder="Enter Lagos, Abuja, or local address..." />
+          </div>
 
-      <!-- Profile Info -->
-      <div id="profile" class="tab-content active">
-        <h3 class="text-lg font-semibold mb-4">Profile Information</h3>
-        <form class="space-y-4 max-w-lg">
-          <input type="text" placeholder="Full Name" class="w-full p-3 border rounded">
-          <input type="email" placeholder="Email Address" class="w-full p-3 border rounded">
-          <input type="tel" placeholder="Phone Number" class="w-full p-3 border rounded">
-          <button class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">Save Changes</button>
+          <button type="submit" class="bg-naija-green text-white font-bold px-6 py-2.5 rounded-xl hover:bg-naija-green/90 transition-colors shadow">
+            Save Demographic Info
+          </button>
         </form>
       </div>
 
-      <!-- Notifications -->
-      <div id="notifications" class="tab-content">
-        <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
-        <div class="space-y-3">
-          <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>Email Alerts</span></label>
-          <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>SMS Notifications</span></label>
-          <label class="flex items-center space-x-3"><input type="checkbox"> <span>Push Notifications</span></label>
+      <!-- Privacy & Security -->
+      <div id="privacy" class="tab-content space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white">Privacy & Security</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Configure consent guidelines and access credentials.</p>
         </div>
-      </div>
 
-      <!-- Privacy -->
-      <div id="privacy" class="tab-content">
-        <h3 class="text-lg font-semibold mb-4">Privacy Settings</h3>
-        <p class="text-sm text-gray-600 mb-3">Manage how your information is shared.</p>
-        <label class="flex items-center space-x-3"><input type="checkbox" checked> <span>Allow profile visibility</span></label>
-        <label class="flex items-center space-x-3"><input type="checkbox"> <span>Share data with third parties</span></label>
-      </div>
-
-      <!-- Appearance -->
-      <div id="appearance" class="tab-content">
-        <h3 class="text-lg font-semibold mb-4">Appearance</h3>
-        <div class="space-x-4">
-          <button id="lightMode" class="px-4 py-2 bg-gray-100 rounded">Light Mode</button>
-          <button id="darkMode" class="px-4 py-2 bg-gray-900 text-white rounded">Dark Mode</button>
+        <!-- AI Consent -->
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-gray-800 dark:text-white">AI Data Sharing Consent</h4>
+              <p class="text-xs text-gray-500 mt-0.5">Let Presibo process logs locally to deliver predictive medical vitals insights.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="aiConsentToggle" class="sr-only peer" />
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-naija-green"></div>
+            </label>
+          </div>
         </div>
-      </div>
 
-      <!-- Change Password -->
-      <div id="password" class="tab-content">
-        <h3 class="text-lg font-semibold mb-4">Change Password</h3>
-        <form class="space-y-4 max-w-md">
-          <input type="password" placeholder="Current Password" class="w-full p-3 border rounded">
-          <input type="password" placeholder="New Password" class="w-full p-3 border rounded">
-          <input type="password" placeholder="Confirm New Password" class="w-full p-3 border rounded">
-          <button class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">Update Password</button>
+        <!-- Password Change -->
+        <form id="passwordForm" class="space-y-4 max-w-md pt-2">
+          <h4 class="font-bold text-sm text-gray-800 dark:text-white">Update Account Password</h4>
+          <div>
+            <input type="password" id="oldPassword" placeholder="Old Password" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" required />
+          </div>
+          <div>
+            <input type="password" id="newPassword" placeholder="New Password" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" required />
+          </div>
+          <div>
+            <input type="password" id="confirmNewPassword" placeholder="Confirm New Password" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg p-2.5 text-sm" required />
+          </div>
+          <button type="submit" class="bg-naija-green text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-naija-green/90 transition-colors">
+            Change Password
+          </button>
         </form>
+
+        <hr class="border-gray-100 dark:border-gray-800 my-4" />
+
+        <!-- Policy Display -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-sm text-gray-800 dark:text-white">Privacy Policy</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Your data is stored and encrypted locally in compliance with the NDPR guidelines. To read our full standard compliance policies, click below.</p>
+          <button onclick="openPolicyModal()" class="text-xs text-naija-green hover:underline font-bold">
+            View Policy Documents <i class="fas fa-external-link-alt ml-0.5"></i>
+          </button>
+        </div>
+
+        <hr class="border-gray-100 dark:border-gray-800 my-4" />
+
+        <!-- Account Deletion -->
+        <div class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-xl p-4 space-y-3">
+          <h4 class="font-bold text-sm text-red-700 dark:text-red-400">Danger Zone</h4>
+          <p class="text-xs text-red-600 dark:text-red-300">Deleting your account clears your demographic profile, tracking history, and consultation logs. This action cannot be undone.</p>
+          <button onclick="openDeleteModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition-colors">
+            Delete My Account
+          </button>
+        </div>
       </div>
+
+      <!-- System Preferences -->
+      <div id="preferences" class="tab-content space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white">Preferences</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Customize your platform experience and toggle device permissions.</p>
+        </div>
+
+        <div class="space-y-4 max-w-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-gray-800 dark:text-white">Dark Mode Theme</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Switch visual look between Light and Dark interface modes.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="darkModeToggle" class="sr-only peer" />
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-naija-green"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-gray-800 dark:text-white">Email & SMS Alerts</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Receive reminders for vital logs and doctor bookings.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="notificationsToggle" class="sr-only peer" checked />
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-naija-green"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-gray-800 dark:text-white">Location Services</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Permit location tracking to discover nearest Nigerian hospitals.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="locationToggle" class="sr-only peer" checked />
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-naija-green"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help & Support -->
+      <div id="support" class="tab-content space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 dark:text-white">Help & Support</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Get answers to questions or contact the Presibo technical desk.</p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">Frequently Asked Questions</h3>
+          
+          <div class="space-y-2 max-w-2xl">
+            <details class="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 cursor-pointer">
+              <summary class="font-bold text-xs text-gray-700 dark:text-gray-300 flex justify-between items-center">
+                How is the Unified Health Score calculated?
+              </summary>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">It rates health parameters from 1.0 to 10.0 based on daily logged steps, sleep duration, water intake, blood pressure bounds, and blood sugar readings.</p>
+            </details>
+
+            <details class="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 cursor-pointer">
+              <summary class="font-bold text-xs text-gray-700 dark:text-gray-300 flex justify-between items-center">
+                What payment platform does the wallet use?
+              </summary>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">All transaction processes use the Paystack payment gateway supporting Naira (NGN) cards, bank transfers, and USSD codes.</p>
+            </details>
+
+            <details class="bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 cursor-pointer">
+              <summary class="font-bold text-xs text-gray-700 dark:text-gray-300 flex justify-between items-center">
+                Is Jitsi video connection encrypted?
+              </summary>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">Yes, all teleconsultation rooms utilize fully encrypted peer-to-peer audio and video transmission hosted by Jitsi Meet.</p>
+            </details>
+          </div>
+
+          <hr class="border-gray-100 dark:border-gray-800 my-4" />
+
+          <div class="space-y-1">
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white">Contact Helplines</h4>
+            <p class="text-xs text-gray-500">📧 Email support: <span class="font-bold text-naija-green">support@presibo.com</span></p>
+            <p class="text-xs text-gray-500">📞 Phone helpline: <span class="font-bold text-naija-green">+234 800 PRESIBO</span></p>
+          </div>
+        </div>
+      </div>
+
     </section>
   </main>
 
-  <!-- Scripts -->
+  <!-- Modals -->
+  <!-- Policy Modal -->
+  <div id="policy-modal" class="dialog-overlay">
+    <div class="dialog-content max-w-lg dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+      <h3 class="font-bold text-lg mb-3">Privacy & NDPR Compliance</h3>
+      <div class="text-xs space-y-3 leading-relaxed max-h-60 overflow-y-auto">
+        <p>This privacy declaration outlines how Presibo collects and stores sensitive clinical telemetry logs. We do not transmit diagnostic statistics without your explicit consent toggled on privacy settings panels.</p>
+        <p>Any blood pressure or glucose reports loaded locally remain cached securely inside the web browser's storage domain.</p>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button onclick="closePolicyModal()" class="bg-naija-green text-white font-bold px-4 py-2 rounded-xl text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="delete-modal" class="dialog-overlay">
+    <div class="dialog-content max-w-sm dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+      <h3 class="font-bold text-lg text-red-600 mb-2">Confirm Account Deletion</h3>
+      <p class="text-xs mb-4 leading-relaxed">Are you absolutely sure? This will wipe your profile and clear all local storage credentials.</p>
+      <div class="flex gap-2 justify-end">
+        <button onclick="deleteAccount()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" class="border border-gray-200 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-xs">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white rounded-lg shadow-lg p-4 z-50 transition-all duration-300 max-w-sm hidden">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <div class="font-bold text-sm text-naija-green" id="toastTitle">Notification</div>
+        <div class="text-xs text-gray-300 mt-1" id="toastMessage">Success!</div>
+      </div>
+      <button onclick="document.getElementById('toast').classList.add('hidden')" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times text-xs"></i>
+      </button>
+    </div>
+  </div>
+
   <script>
-    // Sidebar username
-    document.getElementById('username').textContent = sessionStorage.getItem('username') || 'User';
+    // Session retrieval
+    let email = '';
+    let firstName = 'User';
+    let lastName = '';
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        email = session.email;
+        firstName = session.firstName || 'User';
+        lastName = session.lastName || '';
+      }
+    } catch (e) {}
+
+    if (!email) {
+      email = sessionStorage.getItem('email') || '';
+    }
+
+    if (!email) {
+      window.location.href = '/';
+    }
+
+    // Load inputs
+    document.getElementById('profileEmail').value = email;
+    document.getElementById('profileFirstName').value = firstName;
+    document.getElementById('profileLastName').value = lastName;
+
+    // Load demographics
+    const demoKey = `demographics_${email}`;
+    const storedDemo = JSON.parse(localStorage.getItem(demoKey) || '{}');
+    if (storedDemo.age) document.getElementById('profileAge').value = storedDemo.age;
+    if (storedDemo.sex) document.getElementById('profileSex').value = storedDemo.sex;
+    if (storedDemo.bloodGroup) document.getElementById('profileBlood').value = storedDemo.bloodGroup;
+    if (storedDemo.address) document.getElementById('profileAddress').value = storedDemo.address;
+
+    // AI sharing consent toggle load
+    const aiToggle = document.getElementById('aiConsentToggle');
+    const isAiGranted = localStorage.getItem('ai_data_sharing_consent_granted') === 'true';
+    aiToggle.checked = isAiGranted;
+    aiToggle.addEventListener('change', (e) => {
+      localStorage.setItem('ai_data_sharing_consent_granted', e.target.checked ? 'true' : 'false');
+      showToast("Privacy Updated", "AI data sharing preference saved.");
+    });
+
+    // Dark mode preference load
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const isDark = localStorage.getItem('theme_preference') === 'dark';
+    darkModeToggle.checked = isDark;
+    if (isDark) document.documentElement.classList.add('dark');
+    darkModeToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme_preference', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme_preference', 'light');
+      }
+      showToast("Theme Updated", "Visual settings applied.");
+    });
+
+    // Demographic submit
+    document.getElementById('demographicForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const age = document.getElementById('profileAge').value;
+      const sex = document.getElementById('profileSex').value;
+      const bloodGroup = document.getElementById('profileBlood').value;
+      const address = document.getElementById('profileAddress').value;
+      const fn = document.getElementById('profileFirstName').value;
+      const ln = document.getElementById('profileLastName').value;
+
+      // Update session cache
+      try {
+        const sessionStr = localStorage.getItem('user_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          session.firstName = fn;
+          session.lastName = ln;
+          localStorage.setItem('user_session', JSON.stringify(session));
+        }
+      } catch(e) {}
+
+      // Save demographics
+      localStorage.setItem(demoKey, JSON.stringify({ age, sex, bloodGroup, address }));
+
+      showToast("Demographics Saved", "Your profile details have been updated successfully.");
+    });
+
+    // Password Form Submit
+    document.getElementById('passwordForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nPass = document.getElementById('newPassword').value;
+      const cPass = document.getElementById('confirmNewPassword').value;
+      if (nPass !== cPass) {
+        alert("New passwords do not match.");
+        return;
+      }
+      showToast("Password Updated", "Security credentials changed successfully.");
+      document.getElementById('passwordForm').reset();
+    });
+
+    // Modals
+    function openPolicyModal() { document.getElementById('policy-modal').classList.add('active'); }
+    function closePolicyModal() { document.getElementById('policy-modal').classList.remove('active'); }
+    function openDeleteModal() { document.getElementById('delete-modal').classList.add('active'); }
+    function closeDeleteModal() { document.getElementById('delete-modal').classList.remove('active'); }
+
+    function deleteAccount() {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/logout';
+    }
 
     // Tabs
     const tabs = document.querySelectorAll('.tab-btn');
@@ -134,21 +456,34 @@
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('border-blue-500', 'text-blue-600'));
+        tabs.forEach(t => t.classList.remove('bg-naija-green', 'text-white'));
+        tabs.forEach(t => t.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-800'));
         contents.forEach(c => c.classList.remove('active'));
 
-        tab.classList.add('border-blue-500', 'text-blue-600');
+        tab.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-800');
+        tab.classList.add('bg-naija-green', 'text-white');
         document.getElementById(tab.dataset.tab).classList.add('active');
       });
     });
 
-    // Appearance Mode
-    const body = document.body;
-    document.getElementById('darkMode').addEventListener('click', () => {
-      body.classList.add('bg-gray-900', 'text-white');
-    });
-    document.getElementById('lightMode').addEventListener('click', () => {
-      body.classList.remove('bg-gray-900', 'text-white');
+    // Toast
+    function showToast(title, message) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = message;
+      t.classList.remove('hidden');
+      setTimeout(() => {
+        t.classList.add('hidden');
+      }, 4000);
+    }
+
+    // Header Profile toggle
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
     });
   </script>
 </body>

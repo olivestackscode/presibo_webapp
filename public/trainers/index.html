@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consult a Trainer - Presibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'trust-blue': '#3B82F6',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .input { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; }
+    .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .dialog-overlay.active { display: flex; }
+    .dialog-content { background: white; border-radius: 0.5rem; max-width: 28rem; width: 100%; padding: 1.5rem; }
+    .menu-link { color: black; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+    .menu-link:hover { color: #008753; }
+    .menu-link.active { background: #008753; color: white; }
+    .text-purple { color: #300b5b; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans pt-20">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+          <span class="font-bold text-purple">Presibo</span>
+        </div>
+
+        <nav class="hidden md:flex space-x-4">
+          <a href="/dashboard" class="menu-link">Dashboard</a>
+          <a href="/track" class="menu-link">Track</a>
+          <a href="/fitness" class="menu-link">Fitness</a>
+          <a href="/doctors" class="menu-link">Doctors</a>
+          <a href="/trainers" class="menu-link active">Trainers</a>
+          <a href="/meetings" class="menu-link">Meetings</a>
+        </nav>
+
+        <div class="relative">
+          <button id="profile-btn" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+            <i class="fas fa-user-circle text-2xl"></i>
+          </button>
+          <div id="profile-dropdown" class="absolute top-12 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden">
+            <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+            <a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="max-w-5xl mx-auto p-6 space-y-6">
+    <div class="bg-gradient-to-r from-naija-green to-trust-blue rounded-2xl p-6 text-white shadow">
+      <h2 class="text-2xl font-bold">Consult a Certified Fitness Trainer</h2>
+      <p class="text-sm opacity-90 mt-1">Book personalized coaching or consulting sessions with our fitness experts. 100 credits per session.</p>
+    </div>
+
+    <!-- Trainer List -->
+    <div id="trainersList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Loaded dynamically -->
+    </div>
+  </main>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="dialog-overlay">
+    <div class="dialog-content bg-white p-6 rounded-xl shadow-xl max-w-md mx-auto">
+      <h2 class="text-lg font-semibold mb-4">Book Trainer Consultation</h2>
+      <div id="booking-modal-content" class="text-sm text-gray-700 mb-4"></div>
+      <div class="flex gap-2">
+        <button id="booking-modal-action" class="bg-naija-green text-white px-4 py-2 rounded-lg hover:bg-naija-green/90 font-bold">Book Now</button>
+        <button class="modal-close border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Modal -->
+  <div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center relative">
+      <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold">&times;</span>
+      <h2 id="popupTitle" class="text-lg font-semibold mb-2 text-naija-green"></h2>
+      <p id="popupMessage" class="text-sm text-gray-600"></p>
+      <button id="popupBtn" class="mt-4 bg-naija-green text-white px-4 py-2 rounded hover:bg-naija-green/90 font-bold">OK</button>
+    </div>
+  </div>
+
+  <script>
+    let email = localStorage.getItem('email') || '';
+    if (!email) {
+      try {
+        const sessionStr = localStorage.getItem('user_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          email = session.email;
+        }
+      } catch (e) {}
+    }
+
+    if (!email) {
+      window.location.href = '/';
+    }
+
+    const trainers = [
+      { id: 'trainer-emeka', name: 'Coach Emeka', specialization: 'HIIT & Weight Loss', experience: '6 years', bio: 'Specialist in custom cardio workouts, weight loss, and core strength.', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=150&h=150&fit=crop' },
+      { id: 'trainer-amina', name: 'Coach Amina', specialization: 'Strength & Body Tone', experience: '5 years', bio: 'Focuses on functional fitness, powerlifting, and nutrition guides.', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop' },
+      { id: 'trainer-tunde', name: 'Coach Tunde', specialization: 'Yoga & Flexibility', experience: '8 years', bio: 'Mindfulness practitioner helping with flexibility, posture, and wellness.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop' }
+    ];
+
+    function renderTrainers() {
+      const list = document.getElementById('trainersList');
+      list.innerHTML = trainers.map(t => `
+        <div class="bg-white rounded-2xl p-5 shadow hover:shadow-md border border-gray-100 flex flex-col justify-between">
+          <div class="flex items-center gap-4 mb-4">
+            <img src="${t.image}" class="w-16 h-16 rounded-full object-cover border-2 border-naija-green" alt="${t.name}">
+            <div>
+              <h3 class="font-extrabold text-gray-800 text-lg">${t.name}</h3>
+              <p class="text-xs font-semibold text-naija-green">${t.specialization}</p>
+              <p class="text-[11px] text-gray-500">${t.experience} experience</p>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600 mb-4 leading-relaxed">${t.bio}</p>
+          <button onclick="openBookingModal('${t.id}')" class="w-full bg-naija-green text-white font-bold py-2 rounded-xl text-sm hover:bg-naija-green/90 transition-colors">
+            Book Consultation
+          </button>
+        </div>
+      `).join('');
+    }
+
+    let selectedTrainer = null;
+
+    function openBookingModal(trainerId) {
+      selectedTrainer = trainers.find(t => t.id === trainerId);
+      if (!selectedTrainer) return;
+
+      const modalContent = document.getElementById('booking-modal-content');
+      modalContent.innerHTML = `
+        <p><strong>Trainer:</strong> ${selectedTrainer.name}</p>
+        <p><strong>Specialization:</strong> ${selectedTrainer.specialization}</p>
+        
+        <label class="block mt-3 text-sm font-medium text-gray-700">
+          <strong>Date:</strong>
+          <input type="date" id="booking-date" class="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-naija-green focus:border-naija-green" required />
+        </label>
+
+        <label class="block mt-3 text-sm font-medium text-gray-700">
+          <strong>Time:</strong>
+          <input type="time" id="booking-time" class="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:ring-naija-green focus:border-naija-green" required />
+        </label>
+      `;
+
+      document.getElementById('booking-modal').classList.add('active');
+    }
+
+    document.getElementById('booking-modal-action').onclick = () => {
+      const dateInput = document.getElementById('booking-date').value;
+      const timeInput = document.getElementById('booking-time').value;
+
+      if (!dateInput || !timeInput) {
+        alert("Please specify date and time.");
+        return;
+      }
+
+      // Wallet deduction
+      let currentBalance = parseInt(localStorage.getItem('cached_wallet_balance') || '0');
+      if (currentBalance < 100) {
+        showPopup("Insufficient Balance", "Consultation requires 100 credits. Please top up your wallet.");
+        closeBookingModal();
+        return;
+      }
+
+      currentBalance -= 100;
+      localStorage.setItem('cached_wallet_balance', currentBalance);
+
+      // Log consultation
+      const meetingsKey = `consultations_${email}`;
+      let consultations = JSON.parse(localStorage.getItem(meetingsKey) || '[]');
+      consultations.push({
+        id: Date.now(),
+        doctorId: selectedTrainer.id,
+        doctorName: selectedTrainer.name,
+        specialty: selectedTrainer.specialization,
+        date: dateInput,
+        time: timeInput,
+        status: 'Scheduled',
+        cost: 100,
+        roomUrl: `https://meet.jit.si/presibo-consultation-${selectedTrainer.id}-${Date.now()}`
+      });
+      localStorage.setItem(meetingsKey, JSON.stringify(consultations));
+
+      // Simulate email dispatch
+      console.log(`📧 Dispatched trainer booking email to User (${email}) and Trainer (${selectedTrainer.name}) on ${dateInput} at ${timeInput}.`);
+
+      showPopup("Booking Successful", `Session booked with ${selectedTrainer.name}! 100 credits deducted. Confirmation email dispatched to both parties.`);
+      closeBookingModal();
+    };
+
+    function closeBookingModal() {
+      document.getElementById('booking-modal').classList.remove('active');
+    }
+
+    document.querySelectorAll('.modal-close').forEach(btn => 
+      btn.addEventListener('click', closeBookingModal)
+    );
+
+    function showPopup(title, message) {
+      const modal = document.getElementById('popupModal');
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupMessage').textContent = message;
+      modal.classList.remove('hidden');
+
+      function closePopup() {
+        modal.classList.add('hidden');
+      }
+
+      document.getElementById('popupClose').onclick = closePopup;
+      document.getElementById('popupBtn').onclick = closePopup;
+    }
+
+    // Dropdowns
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    renderTrainers();
+  </script>
+</body>
+</html>

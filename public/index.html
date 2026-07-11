@@ -320,6 +320,21 @@
 
 <script src="/assets/js/config.js"></script>
 <script>
+  // Startup session check (MainScreen behavior)
+  (function() {
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        if (session && session.email) {
+          window.location.href = '/dashboard';
+        }
+      }
+    } catch (e) {
+      console.error('Session check error', e);
+    }
+  })();
+
   // API Configuration loaded from config.js
   const API_URL = CONFIG.API_USERS_URL;
 
@@ -407,8 +422,21 @@
       if (data.message === 'Password verified successfully.' && data.session_created) {
         // Server session created; browser handles cookie
         console.log('Server session created for:', data.email);
+        
+        // Save user_session and authToken in localStorage for mobile-parity
+        const userSession = {
+          email: data.email,
+          firstName: data.first_name || data.firstName || data.email.split('@')[0],
+          userId: data.user_id,
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem('user_session', JSON.stringify(userSession));
+        localStorage.setItem('authToken', data.token || 'mock-auth-token-123456');
+        localStorage.setItem('email', data.email);
+        
         sessionStorage.setItem('email', data.email);
         sessionStorage.setItem('userId', data.user_id);
+        
         showToast('Login Successful', `Welcome back!`);
         setTimeout(() => {
           window.location.href = '/dashboard';
@@ -484,6 +512,17 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     if (response.ok) {
       // Success: Redirect (setTimeout not needed here)
       console.log('Signup successful:', result);
+      
+      const userSession = {
+        email: signupData.email,
+        firstName: signupData.first_name,
+        userId: result.user_id || result.id || 'new-user-id',
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('user_session', JSON.stringify(userSession));
+      localStorage.setItem('authToken', result.token || 'mock-auth-token-123456');
+      localStorage.setItem('email', signupData.email);
+      
       sessionStorage.setItem('email', signupData.email); // Store for session
       //prepare and send email to uers
       //UserEmail = sessionStorage.setItem('email', signupData.email);

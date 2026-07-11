@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Hub - Presibo</title>
+  <meta name="description" content="Manage your fitness goals, daily activities, and lifestyle guide with Presibo.">
+  <meta name="keywords" content="Presibo Fitness, Fitness Goals, Active Tasks, Nigerian Health, Exercise Log">
+  
+  <!-- Favicons -->
+  <link href="https://via.placeholder.com/32x32/008753/FFFFFF?text=P" rel="icon">
+  <link href="https://via.placeholder.com/180x180/008753/FFFFFF?text=P" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .text-purple { color: #300b5b; }
+    
+    /* Swipe Goals Deck */
+    .swipe-deck {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      height: 360px;
+      margin: 1.5rem auto;
+    }
+    .swipe-card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      background: white;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+      cursor: grab;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #f3f4f6;
+    }
+    .swipe-card:active {
+      cursor: grabbing;
+    }
+    .swipe-card.swiped-left {
+      transform: translateX(-180%) rotate(-30deg) !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .swipe-card.swiped-right {
+      transform: translateX(180%) rotate(30deg) !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.active {
+      display: flex;
+    }
+    .dialog-content {
+      background: white;
+      border-radius: 0.75rem;
+      max-width: 28rem;
+      width: 100%;
+      padding: 1.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen pt-20">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <div class="flex items-center space-x-2">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+            <span class="font-extrabold text-purple-800 text-lg">Presibo</span>
+          </div>
+        </div>
+        <nav class="hidden md:flex space-x-8">
+          <a href="/dashboard" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Dashboard</a>
+          <a href="/track" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Track</a>
+          <a href="/food" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">FoodSquare</a>
+          <a href="/doctors" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Doctors</a>
+          <a href="/ai" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">AI Help</a>
+          <a href="/settings" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Settings</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+              <i class="fas fa-user-circle text-2xl"></i>
+            </button>
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/food" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/ai" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">AI Help</a>
+        <a href="/settings" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-naija-green to-trust-blue rounded-2xl p-6 text-white shadow">
+      <div>
+        <h2 class="text-2xl font-bold">Fitness & Lifestyle Hub</h2>
+        <p class="text-sm opacity-90 mt-1">Adopt goals, complete daily active tasks, and log exercises to boost your health score.</p>
+      </div>
+      <button onclick="openExerciseLogModal()" class="bg-white text-naija-green hover:bg-gray-100 font-bold px-4 py-2.5 rounded-lg text-sm transition-colors shadow">
+        <i class="fas fa-plus mr-1"></i> Log Active Exercise
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Daily Tasks Checklist -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow p-6">
+        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-tasks text-naija-green"></i> Daily Active Tasks
+        </h3>
+        <div class="space-y-3" id="tasksListContainer">
+          <!-- Dynamic tasks check list -->
+        </div>
+      </div>
+
+      <!-- Goals Swipe Deck -->
+      <div class="bg-white rounded-2xl shadow p-6 flex flex-col items-center justify-center relative overflow-hidden">
+        <h3 class="font-bold text-sm text-gray-700 mb-2 text-center flex items-center gap-1.5">
+          <i class="fas fa-bullseye text-health-pink"></i> Discover Fitness Goals
+        </h3>
+        <div class="swipe-deck" id="swipeDeckContainer">
+          <!-- Goals cards loaded dynamically -->
+        </div>
+        <div class="flex gap-4 mt-2" id="swipe-controls">
+          <button onclick="swipeGoalCard('left')" class="w-12 h-12 bg-red-50 border border-red-200 text-red-500 rounded-full flex items-center justify-center shadow hover:bg-red-100 transition-colors">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+          <button onclick="swipeGoalCard('right')" class="w-12 h-12 bg-green-50 border border-green-200 text-green-600 rounded-full flex items-center justify-center shadow hover:bg-green-100 transition-colors border-2">
+            <i class="fas fa-check text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lifestyle Guide Section -->
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-heartbeat text-red-500"></i> Healthy Nigerian Lifestyle Guide
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+          <h4 class="font-bold text-emerald-800 text-sm mb-2"><i class="fas fa-walking mr-1.5"></i> Daily Walking</h4>
+          <p class="text-xs text-gray-600 leading-relaxed">Aim for at least 30 minutes of brisk walking. It lowers blood pressure and improves cardio wellness.</p>
+        </div>
+        <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+          <h4 class="font-bold text-orange-800 text-sm mb-2"><i class="fas fa-water mr-1.5"></i> Hydration Targets</h4>
+          <p class="text-xs text-gray-600 leading-relaxed">Drinking 8 glasses of clean water keeps you hydrated, boosts metabolism, and flushes metabolic waste.</p>
+        </div>
+        <div class="p-4 bg-cyan-50 rounded-xl border border-cyan-100">
+          <h4 class="font-bold text-cyan-800 text-sm mb-2"><i class="fas fa-seedling mr-1.5"></i> Fiber-rich Foods</h4>
+          <p class="text-xs text-gray-600 leading-relaxed">Incorporate Nigerian complex carbs like yam, green plantains, and beans porridge to support blood sugar stability.</p>
+        </div>
+        <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+          <h4 class="font-bold text-purple-800 text-sm mb-2"><i class="fas fa-bed mr-1.5"></i> Quality Sleep</h4>
+          <p class="text-xs text-gray-600 leading-relaxed">7 to 8 hours of deep night sleep lowers cortisol levels, helping control both heart rate and sugar parameters.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Log Exercise Modal -->
+  <div id="exercise-modal" class="dialog-overlay">
+    <div class="dialog-content max-w-sm">
+      <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+        <i class="fas fa-running text-naija-green"></i> Log Active Exercise
+      </h2>
+      <form id="exerciseForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Exercise Type</label>
+          <select id="exerciseType" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-naija-green" required>
+            <option value="cardio">Cardio / Jogging</option>
+            <option value="walking">Brisk Walking</option>
+            <option value="strength">Strength Training</option>
+            <option value="yoga">Yoga / Stretching</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Duration (minutes)</label>
+          <input type="number" id="exerciseDuration" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-naija-green" placeholder="e.g. 30" required />
+        </div>
+        <div class="flex gap-2 justify-end pt-2">
+          <button type="submit" class="bg-naija-green text-white px-4 py-2 rounded-lg font-bold hover:bg-naija-green/90 transition-colors">
+            Log Activity
+          </button>
+          <button type="button" onclick="closeExerciseLogModal()" class="border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Session Verification
+    let userEmail = '';
+    let userSession = null;
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        userSession = JSON.parse(sessionStr);
+        userEmail = userSession.email;
+      }
+    } catch(e) {
+      console.error('Session retrieval error', e);
+    }
+    
+    if (!userEmail) {
+      userEmail = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+    }
+    
+    if (!userEmail) {
+      window.location.href = '/';
+    }
+
+    // Audio sound synthesis
+    function playCoinDropSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const playTone = (freq, start, duration) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.15, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + duration);
+        };
+        const now = ctx.currentTime;
+        playTone(987.77, now, 0.08); // B5 note
+        playTone(1318.51, now + 0.08, 0.25); // E6 note
+      } catch (e) {
+        console.warn('Web Audio synthesis failed', e);
+      }
+    }
+
+    function getTodayDateString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function loadLocalTrackData() {
+      const dateStr = getTodayDateString();
+      const key = `track_data_${dateStr}_${userEmail}`;
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error('Error loading track data', e);
+      }
+      return {
+        steps: 0,
+        water: 0,
+        sleep: 0,
+        bloodPressure: '--/--',
+        pulse: 0,
+        bloodSugar: '-- mg/dL',
+        bloodSugarType: 'Fasting',
+        exercises: 0,
+        meals: []
+      };
+    }
+
+    function saveLocalTrackData(data) {
+      const dateStr = getTodayDateString();
+      const key = `track_data_${dateStr}_${userEmail}`;
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        console.error('Error saving track data', e);
+      }
+    }
+
+    function calculateUnifiedHealthScore(data) {
+      let score = 5.0; // Base score
+      const mealCount = data.meals ? data.meals.filter(m => m.completed).length : 0;
+      score += Math.min(mealCount * 0.5, 1.5);
+      if (data.exercises && data.exercises > 0) score += 0.5;
+      if (data.water >= 8) score += 0.5;
+      else if (data.water >= 4) score += 0.2;
+      if (data.steps >= 10000) score += 1.0;
+      else if (data.steps >= 5000) score += 0.5;
+      if (data.sleep >= 7) score += 0.5;
+      if (data.bloodPressure && data.bloodPressure !== '--/--') {
+        const [sys, dia] = data.bloodPressure.split('/').map(Number);
+        if (!isNaN(sys) && !isNaN(dia)) {
+          if (sys >= 110 && sys <= 130 && dia >= 70 && dia <= 90) score += 1.0;
+          else if (sys > 180 || dia > 120) score -= 4.0;
+          else if (sys >= 140 || dia >= 90) score -= 2.0;
+          else if (sys < 90 || dia < 60) score -= 1.0;
+        }
+      }
+      if (data.bloodSugar && data.bloodSugar !== '-- mg/dL') {
+        const val = parseFloat(data.bloodSugar.replace(' mg/dL', ''));
+        if (!isNaN(val)) {
+          if (val >= 70 && val <= 140) score += 0.5;
+          else if (val > 200) score -= 2.5;
+          else if (val > 140) score -= 1.5;
+          else if (val < 70) score -= 1.0;
+        }
+      }
+      score = Math.max(1.0, Math.min(10.0, score));
+      return parseFloat(score.toFixed(1));
+    }
+
+    // Daily checklist tasks
+    let defaultTasks = [
+      { id: 'task-walk', text: "Morning brisk walk / jog for 30 minutes", completed: false },
+      { id: 'task-stretch', text: "Perform 10 minutes muscle stretching", completed: false },
+      { id: 'task-water', text: "Stay hydrated by logging water intake", completed: false },
+      { id: 'task-sugar', text: "Avoid refined sugar beverages today", completed: false }
+    ];
+
+    function loadTasks() {
+      const dateStr = getTodayDateString();
+      const key = `fitness_tasks_checked_${dateStr}_${userEmail}`;
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch(e) {}
+      return defaultTasks;
+    }
+
+    function saveTasks(tasks) {
+      const dateStr = getTodayDateString();
+      const key = `fitness_tasks_checked_${dateStr}_${userEmail}`;
+      localStorage.setItem(key, JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      const tasks = loadTasks();
+      const container = document.getElementById('tasksListContainer');
+      container.innerHTML = '';
+
+      tasks.forEach((task, idx) => {
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-4 rounded-xl border ${task.completed ? 'bg-green-50 border-green-100 text-green-800' : 'bg-gray-50 border-gray-100 text-gray-700'}`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="${task.id}" class="w-5 h-5 text-naija-green border-gray-300 rounded focus:ring-naija-green" ${task.completed ? 'checked' : ''} />
+            <label for="${task.id}" class="text-sm font-medium ${task.completed ? 'line-through opacity-75' : ''}">${task.text}</label>
+          </div>
+          ${task.completed ? '<i class="fas fa-check-circle text-green-600 text-lg"></i>' : ''}
+        `;
+        // Listeners
+        const chk = item.querySelector('input');
+        chk.addEventListener('change', (e) => {
+          tasks[idx].completed = e.target.checked;
+          saveTasks(tasks);
+          if (e.target.checked) {
+            playCoinDropSound();
+          }
+          renderTasks();
+        });
+        container.appendChild(item);
+      });
+    }
+
+    // Tinder goals swipe deck
+    const swipeGoals = [
+      { id: 'goal-steps', title: "Adopt: Walk 10,000 steps daily", desc: "Unlock peak calorie burn and lower hypertension risks.", icon: "fa-walking", category: "Cardio" },
+      { id: 'goal-calisthenics', title: "Adopt: 20 Pushups / Bodyweight squats", desc: "Build lean muscle mass to boost glucose control.", icon: "fa-dumbbell", category: "Strength" },
+      { id: 'goal-sleep', title: "Adopt: Sleep 8 hours tonight", desc: "Reduce stress levels and balance daily vitals.", icon: "fa-bed", category: "Lifestyle" },
+      { id: 'goal-meals', title: "Adopt: Log 3 balanced food meals", desc: "Avoid unhealthy snacking and high sodium takeout.", icon: "fa-carrot", category: "Nutrition" }
+    ];
+
+    let currentGoalIndex = 0;
+
+    function loadSwipeState() {
+      const dateStr = getTodayDateString();
+      const key = `fitness_goals_swiped_${dateStr}_${userEmail}`;
+      const idxStr = localStorage.getItem(key);
+      if (idxStr) {
+        currentGoalIndex = parseInt(idxStr);
+      } else {
+        currentGoalIndex = 0;
+      }
+    }
+
+    function saveSwipeState() {
+      const dateStr = getTodayDateString();
+      const key = `fitness_goals_swiped_${dateStr}_${userEmail}`;
+      localStorage.setItem(key, currentGoalIndex);
+    }
+
+    function renderSwipeDeck() {
+      const container = document.getElementById('swipeDeckContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (currentGoalIndex >= swipeGoals.length) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full text-center p-4">
+            <i class="fas fa-check-circle text-naija-green text-3xl mb-2"></i>
+            <p class="text-xs font-semibold text-gray-700">All suggestions swiped!</p>
+            <button onclick="resetSwipeDeck()" class="mt-3 text-xs bg-gray-100 hover:bg-gray-200 border px-3 py-1.5 rounded-lg font-bold">Show Again</button>
+          </div>
+        `;
+        document.getElementById('swipe-controls').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('swipe-controls').style.display = 'flex';
+
+      for (let i = swipeGoals.length - 1; i >= currentGoalIndex; i--) {
+        const item = swipeGoals[i];
+        const isTop = i === currentGoalIndex;
+        const card = document.createElement('div');
+        card.className = `swipe-card p-5 flex flex-col justify-between ${isTop ? 'z-10' : 'z-0 opacity-40 scale-95 translate-y-2'}`;
+        card.id = `goal-card-${i}`;
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-purple-100 text-purple-700 flex items-center justify-center rounded-xl">
+              <i class="fas ${item.icon} text-xl"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">${item.category}</span>
+              <h4 class="font-extrabold text-gray-800 text-sm mt-1">${item.title}</h4>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed my-3">${item.desc}</p>
+          <div class="text-[10px] text-center text-gray-400 font-semibold italic border-t pt-2">
+            Swipe Right to Adopt Goal • Swipe Left to Skip
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    function swipeGoalCard(direction) {
+      if (currentGoalIndex >= swipeGoals.length) return;
+      const card = document.getElementById(`goal-card-${currentGoalIndex}`);
+      if (!card) return;
+
+      if (direction === 'right') {
+        card.classList.add('swiped-right');
+        const item = swipeGoals[currentGoalIndex];
+        adoptGoalTask(item.title);
+      } else {
+        card.classList.add('swiped-left');
+      }
+
+      currentGoalIndex++;
+      saveSwipeState();
+
+      setTimeout(() => {
+        renderSwipeDeck();
+      }, 350);
+    }
+
+    function adoptGoalTask(title) {
+      const tasks = loadTasks();
+      const newId = `task-adopted-${Date.now()}`;
+      tasks.push({ id: newId, text: title, completed: false });
+      saveTasks(tasks);
+      renderTasks();
+      playCoinDropSound();
+      showToastNotification("Goal Adopted!", "Added to your daily active tasks checklist.");
+    }
+
+    function resetSwipeDeck() {
+      currentGoalIndex = 0;
+      saveSwipeState();
+      renderSwipeDeck();
+    }
+
+    // Exercise logging modal
+    function openExerciseLogModal() {
+      document.getElementById('exercise-modal').classList.add('active');
+    }
+
+    function closeExerciseLogModal() {
+      document.getElementById('exercise-modal').classList.remove('active');
+      document.getElementById('exerciseForm').reset();
+    }
+
+    document.getElementById('exerciseForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const duration = parseInt(document.getElementById('exerciseDuration').value);
+      const type = document.getElementById('exerciseType').value;
+
+      const data = loadLocalTrackData();
+      data.exercises = (data.exercises || 0) + 1;
+      // Boost steps if cardio/walking
+      if (type === 'cardio') data.steps += duration * 120;
+      if (type === 'walking') data.steps += duration * 80;
+      saveLocalTrackData(data);
+
+      const score = calculateUnifiedHealthScore(data);
+      localStorage.setItem(`fitness_score_${getTodayDateString()}_${userEmail}`, score);
+
+      playCoinDropSound();
+      closeExerciseLogModal();
+
+      showToastNotification("Exercise Logged!", `Completed ${duration} mins of exercise! Health Score: ${score}`);
+    });
+
+    // Toast feedback simulation
+    function showToastNotification(title, message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white rounded-lg shadow-lg p-4 z-50 transition-all duration-300 max-w-sm';
+      toast.innerHTML = `
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-sm text-naija-green">${title}</div>
+            <div class="text-xs text-gray-300 mt-1">${message}</div>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 4000);
+    }
+
+    // Header dropdown
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    // Initialize
+    (function init() {
+      loadSwipeState();
+      renderSwipeDeck();
+      renderTasks();
+    })();
+  </script>
+</body>
+</html>

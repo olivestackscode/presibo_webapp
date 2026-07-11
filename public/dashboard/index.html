@@ -144,6 +144,33 @@
     .text-purple{
       color: #300b5b;
     }
+    .health-score-dial-svg {
+      transform: rotate(-90deg);
+    }
+    .health-score-bg {
+      fill: none;
+      stroke: #e5e7eb;
+      stroke-width: 8;
+    }
+    .health-score-progress {
+      fill: none;
+      stroke: #F97316; /* warm-orange */
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease-in-out;
+    }
+    .low-balance-banner {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 font-sans">
@@ -236,39 +263,91 @@
         <div class="bg-white rounded-2xl p-4 h-32"></div>
       </div>
     </div>
-<!-- Welcome Section -->
+
+    <!-- Low Balance Warning Banner -->
+    <div id="low-balance-banner" class="low-balance-banner" onclick="openTopUpModal()">
+      <div class="flex items-center space-x-3">
+        <i class="fas fa-exclamation-triangle text-lg"></i>
+        <span>Low balance! Under ₦5,000. Top up to continue using premium services.</span>
+      </div>
+      <button class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-700 font-semibold">Top Up</button>
+    </div>
+
+    <!-- Welcome Section -->
     <div id="welcome-section" class="bg-white rounded-2xl shadow p-6">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
         <div>
           <h2 id="greeting" class="text-2xl font-bold text-gray-800"></h2>
           <p class="text-gray-600 text-sm">Let's track your health today</p>
         </div>
-        <div class="text-right flex flex-col space-y-2">
-          <button id="subscribe-btn" class="bg-golden-yellow hover:bg-golden-yellow/90 text-black text-xs px-3 py-1 rounded-lg">
+        <div class="text-right flex items-center space-x-3">
+          <button id="subscribe-btn" class="bg-golden-yellow hover:bg-golden-yellow/90 text-black text-xs px-3 py-2 rounded-lg font-semibold shadow-sm">
             <i class="fas fa-crown mr-1"></i>Subscribe
           </button>
           <div>
-            <div class="text-sm text-gray-500">Today</div>
-            <div id="current-date" class="text-lg font-semibold text-naija-green"></div>
+            <div class="text-xs text-gray-500 font-medium">Today</div>
+            <div id="current-date" class="text-sm font-semibold text-naija-green"></div>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="health-gradient rounded-xl p-4 text-black">
-          <div class="flex items-center space-x-2">
-            <i class="fas fa-apple-alt"></i>
-            <span class="text-sm">Health Score</span>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        <!-- Circular Health Score Dial -->
+        <div class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <div class="relative w-36 h-36 flex items-center justify-center">
+            <svg class="health-score-dial-svg w-full h-full" viewBox="0 0 100 100">
+              <circle class="health-score-bg" cx="50" cy="50" r="40" />
+              <circle id="health-score-progress" class="health-score-progress" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+            </svg>
+            <div class="absolute text-center">
+              <span id="health-score" class="text-3xl font-extrabold text-gray-800">0.0</span>
+              <span class="text-xs text-gray-400 block font-semibold text-center">Score</span>
+            </div>
           </div>
-          <div id="health-score" class="text-2xl font-bold mt-1">8.2</div>
-          <div class="text-xs opacity-90">Excellent</div>
+          <div id="health-score-label" class="mt-3 text-sm font-bold text-naija-green">Normal</div>
         </div>
-        <div class="info-gradient rounded-xl p-4 text-black">
-          <div class="flex items-center space-x-2">
-            <i class="fas fa-utensils"></i>
-            <span class="text-sm">Meals Today</span>
+
+        <!-- Metrics Cards Grid -->
+        <div class="md:col-span-2 grid grid-cols-2 gap-4">
+          <!-- Steps Card -->
+          <div class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 rounded-xl p-4 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-blue-700 uppercase tracking-wider">Steps</span>
+              <i class="fas fa-walking text-blue-500"></i>
+            </div>
+            <div id="metric-steps" class="text-xl font-bold text-gray-800">0 / 10,000</div>
+            <div class="text-xs text-gray-500 mt-1">Goal: 10k steps</div>
           </div>
-          <div id="meals-today" class="text-2xl font-bold mt-1">0/3</div>
-          <div id="meals-status" class="text-xs opacity-90">More meals needed</div>
+          
+          <!-- Water Card -->
+          <div class="bg-cyan-50/50 hover:bg-cyan-50 border border-cyan-100 rounded-xl p-4 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-cyan-700 uppercase tracking-wider">Water</span>
+              <i class="fas fa-tint text-cyan-500"></i>
+            </div>
+            <div id="metric-water" class="text-xl font-bold text-gray-800">0 / 8 glasses</div>
+            <div class="text-xs text-gray-500 mt-1">Goal: 8 glasses</div>
+          </div>
+          
+          <!-- Sleep Card -->
+          <div class="bg-purple-50/50 hover:bg-purple-50 border border-purple-100 rounded-xl p-4 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-purple-700 uppercase tracking-wider">Sleep</span>
+              <i class="fas fa-moon text-purple-500"></i>
+            </div>
+            <div id="metric-sleep" class="text-xl font-bold text-gray-800">0 / 8 hrs</div>
+            <div class="text-xs text-gray-500 mt-1">Goal: 8 hours</div>
+          </div>
+          
+          <!-- Meals Card -->
+          <div class="bg-orange-50/50 hover:bg-orange-50 border border-orange-100 rounded-xl p-4 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-orange-700 uppercase tracking-wider">Meals</span>
+              <i class="fas fa-utensils text-orange-500"></i>
+            </div>
+            <div id="metric-meals" class="text-xl font-bold text-gray-800">0 / 3</div>
+            <div id="metric-meals-status" class="text-xs text-gray-500 mt-1">More meals needed</div>
+          </div>
         </div>
       </div>
     </div>
@@ -452,15 +531,69 @@
         </div>
       </div>
     </div>
+
+    <!-- Medical Disclaimer Modal -->
+    <div id="medical-disclaimer-modal" class="dialog-overlay">
+      <div class="dialog-content max-w-md">
+        <h2 class="text-lg font-bold text-red-600 mb-3 flex items-center gap-2">
+          <i class="fas fa-exclamation-circle"></i> Medical Disclaimer
+        </h2>
+        <div class="text-sm text-gray-700 space-y-3 max-h-60 overflow-y-auto mb-4 p-2 bg-gray-50 rounded border">
+          <p><strong>PLEASE READ CAREFULLY BEFORE PROCEEDING:</strong></p>
+          <p>Presibo is an AI-assisted health tracking and consultation support application. All suggestions, scores, analysis results, and wellness advice provided by this app are for educational and informational purposes only.</p>
+          <p><strong>This application does NOT provide formal medical advice, diagnosis, or treatment.</strong></p>
+          <p>Always seek the advice of a qualified physician or healthcare provider regarding any medical condition or symptoms. Never disregard professional medical advice or delay seeking it because of something you read on this application.</p>
+        </div>
+        <button id="accept-disclaimer-btn" class="w-full bg-naija-green text-white py-2.5 rounded-lg hover:bg-naija-green/90 font-semibold transition-colors">
+          I Accept & Understand
+        </button>
+      </div>
+    </div>
+
+    <!-- AI Data Sharing Consent Modal -->
+    <div id="ai-consent-modal" class="dialog-overlay">
+      <div class="dialog-content max-w-md">
+        <h2 class="text-lg font-bold text-purple-700 mb-3 flex items-center gap-2">
+          <i class="fas fa-user-shield"></i> AI Data Sharing Consent
+        </h2>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+          To provide you with personalized daily health tips and vital analysis, Presibo utilizes secure third-party AI services (including OpenAI / OpenRouter proxy). 
+          Your health metrics (vitals, logged meals, and score) will be shared anonymously with the AI to generate tailored suggestions.
+        </p>
+        <div class="flex gap-2">
+          <button id="grant-ai-consent-btn" class="bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 font-semibold flex-1 transition-colors">
+            Share & Enable AI
+          </button>
+          <button id="decline-ai-consent-btn" class="border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-100 font-semibold flex-1 transition-colors">
+            Don't Share
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     // API Configuration
-    const userEmail = sessionStorage.getItem('email');
-    const DATABASE_URL = `https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(userEmail)}`;
-    if (!sessionStorage.getItem('email')) {
+    let userEmail = '';
+    let userSession = null;
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        userSession = JSON.parse(sessionStr);
+        userEmail = userSession.email;
+      }
+    } catch(e) {
+      console.error('Session retrieval error', e);
+    }
+    
+    if (!userEmail) {
+      userEmail = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+    }
+    
+    if (!userEmail) {
       window.location.href = '/';
     }
+    const DATABASE_URL = `https://api.presibo.com/db/index.php?action=get_user&email=${encodeURIComponent(userEmail)}`;
 
 
     // Mock Data for non-user-specific elements
@@ -627,24 +760,338 @@
       return { label: 'Diabetes Range', color: 'text-red-500' };
     }
 
+    // Helper functions for Vitals Parity
+    function getTodayDateString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function loadLocalTrackData() {
+      const dateStr = getTodayDateString();
+      const key = `track_data_${dateStr}_${userEmail}`;
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error('Error loading track data', e);
+      }
+      return {
+        steps: 0,
+        water: 0,
+        sleep: 0,
+        bloodPressure: '--/--',
+        bloodSugar: '-- mg/dL',
+        exercises: 0,
+        meals: []
+      };
+    }
+
+    function saveLocalTrackData(data) {
+      const dateStr = getTodayDateString();
+      const key = `track_data_${dateStr}_${userEmail}`;
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        console.error('Error saving track data', e);
+      }
+    }
+
+    function calculateUnifiedHealthScore(data) {
+      let score = 5.0; // Base score
+
+      // Meals: +0.5 per meal logged (max +1.5)
+      const mealCount = data.meals ? data.meals.filter(m => m.completed).length : 0;
+      score += Math.min(mealCount * 0.5, 1.5);
+
+      // Exercise: +0.5 for physical activity
+      if (data.exercises && data.exercises > 0) {
+        score += 0.5;
+      }
+
+      // Water: +0.5 for >= 8 glasses, +0.2 for >= 4 glasses
+      if (data.water >= 8) {
+        score += 0.5;
+      } else if (data.water >= 4) {
+        score += 0.2;
+      }
+
+      // Steps: +1.0 for >= 10,000 steps, +0.5 for >= 5,000 steps
+      if (data.steps >= 10000) {
+        score += 1.0;
+      } else if (data.steps >= 5000) {
+        score += 0.5;
+      }
+
+      // Sleep: +0.5 for >= 7 hours
+      if (data.sleep >= 7) {
+        score += 0.5;
+      }
+
+      // BP: +1.0 for normal (110-130 / 70-90), penalties up to -4.0
+      if (data.bloodPressure && data.bloodPressure !== '--/--') {
+        const [sys, dia] = data.bloodPressure.split('/').map(Number);
+        if (!isNaN(sys) && !isNaN(dia)) {
+          if (sys >= 110 && sys <= 130 && dia >= 70 && dia <= 90) {
+            score += 1.0;
+          } else if (sys > 180 || dia > 120) {
+            score -= 4.0;
+          } else if (sys >= 140 || dia >= 90) {
+            score -= 2.0;
+          } else if (sys < 90 || dia < 60) {
+            score -= 1.0;
+          }
+        }
+      }
+
+      // Sugar: +0.5 for normal (70-140 mg/dL), penalties up to -2.5
+      if (data.bloodSugar && data.bloodSugar !== '-- mg/dL') {
+        const val = parseFloat(data.bloodSugar.replace(' mg/dL', ''));
+        if (!isNaN(val)) {
+          if (val >= 70 && val <= 140) {
+            score += 0.5;
+          } else if (val > 200) {
+            score -= 2.5;
+          } else if (val > 140) {
+            score -= 1.5;
+          } else if (val < 70) {
+            score -= 1.0;
+          }
+        }
+      }
+
+      score = Math.max(1.0, Math.min(10.0, score));
+      return parseFloat(score.toFixed(1));
+    }
+
+    function updateHealthScoreDial(score) {
+      const scoreEl = document.getElementById('health-score');
+      const progressCircle = document.getElementById('health-score-progress');
+      const labelEl = document.getElementById('health-score-label');
+
+      if (scoreEl) scoreEl.textContent = score.toFixed(1);
+
+      if (progressCircle) {
+        const perimeter = 251.2;
+        const offset = perimeter - (score / 10.0) * perimeter;
+        progressCircle.style.strokeDashoffset = offset;
+      }
+
+      if (labelEl) {
+        let label = 'Normal';
+        let colorClass = 'text-naija-green';
+        if (score >= 9.0) {
+          label = 'Excellent';
+          colorClass = 'text-green-600';
+        } else if (score >= 7.0) {
+          label = 'Very Good';
+          colorClass = 'text-teal-600';
+        } else if (score >= 5.0) {
+          label = 'Normal';
+          colorClass = 'text-naija-green';
+        } else {
+          label = 'Needs Attention';
+          colorClass = 'text-red-500';
+        }
+        labelEl.textContent = label;
+        labelEl.className = `mt-3 text-sm font-bold ${colorClass}`;
+      }
+    }
+
+    function updateDashboardMetrics() {
+      const localData = loadLocalTrackData();
+      const score = calculateUnifiedHealthScore(localData);
+
+      // Cache score
+      const dateStr = getTodayDateString();
+      localStorage.setItem(`fitness_score_${dateStr}_${userEmail}`, score);
+
+      updateHealthScoreDial(score);
+
+      // Update UI cards
+      document.getElementById('metric-steps').textContent = `${localData.steps.toLocaleString()} / 10,000`;
+      document.getElementById('metric-water').textContent = `${localData.water} / 8 glasses`;
+      document.getElementById('metric-sleep').textContent = `${localData.sleep} / 8 hrs`;
+      
+      const mealCount = localData.meals ? localData.meals.filter(m => m.completed).length : 0;
+      document.getElementById('metric-meals').textContent = `${mealCount} / 3`;
+      document.getElementById('metric-meals-status').textContent = mealCount < 3 ? 'More meals needed' : 'All meals complete';
+
+      // Synced database displays (blood pressure & sugar)
+      if (localData.bloodPressure && localData.bloodPressure !== '--/--') {
+        bloodPressure.textContent = localData.bloodPressure;
+        bloodPressureStatus.textContent = getBloodPressureStatus(localData.bloodPressure).label;
+        bloodPressureStatus.className = `text-xs mt-1 ${getBloodPressureStatus(localData.bloodPressure).color}`;
+      }
+      if (localData.bloodSugar && localData.bloodSugar !== '-- mg/dL') {
+        bloodSugar.textContent = localData.bloodSugar;
+        bloodSugarStatus.textContent = getBloodSugarStatus(localData.bloodSugar).label;
+        bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(localData.bloodSugar).color}`;
+      }
+    }
+
+    function playCoinDropSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const playTone = (freq, start, duration) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.15, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + duration);
+        };
+        const now = ctx.currentTime;
+        playTone(987.77, now, 0.08); // B5 note
+        playTone(1318.51, now + 0.08, 0.25); // E6 note
+      } catch (e) {
+        console.warn('Web Audio synthesis failed', e);
+      }
+    }
+
+    function checkDisclaimersAndConsent() {
+      const disclaimerAccepted = localStorage.getItem('medical_disclaimer_accepted');
+      const aiConsentGranted = localStorage.getItem('ai_data_sharing_consent_granted');
+
+      const disclaimerModal = document.getElementById('medical-disclaimer-modal');
+      const consentModal = document.getElementById('ai-consent-modal');
+
+      if (disclaimerAccepted !== 'true') {
+        disclaimerModal.classList.add('active');
+      } else if (aiConsentGranted === null) {
+        consentModal.classList.add('active');
+      } else {
+        loadAIHealthTip();
+      }
+    }
+
+    async function loadAIHealthTip() {
+      const consent = localStorage.getItem('ai_data_sharing_consent_granted');
+      const healthTipEl = document.getElementById('health-tip');
+      if (!healthTipEl) return;
+
+      if (consent === 'true') {
+        healthTipEl.textContent = "Loading personalized AI health tip...";
+        try {
+          const localData = loadLocalTrackData();
+          const score = calculateUnifiedHealthScore(localData);
+          
+          const response = await fetch('https://api.presibo.com/ai/global.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: userEmail,
+              vitals: {
+                blood_pressure: localData.bloodPressure,
+                blood_sugar: localData.bloodSugar,
+                steps: localData.steps,
+                water: localData.water,
+                sleep: localData.sleep
+              },
+              health_score: score
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.tip) {
+              healthTipEl.textContent = data.tip;
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to fetch personalized AI health tip, using fallback', e);
+        }
+      }
+      healthTipEl.textContent = healthTipData.tip;
+    }
+
+    function run30MinuteVitalsCheck() {
+      const localData = loadLocalTrackData();
+      const mealCount = localData.meals ? localData.meals.filter(m => m.completed).length : 0;
+      const newNotifications = [];
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (mealCount < 3) {
+        newNotifications.push({
+          id: Date.now() + 1,
+          title: 'Missing Meal Logs',
+          message: 'Remember to log your breakfast, lunch, and dinner to keep your health score high!',
+          time: nowStr,
+          unread: true
+        });
+      }
+
+      if (localData.steps < 5000) {
+        newNotifications.push({
+          id: Date.now() + 2,
+          title: 'Vitals Warning: Low Activity',
+          message: 'You have logged less than 5,000 steps today. Get moving to boost your score!',
+          time: nowStr,
+          unread: true
+        });
+      }
+
+      if (newNotifications.length > 0) {
+        notifications = [...newNotifications, ...notifications];
+        renderNotifications();
+        updateNotificationCount();
+        localStorage.setItem('notifications_history', JSON.stringify(notifications));
+      }
+    }
+
+    function openTopUpModal() {
+      window.location.href = '/wallet';
+    }
+
     // Render Functions
     function renderDashboard(userData) {
       loadingDiv.classList.add('hidden');
       dashboardDiv.classList.remove('hidden');
 
-      const firstName = userData.FirstName || userData.first_name || 'User'; // Handle casing
+      const firstName = userData.FirstName || userData.first_name || 'User'; 
       greeting.textContent = `${getCurrentGreeting()}, ${firstName}`;
       currentDate.textContent = getCurrentDate();
-      healthScore.textContent = userData.health_score || 8.2;
-      mealsToday.textContent = `${userData.meals_today || 0}/${userData.total_meals_expected || 3}`;
-      mealsStatus.textContent = (userData.meals_today || 0) < (userData.total_meals_expected || 3) ? 'More meals needed' : 'All meals complete';
-      bloodPressure.textContent = userData.recent_blood_pressure || '--/--';
-      bloodPressureStatus.textContent = getBloodPressureStatus(userData.recent_blood_pressure || '--/--').label;
-      bloodPressureStatus.className = `text-xs mt-1 ${getBloodPressureStatus(userData.recent_blood_pressure || '--/--').color}`;
-      bloodSugar.textContent = userData.recent_blood_sugar || '-- mg/dL';
-      bloodSugarStatus.textContent = getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').label;
-      bloodSugarStatus.className = `text-xs mt-1 ${getBloodSugarStatus(userData.recent_blood_sugar || '-- mg/dL').color}`;
-      healthTip.textContent = userData.health_tip || healthTipData.tip;
+      
+      // Update local storage cached wallet balance
+      const walletVal = userData.wallet || 0;
+      localStorage.setItem('cached_wallet_balance', walletVal);
+      
+      const balanceBanner = document.getElementById('low-balance-banner');
+      if (balanceBanner) {
+        if (walletVal < 5000) {
+          balanceBanner.style.display = 'flex';
+        } else {
+          balanceBanner.style.display = 'none';
+        }
+      }
+
+      // Sync user data to local track data if database is more recent
+      const localData = loadLocalTrackData();
+      let updated = false;
+      if (userData.recent_blood_pressure && userData.recent_blood_pressure !== localData.bloodPressure) {
+        localData.bloodPressure = userData.recent_blood_pressure;
+        updated = true;
+      }
+      if (userData.recent_blood_sugar && userData.recent_blood_sugar !== localData.bloodSugar) {
+        localData.bloodSugar = userData.recent_blood_sugar;
+        updated = true;
+      }
+      if (updated) {
+        saveLocalTrackData(localData);
+      }
+
+      updateDashboardMetrics();
     }
 
     function renderNotifications() {
@@ -671,6 +1118,7 @@
             notif.unread = false;
             div.classList.remove('unread');
             updateNotificationCount();
+            localStorage.setItem('notifications_history', JSON.stringify(notifications));
           }
         });
         notificationList.appendChild(div);
@@ -684,9 +1132,11 @@
     }
 
     function renderMealTracking() {
+      const localData = loadLocalTrackData();
+      const meals = localData.meals || [];
       mealTracking.innerHTML = '';
       mealTypes.forEach(meal => {
-        const completedMeal = todayMeals.find(m => m.type === meal.type && m.completed);
+        const completedMeal = meals.find(m => m.type === meal.type && m.completed);
         const div = document.createElement('div');
         div.className = `flex items-center justify-between p-4 rounded-xl ${completedMeal ? 'border border-gray-100' : 'border-2 border-dashed border-gray-200'}`;
         div.innerHTML = `
@@ -759,11 +1209,25 @@
 
     // Event Handlers
     function handleMarkMealComplete(mealType) {
-      alert('Meal tracking is loading in this app.');
-      todayMeals.push({ type: mealType, completed: true });
+      const localData = loadLocalTrackData();
+      if (!localData.meals) localData.meals = [];
+      
+      let meal = localData.meals.find(m => m.type === mealType);
+      if (!meal) {
+        meal = { type: mealType, completed: true };
+        localData.meals.push(meal);
+      } else {
+        meal.completed = true;
+      }
+      
+      saveLocalTrackData(localData);
+      
+      // Award points & sound effect
+      playCoinDropSound();
+      
       renderMealTracking();
-      mealsToday.textContent = `${todayMeals.length}/${3}`;
-      mealsStatus.textContent = todayMeals.length < 3 ? 'More meals needed' : 'All meals complete';
+      updateDashboardMetrics();
+      showToast('Meal Logged', `${mealType.toUpperCase()} marked as completed!`);
     }
 
     function handlePhotoCapture() {
@@ -787,7 +1251,7 @@
     }
 
     function handleHealthReadingUpdate(type) {
-      alert(`Health reading updates for ${type} are loading in this app.`);
+      window.location.href = '/track';
     }
 
     function toggleMobileMenu() {
@@ -807,15 +1271,31 @@
       loadingDiv.classList.remove('hidden');
       dashboardDiv.classList.add('hidden');
 
+      // Load notification history
+      try {
+        const storedNotifs = localStorage.getItem('notifications_history');
+        if (storedNotifs) {
+          notifications = JSON.parse(storedNotifs);
+        }
+      } catch(e) {}
+
       // Fetch user data for first_name and session validation
       const userData = await fetchUserData();
-      // Even if userData is null, proceed with defaults
       renderDashboard(userData || {});
       renderMealTracking();
       renderFoodRecommendations();
       renderRotationFoods();
       renderNotifications();
       updateNotificationCount();
+
+      // Check disclaimers on load
+      checkDisclaimersAndConsent();
+
+      // Set up AI Tip reload every 5 minutes
+      setInterval(loadAIHealthTip, 300000);
+
+      // Set up background vital notification check every 30 minutes
+      setInterval(run30MinuteVitalsCheck, 1800000);
 
       // Event Listeners
       mobileMenuBtn.addEventListener('click', toggleMobileMenu);
@@ -834,18 +1314,36 @@
       updateBpBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_pressure'));
       updateBsBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_sugar'));
       foodFeedBtn.addEventListener('click', () => {
-        //alert('Community food feeds are loading in this app.');
         window.location.href = '/food';
       });
       uploadPhotoBtn.addEventListener('click', handlePhotoCapture);
       subscribeNowBtn.addEventListener('click', () => {
-        //alert('Subscription is loading in this app.');
         window.location.href = '/subscribe';
       });
       healthTipsSubscribeBtn.addEventListener('click', () => {
         alert('Health tips subscription is loading in this app.');
         healthTipsPopup.classList.remove('active');
       });
+
+      // Disclaimer and Consent buttons
+      document.getElementById('accept-disclaimer-btn').addEventListener('click', () => {
+        localStorage.setItem('medical_disclaimer_accepted', 'true');
+        document.getElementById('medical-disclaimer-modal').classList.remove('active');
+        checkDisclaimersAndConsent();
+      });
+
+      document.getElementById('grant-ai-consent-btn').addEventListener('click', () => {
+        localStorage.setItem('ai_data_sharing_consent_granted', 'true');
+        document.getElementById('ai-consent-modal').classList.remove('active');
+        loadAIHealthTip();
+      });
+
+      document.getElementById('decline-ai-consent-btn').addEventListener('click', () => {
+        localStorage.setItem('ai_data_sharing_consent_granted', 'false');
+        document.getElementById('ai-consent-modal').classList.remove('active');
+        loadAIHealthTip();
+      });
+
       document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
           fileUploadModal.classList.remove('active');
@@ -854,6 +1352,7 @@
           healthTipsPopup.classList.remove('active');
         });
       });
+      
       mealTracking.addEventListener('click', e => {
         if (e.target.classList.contains('mark-meal-btn')) {
           handleMarkMealComplete(e.target.dataset.type);
@@ -862,9 +1361,6 @@
     }
 
     // Run Initialization
-    init();
-
-
 
             let counter = 0;
         let pageName = '/dashboard';

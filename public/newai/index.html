@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
   <title>AI Personal Health Assistant - Presibo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://js.paystack.co/v1/inline.js" async></script>
-    <script src="/assets/js/config.js"></script>
+    
 
 
   <!-- Favicon Meta Tags - Using online placeholder -->
@@ -204,16 +205,11 @@
   </header>
   <div class="max-w-7xl mx-auto space-y-4">
     <!-- Header -->
-    <div class="bg-white shadow rounded-lg border-l-4 border-purple-600">
+    <div class="bg-white shadow rounded-lg">
       <div class="p-6 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 border-2 border-purple-300">
-            <i class="fas fa-user-md text-2xl"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-900">Dr. Helen</h1>
-            <p class="text-xs text-purple-600 font-medium">Your Personal AI Health Assistant</p>
-          </div>
+        <div class="flex items-center gap-2">
+         <!-- <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-12 h-12 object-contain">-->
+          <h1 class="text-xl font-semibold text-gray-900">Personal AI Health Assistant</h1>
         </div>
         <div class="text-right">
           <div id="usageStatus" class="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-sm">
@@ -222,8 +218,8 @@
           </div>
         </div>
       </div>
-      <div class="px-6 pb-6 text-gray-600 text-sm leading-relaxed">
-        Get instant health guidance for common Nigerian health concerns from Dr. Helen. Chat about symptoms, log details, and get personalized doctor recommendations.
+      <div class="px-6 pb-6 text-gray-600">
+        Get instant health guidance for common Nigerian health concerns. Chat about symptoms and get personalized doctor recommendations.
       </div>
     </div>
 
@@ -262,42 +258,11 @@
             </div>
           </div>
           <div class="separator h-px bg-gray-100"></div>
-          <div class="p-6 flex flex-col gap-3 bg-gray-50 border-t rounded-b-lg">
-            <!-- Quick Action Chips -->
-            <div class="flex flex-wrap gap-2 mb-1" id="quick-action-chips">
-              <button class="action-chip bg-white border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm font-medium transition-colors" onclick="window.location.href='/hospitals'">
-                <i class="fas fa-map-marker-alt"></i> Hospitals Locator
-              </button>
-              <button class="action-chip bg-white border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm font-medium transition-colors" onclick="window.location.href='/food'">
-                <i class="fas fa-utensils"></i> MyFood Logging
-              </button>
-              <button class="action-chip bg-white border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm font-medium transition-colors" onclick="window.location.href='/doctors'">
-                <i class="fas fa-user-md"></i> Doctors List
-              </button>
-              <button class="action-chip bg-white border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm font-medium transition-colors" onclick="window.location.href='/track'">
-                <i class="fas fa-heartbeat"></i> Vital Tracker
-              </button>
-              <a class="action-chip bg-white border border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-sm font-medium transition-colors" href="tel:+2348011123456">
-                <i class="fas fa-phone"></i> Call a Doctor
-              </a>
-            </div>
-
-            <!-- Input area -->
-            <div class="flex gap-2 items-center">
-              <input id="chatInput" class="input flex-1 bg-white" placeholder="Type your health question here..." />
-              <button id="micButton" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2.5 rounded-lg transition-colors border" title="Voice dictation">
-                <i class="fas fa-microphone" id="micIcon"></i>
-              </button>
-              <button id="sendButton" class="bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center border border-purple-700 shadow-sm" style="min-height: 42px;">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-              </button>
-            </div>
-            
-            <!-- Paystack topup button directly visible when balance insufficient -->
-            <div id="insufficient-balance-panel" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between text-xs text-red-800">
-              <span>You have used your free AI consultations. Subscribe now to continue chat.</span>
-              <button onclick="subscriptionModal.classList.add('active')" class="bg-purple-600 text-white px-3 py-1.5 rounded-md hover:bg-purple-700 font-semibold shadow-sm">Top Up</button>
-            </div>
+          <div class="p-6 flex gap-2">
+            <input id="chatInput" class="input flex-1" placeholder="Type your health question here..." />
+            <button id="sendButton" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -387,10 +352,9 @@
 ===================================================== */
 const userEmail = sessionStorage.getItem('email');
 
-// Load API endpoints from centralized config
-const AI_API = CONFIG.API_AI_URL || 'https://api.presibo.com/ai/open.php';
-const DOCTORS_API = CONFIG.API_DOCTORS_URL || 'https://api.presibo.com/doctors/index.php';
-const EMAIL_API = CONFIG.API_EMAIL_URL || 'https://api.presibo.com/email/index.php'; // <-- your email API endpoint
+const AI_API = 'https://api.presibo.com/ai/open.php';
+const DOCTORS_API = 'https://api.presibo.com/doctors/index.php';
+const EMAIL_API = 'https://api.presibo.com/email/index.php';
 let freeLimit = 2; // Changed to 2 as requested
 let remaining = freeLimit;
 let isSubscribed = false;
@@ -473,7 +437,7 @@ const closeModal = document.getElementById('closeModal');
 /* =====================================================
    INITIAL WELCOME MESSAGE
 ===================================================== */
-addAIMessage("Hello! I'm Dr. Helen, your Personal AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?", false);
+addAIMessage("Hello! I'm your Personal AI Health Assistant specialized in helping with common health concerns in Nigeria, particularly high blood pressure, diabetes and other common ailments. I can help you find doctors and hospitals near you. How can I help you today?", false);
 
 /* =====================================================
    HELPERS
@@ -500,22 +464,6 @@ function createMessageElement({ type, content, timestamp = new Date(), isSubscri
       ? 'bg-red-50 border border-red-200 text-red-800'
       : 'bg-gray-100 text-gray-900';
 
-  let translationDropdownHtml = '';
-  if (type === 'ai' && !isSubscriptionError) {
-    translationDropdownHtml = `
-      <div class="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1.5 text-xs text-gray-400">
-        <span>Translate:</span>
-        <select onchange="translateBubbleText(this)" class="bg-transparent border border-gray-300 rounded px-1 py-0.5 text-xs text-gray-500 outline-none focus:border-purple-500 cursor-pointer">
-          <option value="en">English</option>
-          <option value="yo">Yoruba</option>
-          <option value="ig">Igbo</option>
-          <option value="ha">Hausa</option>
-          <option value="pid">Pidgin</option>
-        </select>
-      </div>
-    `;
-  }
-
   wrapper.innerHTML = `
     <div class="flex gap-2 max-w-[80%] ${type === 'user' ? 'flex-row-reverse' : 'flex-row'}">
       <div class="${type === 'user'
@@ -528,9 +476,8 @@ function createMessageElement({ type, content, timestamp = new Date(), isSubscri
           }
         </svg>
       </div>
-      <div class="rounded-lg p-3 ${bubbleColor} msg-bubble" data-original="${escapeHtml(content)}">
-        <div class="text-sm message-content whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
-        ${translationDropdownHtml}
+      <div class="rounded-lg p-3 ${bubbleColor}">
+        <div class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(content)}</div>
         ${isSubscriptionError
           ? `<div class="mt-3 pt-3 border-t border-red-200">
               <button class="subscribe-now w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-lg">
@@ -758,23 +705,11 @@ async function sendMessage() {
 // Update usage display
 function updateUsageDisplay() {
   usageRemaining.textContent = `${remaining} of ${freeLimit} remaining`;
-  const insufficientPanel = document.getElementById('insufficient-balance-panel');
-  if (insufficientPanel) {
-    if (!isSubscribed && remaining <= 0) {
-      insufficientPanel.classList.remove('hidden');
-    } else {
-      insufficientPanel.classList.add('hidden');
-    }
-  }
 }
 
 // Show payment modal
 function showPaymentModal() {
   subscriptionModal.classList.add('active');
-  const insufficientPanel = document.getElementById('insufficient-balance-panel');
-  if (insufficientPanel) {
-    insufficientPanel.classList.remove('hidden');
-  }
 }
 
 // Initialize Paystack payment
@@ -799,7 +734,7 @@ function handleSubscribeClick() {
   
   // Initialize Paystack
   const handler = PaystackPop.setup({
-    key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_test_your_paystack_public_key_here', // Replace with actual Paystack public key
+    key: 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx', // Replace with actual Paystack public key
     email: email,
     amount: 100000, // 1000 naira in kobo
     currency: 'NGN',
@@ -953,168 +888,15 @@ closeNotification.addEventListener('click', () => {
 });
 
 
-// Translate AI chat bubble
-function translateBubbleText(select) {
-  const bubble = select.closest('.msg-bubble');
-  const contentEl = bubble.querySelector('.message-content');
-  const lang = select.value;
-  const originalText = bubble.getAttribute('data-original');
-
-  if (lang === 'en') {
-    contentEl.textContent = originalText;
-    return;
-  }
-
-  // Dictionary mapping for common phrases in the assistant's context
-  const dictionary = {
-    yo: {
-      "Hello! I'm": "Ẹ n lẹ! Emi ni",
-      "your Personal AI Health Assistant": "Oluranlọwọ Ilera AI ti ara rẹ",
-      "specialized in helping with common health concerns in Nigeria": "ti o ṣe pataki ni iranlọwọ pẹlu awọn iṣoro ilera ti o wọpọ ni Nigeria",
-      "high blood pressure": "ẹjẹ riru",
-      "diabetes": "àtọ̀gbẹ",
-      "ailments": "awọn aisan",
-      "hospitals": "awọn ile-iwosan",
-      "doctors": "awon dokita",
-      "How can I help you today?": "Bawo ni mo ṣe le ran ọ lọwọ loni?",
-      "Warning: You are not logged in.": "Ikilọ: O ko wọle.",
-      "Please log in to continue using AI services.": "Jọwọ wọle lati tẹsiwaju lilo awọn iṣẹ AI.",
-      "Subscribe": "Alabapin",
-      "Free Consultations": "Ijumọsọrọ Ọfẹ",
-      "remaining": "o ku",
-      "I have high blood pressure symptoms": "Mo ni awọn ami aisan riru ẹjẹ giga",
-      "Blood sugar levels concern": "Ibajẹ awọn ipele suga ẹjẹ"
-    },
-    ig: {
-      "Hello! I'm": "Nnọọ! Abụ m",
-      "your Personal AI Health Assistant": "Onye Nwanyị Enyemaka Ahụike AI nke gị",
-      "specialized in helping with common health concerns in Nigeria": "ọkachamara n'inyere aka na nchegbu ahụike nkịtị na Nigeria",
-      "high blood pressure": "mgbali elu ọbara",
-      "diabetes": "ọrịa shuga",
-      "ailments": "ọrịa dị iche iche",
-      "hospitals": "ụlọ ọgwụ",
-      "doctors": "ndị dọkịta",
-      "How can I help you today?": "Kedu ka m ga-esi nyere gị aka taa?",
-      "Warning: You are not logged in.": "Ịdọ aka ná ntị: Ị banyeghị.",
-      "Please log in to continue using AI services.": "Biko banye ka ị gaa n'ihu na-eji ọrụ AI.",
-      "Subscribe": "Debanye aha",
-      "Free Consultations": "Ndụmọdụ efu",
-      "remaining": "fọdụrụ",
-      "I have high blood pressure symptoms": "Enwere m mgbaàmà mgbali elu ọbara",
-      "Blood sugar levels concern": "Nchegbu banyere ọkwa shuga ọbara"
-    },
-    ha: {
-      "Hello! I'm": "Sannu! Ni ce",
-      "your Personal AI Health Assistant": "Mataimakin Lafiya na AI na kanka",
-      "specialized in helping with common health concerns in Nigeria": "wanda ya ƙware wajen taimakawa da matsalolin lafiya na yau da kullun a Najeriya",
-      "high blood pressure": "hawan jini",
-      "diabetes": "ciwon sukari",
-      "ailments": "cututtuka",
-      "hospitals": "asibitoci",
-      "doctors": "likitoci",
-      "How can I help you today?": "Yaya zan iya taimaka muku yau?",
-      "Warning: You are not logged in.": "Gargaɗi: Ba ku shiga ba.",
-      "Please log in to continue using AI services.": "Da fatan za a shiga don ci gaba da amfani da sabis na AI.",
-      "Subscribe": "Yi rajista",
-      "Free Consultations": "Tashoshin kyauta",
-      "remaining": "sauran",
-      "I have high blood pressure symptoms": "Ina da alamun hawan jini",
-      "Blood sugar levels concern": "Damuwa game da matakan sukari na jini"
-    },
-    pid: {
-      "Hello! I'm": "Howfa! I be",
-      "your Personal AI Health Assistant": "your Personal AI Health Assistant",
-      "specialized in helping with common health concerns in Nigeria": "specialist for helping with health issues for Nigeria",
-      "high blood pressure": "high blood pressure",
-      "diabetes": "diabetes",
-      "ailments": "sickness",
-      "hospitals": "hospitals",
-      "doctors": "doctors",
-      "How can I help you today?": "How I fit help you today?",
-      "Warning: You are not logged in.": "Warning: You never log in.",
-      "Please log in to continue using AI services.": "Beg you log in to continue dey use AI.",
-      "Subscribe": "Subscribe",
-      "Free Consultations": "Free consultations",
-      "remaining": "remain",
-      "I have high blood pressure symptoms": "I get high blood pressure symptoms",
-      "Blood sugar levels concern": "Blood sugar levels concern"
-    }
-  };
-
-  let translated = originalText;
-  const langDict = dictionary[lang];
-  if (langDict) {
-    for (const [english, translation] of Object.entries(langDict)) {
-      const regex = new RegExp(english.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
-      translated = translated.replace(regex, translation);
-    }
-    const prefixes = { yo: "[YORÙBÁ] ", ig: "[IGBO] ", ha: "[HAUSA] ", pid: "[PIDGIN] " };
-    translated = (prefixes[lang] || '') + translated;
-  }
-
-  contentEl.textContent = translated;
-}
-
-// Voice Dictation (Speech Recognition) Setup
-(function setupVoiceDictation() {
-  const micButton = document.getElementById('micButton');
-  const micIcon = document.getElementById('micIcon');
-  if (!micButton) return;
-
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-NG'; // Nigerian English
-
-    recognition.onstart = () => {
-      micButton.classList.add('bg-red-100', 'text-red-600', 'border-red-300');
-      micIcon.className = 'fas fa-microphone-alt animate-pulse';
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      chatInput.value = (chatInput.value + ' ' + transcript).trim();
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
-      showNotification('Voice dictation error: ' + event.error);
-    };
-
-    recognition.onend = () => {
-      micButton.classList.remove('bg-red-100', 'text-red-600', 'border-red-300');
-      micIcon.className = 'fas fa-microphone';
-    };
-
-    micButton.addEventListener('click', () => {
-      try {
-        recognition.start();
-      } catch (e) {
-        recognition.stop();
-      }
-    });
-  } else {
-    micButton.title = 'Voice recognition not supported in this browser';
-    micButton.classList.add('opacity-50', 'cursor-not-allowed');
-    micButton.addEventListener('click', () => {
-      showNotification('Speech recognition is not supported in this browser. Try Chrome or Edge.');
-    });
-  }
-})();
-
 // Profile dropdown & mobile menu
-const profileBtn = document.getElementById('profile-btn');
-const profileDropdown = document.getElementById('profile-dropdown');
-profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
 
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const mobileMenu = document.getElementById('mobile-menu');
-mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-
-// Update display state on launch
-setTimeout(updateUsageDisplay, 100);
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    
 </script>
 
 </body>
