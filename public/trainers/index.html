@@ -161,11 +161,42 @@
       window.location.href = '/';
     }
 
-    const trainers = [
-      { id: 'trainer-emeka', name: 'Coach Emeka', specialization: 'HIIT & Weight Loss', experience: '6 years', bio: 'Specialist in custom cardio workouts, weight loss, and core strength.', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=150&h=150&fit=crop' },
-      { id: 'trainer-amina', name: 'Coach Amina', specialization: 'Strength & Body Tone', experience: '5 years', bio: 'Focuses on functional fitness, powerlifting, and nutrition guides.', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop' },
-      { id: 'trainer-tunde', name: 'Coach Tunde', specialization: 'Yoga & Flexibility', experience: '8 years', bio: 'Mindfulness practitioner helping with flexibility, posture, and wellness.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop' }
-    ];
+    let trainers = [];
+
+    async function fetchTrainers() {
+      try {
+        const res = await fetch("https://presibo-wl.vercel.app/trainers.json");
+        const data = await res.json();
+        
+        const thumbnailsMap = {
+          "doc0": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=150&h=150&fit=crop",
+          "doc02": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop",
+          "doc03": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
+          "doc04": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop"
+        };
+        
+        trainers = data.users.map(t => ({
+          id: String(t.id),
+          name: `${t.firstname} ${t.lastname}`,
+          specialization: t.specialization || "Fitness Trainer",
+          experience: `${t.years || 2} years`,
+          bio: `Specialist trainer operating in ${t.location || 'Lekki, Lagos'}. Active cases: ${t.cases || '0'}. Distance: ${t.distance || 'nearby'}.`,
+          image: thumbnailsMap[t.thumbnail] || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=150&h=150&fit=crop"
+        }));
+        
+        renderTrainers();
+      } catch (err) {
+        console.error("Error fetching trainers:", err);
+        // Fallback trainers
+        trainers = [
+          { id: '100', name: 'Precious Edwin', specialization: 'Fitness Trainer', experience: '2 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 3. Distance: 13 km.', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=150&h=150&fit=crop' },
+          { id: '102', name: 'Ebiweni Zikenah', specialization: 'Fitness Trainer', experience: '2 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 8. Distance: 8 km.', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop' },
+          { id: '103', name: 'Naomi Anyiema', specialization: 'Fitness Trainer', experience: '1 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 4. Distance: 7 km.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop' },
+          { id: '104', name: 'Matthew King', specialization: 'Fitness Trainer', experience: '3 years', bio: 'Specialist trainer operating in GRA, Enugu. Active cases: 3. Distance: 9 km.', image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop' }
+        ];
+        renderTrainers();
+      }
+    }
 
     function renderTrainers() {
       const list = document.getElementById('trainersList');
@@ -360,7 +391,7 @@
       });
     })();
 
-    renderTrainers();
+    fetchTrainers();
   </script>
 </body>
 </html>
