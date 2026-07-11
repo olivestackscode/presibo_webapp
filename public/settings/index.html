@@ -44,29 +44,51 @@
 <body class="bg-gray-50 text-gray-800 dark:bg-dark-bg dark:text-gray-100 min-h-screen pt-20">
 
   <!-- Header -->
-  <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 fixed top-0 left-0 w-full z-50 shadow-sm flex items-center justify-between px-6">
-    <div class="flex items-center space-x-2">
-      <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
-      <span class="font-extrabold text-green-700 dark:text-green-500 text-lg">Presibo</span>
+  <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 fixed top-0 left-0 w-full z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-850 rounded-md">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+        <span class="font-extrabold text-green-700 dark:text-green-500 text-lg">Presibo</span>
+      </div>
+
+      <!-- Desktop Menu Links -->
+      <nav class="hidden md:flex space-x-6 mx-auto">
+        <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+        <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+        <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+        <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+        <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+        <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+        <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+        <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
+      </nav>
+
+      <div class="relative">
+        <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-white rounded-full">
+          <i class="fas fa-user-circle text-2xl"></i>
+        </button>
+        <div id="profile-dropdown" class="absolute top-12 right-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] hidden text-gray-700 dark:text-gray-200">
+          <a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+          <a href="/logout" class="block px-4 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+        </div>
+      </div>
     </div>
 
-    <nav class="hidden md:flex space-x-6">
-      <a href="/dashboard" class="text-sm font-semibold hover:text-naija-green">Dashboard</a>
-      <a href="/track" class="text-sm font-semibold hover:text-naija-green">Track</a>
-      <a href="/fitness" class="text-sm font-semibold hover:text-naija-green">Fitness</a>
-      <a href="/food" class="text-sm font-semibold hover:text-naija-green">FoodSquare</a>
-      <a href="/doctors" class="text-sm font-semibold hover:text-naija-green">Doctors</a>
-      <a href="/meetings" class="text-sm font-semibold hover:text-naija-green">Meetings</a>
-    </nav>
-
-    <div class="relative">
-      <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 dark:hover:text-white rounded-full">
-        <i class="fas fa-user-circle text-2xl"></i>
-      </button>
-      <div id="profile-dropdown" class="absolute top-12 right-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] hidden text-gray-700 dark:text-gray-200">
-        <a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
-        <a href="/logout" class="block px-4 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
-      </div>
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Settings</a>
+      </nav>
     </div>
   </header>
 
@@ -490,11 +512,34 @@
     // Header Profile toggle
     const profileBtn = document.getElementById('profile-btn');
     const profileDropdown = document.getElementById('profile-dropdown');
-    profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+    if (profileBtn && profileDropdown) {
+      profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+    }
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    }
 
     document.addEventListener('click', (e) => {
-      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+      if (profileBtn && !profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
     });
+
+    // Dynamic Navigation Active State
+    (function() {
+      const path = window.location.pathname;
+      const links = document.querySelectorAll('.menu-link');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (path === href || path.startsWith(href + '/') || (href === '/settings' && path === '/settings/index.html'))) {
+          link.classList.add('text-naija-green', 'font-bold');
+          if (link.classList.contains('block')) {
+            link.classList.add('bg-green-50');
+          }
+        }
+      });
+    })();
   </script>
 </body>
 </html>

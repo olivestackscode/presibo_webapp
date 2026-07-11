@@ -234,13 +234,15 @@
         </div>
 
         <!-- Desktop Menu Links -->
-        <nav class="hidden md:flex space-x-8 mx-auto">
-          <a href="/dashboard" class="menu-link">Dashboard</a>
-          <a href="/vitals" class="menu-link">Vitals</a>
-          <a href="/insights" class="menu-link">Insights Hub</a>
-          <a href="/community" class="menu-link">Community</a>
-          <a href="/challenges" class="menu-link">Challenges</a>
-          <a href="/support" class="menu-link">Support</a>
+        <nav class="hidden md:flex space-x-6 mx-auto">
+          <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+          <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+          <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+          <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+          <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+          <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+          <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+          <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
         </nav>
 
         <!-- Right Side: Notifications, Profile -->
@@ -280,12 +282,14 @@
     <!-- Mobile Menu Dropdown -->
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
-          <a href="/dashboard" class="menu-link block">Dashboard</a>
-          <a href="/vitals" class="menu-link block">Vitals</a>
-          <a href="/insights" class="menu-link block">Insights Hub</a>
-          <a href="/community" class="menu-link block">Community</a>
-          <a href="/challenges" class="menu-link block">Challenges</a>
-          <a href="/support" class="menu-link block">Support</a>
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
       </nav>
     </div>
   </header>
@@ -1175,19 +1179,20 @@
       if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
     });
 
-    // Initialize
-    function init() {
-      loadingDiv.classList.remove('hidden');
-      loadSwipeDeckState();
-      
-      setTimeout(() => {
-        loadingDiv.classList.add('hidden');
-        foodListDiv.classList.remove('hidden');
-        renderFoodGrid(filteredFoods);
-        renderSwipeDeck();
-        updateNutritionalTracker();
-      }, 1000);
-    }
+    // Dynamic Navigation Active State
+    (function() {
+      const path = window.location.pathname;
+      const links = document.querySelectorAll('.menu-link');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (path === href || path.startsWith(href + '/') || (href === '/food' && path === '/food/index.html'))) {
+          link.classList.add('text-naija-green', 'font-bold');
+          if (link.classList.contains('block')) {
+            link.classList.add('bg-green-50');
+          }
+        }
+      });
+    })();
 
     init();
   </script>

@@ -128,13 +128,16 @@
             <span class="font-extrabold text-purple-800 text-lg">Presibo</span>
           </div>
         </div>
-        <nav class="hidden md:flex space-x-8">
-          <a href="/dashboard" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Dashboard</a>
-          <a href="/track" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Track</a>
-          <a href="/food" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">FoodSquare</a>
-          <a href="/doctors" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Doctors</a>
-          <a href="/ai" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">AI Help</a>
-          <a href="/settings" class="text-gray-700 hover:text-naija-green px-3 py-2 rounded-md text-sm font-semibold">Settings</a>
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-6 mx-auto">
+          <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+          <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+          <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+          <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+          <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+          <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+          <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+          <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
         </nav>
         <div class="flex items-center space-x-4">
           <div class="relative">
@@ -152,12 +155,14 @@
     <!-- Mobile Menu Dropdown -->
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
-        <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
-        <a href="/track" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
-        <a href="/food" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
-        <a href="/doctors" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
-        <a href="/ai" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">AI Help</a>
-        <a href="/settings" class="block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
       </nav>
     </div>
   </header>
@@ -618,6 +623,19 @@
       loadSwipeState();
       renderSwipeDeck();
       renderTasks();
+      
+      // Dynamic Navigation Active State
+      const path = window.location.pathname;
+      const links = document.querySelectorAll('.menu-link');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (path === href || path.startsWith(href + '/') || (href === '/fitness' && path === '/fitness/index.html'))) {
+          link.classList.add('text-naija-green', 'font-bold');
+          if (link.classList.contains('block')) {
+            link.classList.add('bg-green-50');
+          }
+        }
+      });
     })();
   </script>
 </body>

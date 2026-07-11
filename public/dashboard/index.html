@@ -210,12 +210,14 @@
 
         <!-- Desktop Menu Links -->
         <nav class="hidden md:flex space-x-8 mx-auto">
-          <a href="/insights" class="menu-link active">Insights Hub</a>
-          <a href="/challenges" class="menu-link">Challenges</a>
-          <a href="https://flow.presibo.com" class="menu-link">Flow</a>
-          <a href="/calendar" class="menu-link">Calendar</a>
-          <a href="https://presibo.com/instant" class="menu-link">Payments</a>
-          <a href="/support" class="menu-link">Support</a>
+          <a href="/dashboard" class="menu-link active">Dashboard</a>
+          <a href="/track" class="menu-link">Track</a>
+          <a href="/fitness" class="menu-link">Fitness</a>
+          <a href="/food" class="menu-link">FoodSquare</a>
+          <a href="/doctors" class="menu-link">Doctors</a>
+          <a href="/trainers" class="menu-link">Trainers</a>
+          <a href="/meetings" class="menu-link">Meetings</a>
+          <a href="/settings" class="menu-link">Settings</a>
         </nav>
 
         <!-- Right Side: Notifications, Profile -->
@@ -255,11 +257,13 @@
     <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
         <a href="/dashboard" class="menu-link active block">Dashboard</a>
-        <a href="/vitals" class="menu-link block">Vitals</a>
-        <a href="/meals" class="menu-link block">Meals</a>
-        <a href="/reports" class="menu-link block">Reports</a>
-        <a href="/community" class="menu-link block">Community</a>
-        <a href="/support" class="menu-link block">Support</a>
+        <a href="/track" class="menu-link block">Track</a>
+        <a href="/fitness" class="menu-link block">Fitness</a>
+        <a href="/food" class="menu-link block">FoodSquare</a>
+        <a href="/doctors" class="menu-link block">Doctors</a>
+        <a href="/trainers" class="menu-link block">Trainers</a>
+        <a href="/meetings" class="menu-link block">Meetings</a>
+        <a href="/settings" class="menu-link block">Settings</a>
       </nav>
     </div>
   </header>
@@ -1307,68 +1311,68 @@
 
       // Set up background vital notification check every 30 minutes
       setInterval(run30MinuteVitalsCheck, 1800000);
+    }
 
-      // Event Listeners
-      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-      notificationBtn.addEventListener('click', toggleNotificationDropdown);
-      profileBtn.addEventListener('click', toggleProfileDropdown);
-      document.addEventListener('click', (e) => {
-        if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
-        if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
-      });
+    // Synchronous Event Listeners (Moved outside init for resilience)
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    notificationBtn.addEventListener('click', toggleNotificationDropdown);
+    profileBtn.addEventListener('click', toggleProfileDropdown);
+    document.addEventListener('click', (e) => {
+      if (!notificationBtn.contains(e.target)) notificationDropdown.classList.remove('active');
+      if (!profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
 
-      subscribeBtn.addEventListener('click', () => {
-        subscriptionContent.textContent = 'Subscribe to unlock premium features like food analysis and health tips.';
-        subscriptionPopup.classList.add('active');
-      });
-      uploadBtn.addEventListener('click', () => fileUploadModal.classList.add('active'));
-      updateBpBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_pressure'));
-      updateBsBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_sugar'));
-      foodFeedBtn.addEventListener('click', () => {
-        window.location.href = '/food';
-      });
-      uploadPhotoBtn.addEventListener('click', handlePhotoCapture);
-      subscribeNowBtn.addEventListener('click', () => {
-        window.location.href = '/subscribe';
-      });
-      healthTipsSubscribeBtn.addEventListener('click', () => {
-        alert('Health tips subscription is loading in this app.');
+    subscribeBtn.addEventListener('click', () => {
+      window.location.href = '/subscribe';
+    });
+    uploadBtn.addEventListener('click', () => fileUploadModal.classList.add('active'));
+    updateBpBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_pressure'));
+    updateBsBtn.addEventListener('click', () => handleHealthReadingUpdate('blood_sugar'));
+    foodFeedBtn.addEventListener('click', () => {
+      window.location.href = '/food';
+    });
+    uploadPhotoBtn.addEventListener('click', handlePhotoCapture);
+    subscribeNowBtn.addEventListener('click', () => {
+      window.location.href = '/subscribe';
+    });
+    healthTipsSubscribeBtn.addEventListener('click', () => {
+      alert('Health tips subscription is loading in this app.');
+      healthTipsPopup.classList.remove('active');
+    });
+
+    // Disclaimer and Consent buttons
+    document.getElementById('accept-disclaimer-btn').addEventListener('click', () => {
+      localStorage.setItem('medical_disclaimer_accepted', 'true');
+      document.getElementById('medical-disclaimer-modal').classList.remove('active');
+      checkDisclaimersAndConsent();
+    });
+
+    document.getElementById('grant-ai-consent-btn').addEventListener('click', () => {
+      localStorage.setItem('ai_data_sharing_consent_granted', 'true');
+      document.getElementById('ai-consent-modal').classList.remove('active');
+      loadAIHealthTip();
+    });
+
+    document.getElementById('decline-ai-consent-btn').addEventListener('click', () => {
+      localStorage.setItem('ai_data_sharing_consent_granted', 'false');
+      document.getElementById('ai-consent-modal').classList.remove('active');
+      loadAIHealthTip();
+    });
+
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        fileUploadModal.classList.remove('active');
+        analysisModal.classList.remove('active');
+        subscriptionPopup.classList.remove('active');
         healthTipsPopup.classList.remove('active');
       });
-
-      // Disclaimer and Consent buttons
-      document.getElementById('accept-disclaimer-btn').addEventListener('click', () => {
-        localStorage.setItem('medical_disclaimer_accepted', 'true');
-        document.getElementById('medical-disclaimer-modal').classList.remove('active');
-        checkDisclaimersAndConsent();
-      });
-
-      document.getElementById('grant-ai-consent-btn').addEventListener('click', () => {
-        localStorage.setItem('ai_data_sharing_consent_granted', 'true');
-        document.getElementById('ai-consent-modal').classList.remove('active');
-        loadAIHealthTip();
-      });
-
-      document.getElementById('decline-ai-consent-btn').addEventListener('click', () => {
-        localStorage.setItem('ai_data_sharing_consent_granted', 'false');
-        document.getElementById('ai-consent-modal').classList.remove('active');
-        loadAIHealthTip();
-      });
-
-      document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', () => {
-          fileUploadModal.classList.remove('active');
-          analysisModal.classList.remove('active');
-          subscriptionPopup.classList.remove('active');
-          healthTipsPopup.classList.remove('active');
-        });
-      });
-      
-      mealTracking.addEventListener('click', e => {
-        if (e.target.classList.contains('mark-meal-btn')) {
-          handleMarkMealComplete(e.target.dataset.type);
-        }
-      });
+    });
+    
+    mealTracking.addEventListener('click', e => {
+      if (e.target.classList.contains('mark-meal-btn')) {
+        handleMarkMealComplete(e.target.dataset.type);
+      }
+    });
     }
 
     // Run Initialization

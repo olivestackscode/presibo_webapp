@@ -59,15 +59,16 @@
           <span class="font-bold text-purple">Presibo</span>
         </div>
 
-        <nav class="hidden md:flex space-x-4">
-          <a href="/dashboard" class="menu-link">Dashboard</a>
-          <a href="/track" class="menu-link">Track</a>
-          <a href="/insights" class="menu-link">Insights</a>
-          <a href="/community" class="menu-link">Community</a>
-          <a href="/hospitals" class="menu-link">Hospitals</a>
-          <a href="/ai" class="menu-link">Ask AI</a>
-          
-          <a href="/doctors" class="menu-link active">Doctors</a>
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-6 mx-auto">
+          <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+          <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+          <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+          <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+          <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+          <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+          <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+          <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
         </nav>
 
         <div class="relative">
@@ -75,9 +76,6 @@
             <i class="fas fa-user-circle text-2xl"></i>
           </button>
           <div id="profile-dropdown" class="absolute top-12 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden">
-            <a href="/profile" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-            <a href="https://flow.presibo.com" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Canvas</a>
-            
             <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
             <a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
           </div>
@@ -85,16 +83,17 @@
       </div>
     </div>
 
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
       <nav class="px-2 pt-2 pb-3 space-y-1">
-        <a href="/dashboard" class="menu-link block">Dashboard</a>
-        <a href="/vitals" class="menu-link block">Vitals</a>
-        <a href="/insights" class="menu-link block">Insights</a>
-        <a href="/community" class="menu-link block">Community</a>
-        <a href="/hospitals" class="menu-link block">Hospitals</a>
-        <a href="/ai" class="menu-link block">Ask AI</a>
-        
-        <a href="/doctors" class="menu-link active block">Doctors</a>
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
       </nav>
     </div>
   </header>
@@ -394,6 +393,21 @@ modalContent.innerHTML = `
   }
 
     fetchDoctors();
+
+    // Dynamic Navigation Active State
+    (function() {
+      const path = window.location.pathname;
+      const links = document.querySelectorAll('.menu-link');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (path === href || path.startsWith(href + '/') || (href === '/doctors' && path === '/doctors/index.html'))) {
+          link.classList.add('text-naija-green', 'font-bold');
+          if (link.classList.contains('block')) {
+            link.classList.add('bg-green-50');
+          }
+        }
+      });
+    })();
   </script>
 </body>
 </html>
