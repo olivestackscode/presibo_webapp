@@ -188,6 +188,14 @@
             color: white;
         }
 
+        .mute-btn .action-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.12);
+            margin-bottom: 3px;
+        }
+
         .top-nav {
             position: fixed;
             top: 0;
@@ -455,8 +463,8 @@
                     <div class="post-actions">
                         ${post.type === 'video' ? `
                         <button class="action-btn mute-btn ${isMutedGlobal ? 'muted' : ''}" onclick="toggleMuteAll()">
-                            <div class="action-icon">${isMutedGlobal ? '🔇' : '🔊'}</div>
-                            <span class="action-count">${isMutedGlobal ? 'Muted' : 'Unmuted'}</span>
+                            <div class="action-icon"><i class="fas ${isMutedGlobal ? 'fa-volume-mute' : 'fa-volume-up'} text-white"></i></div>
+                            <span class="action-count text-[10px]">${isMutedGlobal ? 'Muted' : 'Unmuted'}</span>
                         </button>
                         ` : ''}
                         <button class="action-btn like-btn" onclick="toggleLike(${post.id})">
@@ -564,13 +572,18 @@
             
             if (video.paused) {
                 video.play().catch(() => {});
-                playBtn.classList.remove('show');
-            } else {
-                video.pause();
+                playBtn.innerHTML = '<i class="fas fa-play text-2xl text-white opacity-90"></i>';
                 playBtn.classList.add('show');
                 playBtnTimeout = setTimeout(() => {
                     playBtn.classList.remove('show');
-                }, 3000);
+                }, 800);
+            } else {
+                video.pause();
+                playBtn.innerHTML = '<i class="fas fa-pause text-2xl text-white opacity-90"></i>';
+                playBtn.classList.add('show');
+                playBtnTimeout = setTimeout(() => {
+                    playBtn.classList.remove('show');
+                }, 800);
             }
         }
 
@@ -583,11 +596,11 @@
                 const icon = btn.querySelector('.action-icon');
                 const text = btn.querySelector('.action-count');
                 if (isMutedGlobal) {
-                    icon.innerHTML = '🔇';
+                    icon.innerHTML = '<i class="fas fa-volume-mute text-sm text-white"></i>';
                     text.textContent = 'Muted';
                     btn.classList.add('muted');
                 } else {
-                    icon.innerHTML = '🔊';
+                    icon.innerHTML = '<i class="fas fa-volume-up text-sm text-white"></i>';
                     text.textContent = 'Unmuted';
                     btn.classList.remove('muted');
                 }
@@ -641,14 +654,16 @@
             newCurrentIndex = Math.max(0, Math.min(newCurrentIndex, posts.length - 1));
             
             if (newCurrentIndex !== currentPostIndex) {
-                // Pause previous video
-                const prevPost = posts[currentPostIndex];
-                const prevVideo = prevPost?.querySelector('video');
-                if (prevVideo) {
-                    prevVideo.pause();
-                    const prevPlayBtn = prevPost.querySelector('.play-pause-btn');
-                    if (prevPlayBtn) prevPlayBtn.classList.remove('show');
-                }
+                // Pause and stop all other videos first
+                document.querySelectorAll('video').forEach(video => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+
+                // Remove show class from all play/pause buttons
+                document.querySelectorAll('.play-pause-btn').forEach(btn => {
+                    btn.classList.remove('show');
+                });
                 
                 currentPostIndex = newCurrentIndex;
                 updateProgressIndicator();
