@@ -514,6 +514,27 @@
   </div>
 
   <script>
+    // Session Verification
+    let userEmail = '';
+    let userSession = null;
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        userSession = JSON.parse(sessionStr);
+        userEmail = userSession.email;
+      }
+    } catch(e) {
+      console.error('Session retrieval error', e);
+    }
+    
+    if (!userEmail) {
+      userEmail = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+    }
+    
+    if (!userEmail) {
+      window.location.href = '/';
+    }
+
     // Mock Nigerian Food Data
     const nigerianFoods = [
       {
@@ -609,6 +630,8 @@
     const mobileMenu = document.getElementById('mobile-menu');
     const notificationBtn = document.getElementById('notification-btn');
     const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationList = document.getElementById('notification-list');
+    const notificationCount = document.getElementById('notification-count');
     const profileBtn = document.getElementById('profile-btn');
     const profileDropdown = document.getElementById('profile-dropdown');
 
@@ -620,7 +643,7 @@
       foodGrid.innerHTML = '';
       foods.forEach(food => {
         const card = document.createElement('div');
-        card.className = 'food-card bg-white rounded-xl shadow p-4 cursor-pointer';
+        card.className = 'food-card bg-white border border-gray-100 rounded-xl shadow-sm p-4 cursor-pointer hover:border-green-200';
         card.innerHTML = `
           <div class="flex items-center mb-3">
             <span class="text-3xl mr-3">${food.emoji}</span>
@@ -628,8 +651,8 @@
               <h4 class="font-bold text-gray-800 text-sm">${food.name}</h4>
             </div>
           </div>
-          <div class="bg-info-gradient text-white px-3 py-1 rounded-full mb-3">
-            <span class="text-xs font-medium">${food.region}</span>
+          <div class="inline-block bg-green-50 text-naija-green border border-green-200 px-3 py-1 rounded-full mb-3">
+            <span class="text-[10px] font-bold tracking-wide uppercase">${food.region}</span>
           </div>
           <p class="text-sm text-gray-600 mb-3 line-clamp-3">${food.description}</p>
           <div class="flex items-center">
@@ -707,6 +730,11 @@
     // Search and Filter
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
+      if (searchQuery.trim()) {
+        clearSearch.classList.remove('hidden');
+      } else {
+        clearSearch.classList.add('hidden');
+      }
       updateFilteredFoods();
     });
 
@@ -760,21 +788,7 @@
       input.click();
     });
 
-    cameraUpload.addEventListener('click', () => {
-      // Simulate camera - use file input for demo
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'environment';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            previewImg.src = ev.target.result;
-            selectedImage = ev.target.result;
-            imagePreview.classList.remove('hidden');
-            analysisResult.classList.add('hidden');
+
     // Audio Synthesis for Coin sound
     function playCoinDropSound() {
       try {
@@ -1058,11 +1072,82 @@
               <span class="font-bold">${item.fat}g</span>
             </div>
           </div>
-          <div class="text-[10px] text-center text-gray-400 font-semibold italic">
+          <div class="text-[10px] text-center text-gray-400 font-semibold italic font-sans">
             Swipe Right to Log • Swipe Left to Skip
           </div>
         `;
         container.appendChild(card);
+
+        if (isTop) {
+          let startX = 0;
+          let startY = 0;
+          let isDragging = false;
+
+          const startDrag = (e) => {
+            isDragging = true;
+            startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            card.style.transition = 'none';
+
+            if (e.type === 'mousedown') {
+              document.addEventListener('mousemove', moveDrag);
+              document.addEventListener('mouseup', endDrag);
+            } else {
+              document.addEventListener('touchmove', moveDrag, { passive: true });
+              document.addEventListener('touchend', endDrag);
+            }
+          };
+
+          const moveDrag = (e) => {
+            if (!isDragging) return;
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+            const rotate = deltaX * 0.08;
+
+            card.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotate}deg)`;
+
+            if (deltaX > 40) {
+              card.style.borderColor = 'rgba(0, 135, 83, 0.4)';
+              card.style.boxShadow = '0 10px 25px -5px rgba(0, 135, 83, 0.2)';
+            } else if (deltaX < -40) {
+              card.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+              card.style.boxShadow = '0 10px 25px -5px rgba(239, 68, 68, 0.2)';
+            } else {
+              card.style.borderColor = '#f3f4f6';
+              card.style.boxShadow = '';
+            }
+          };
+
+          const endDrag = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            document.removeEventListener('mousemove', moveDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', moveDrag);
+            document.removeEventListener('touchend', endDrag);
+
+            card.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease, border-color 0.2s';
+
+            const clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+            const deltaX = clientX - startX;
+
+            if (deltaX > 100) {
+              swipeCurrentCard('right');
+            } else if (deltaX < -100) {
+              swipeCurrentCard('left');
+            } else {
+              card.style.transform = '';
+              card.style.borderColor = '#f3f4f6';
+              card.style.boxShadow = '';
+            }
+          };
+
+          card.addEventListener('mousedown', startDrag);
+          card.addEventListener('touchstart', startDrag, { passive: true });
+        }
       }
     }
 
@@ -1193,6 +1278,80 @@
         }
       });
     })();
+
+    // Mock notifications
+    const notifications = [
+      { id: 1, title: 'Calorie Target reached', message: 'You have logged 1,200 kcal today.', time: '1h ago', unread: true },
+      { id: 2, title: 'New food recommendation', message: 'Try Amala & Ewedu for dinner!', time: '3h ago', unread: true },
+      { id: 3, title: 'Weekly summary ready', message: 'Check your nutrition report for this week.', time: '1d ago', unread: false }
+    ];
+
+    function renderNotifications() {
+      if (!notificationList) return;
+      notificationList.innerHTML = '';
+      notifications.forEach(notif => {
+        const div = document.createElement('div');
+        div.className = `notification-item ${notif.unread ? 'unread font-semibold bg-gray-50' : 'text-gray-600'}`;
+        div.innerHTML = `
+          <div class="flex items-start space-x-3 text-left">
+            <div class="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-info-circle text-naija-green text-xs"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-gray-900 truncate">${notif.title}</p>
+              <p class="text-[10px] text-gray-500 truncate">${notif.message}</p>
+            </div>
+            <div class="text-right text-[9px] text-gray-400 flex-shrink-0">
+              ${notif.time}
+            </div>
+          </div>
+        `;
+        div.addEventListener('click', () => {
+          if (notif.unread) {
+            notif.unread = false;
+            div.classList.remove('unread', 'font-semibold', 'bg-gray-50');
+            div.classList.add('text-gray-600');
+            updateNotificationCount();
+          }
+        });
+        notificationList.appendChild(div);
+      });
+    }
+
+    function updateNotificationCount() {
+      if (!notificationCount) return;
+      const unreadCount = notifications.filter(n => n.unread).length;
+      notificationCount.textContent = unreadCount;
+      notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+    }
+
+    function init() {
+      // Hide loading skeleton, show main content
+      if (loadingDiv) loadingDiv.classList.add('hidden');
+      if (foodListDiv) foodListDiv.classList.remove('hidden');
+
+      // Populate food grid
+      updateFilteredFoods();
+
+      // Setup backToList button handler
+      if (backToList) {
+        backToList.addEventListener('click', () => {
+          foodDetailDiv.classList.add('hidden');
+          foodListDiv.classList.remove('hidden');
+        });
+      }
+
+      // Daily nutrient updates
+      updateNutritionalTracker();
+
+      // Swipe Suggestion Deck
+      loadSwipeDeckState();
+      renderSwipeDeck();
+
+      // Notifications dropdown
+      renderNotifications();
+      updateNotificationCount();
+    }
 
     init();
   </script>
