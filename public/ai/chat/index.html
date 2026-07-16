@@ -270,7 +270,17 @@
 /* =====================================================
    CONFIG / STATE
 ===================================================== */
-const userEmail = sessionStorage.getItem('email');
+let userEmail = '';
+try {
+  const sessionStr = localStorage.getItem('user_session');
+  if (sessionStr) {
+    const userSession = JSON.parse(sessionStr);
+    userEmail = userSession.email;
+  }
+} catch(e) {}
+if (!userEmail) {
+  userEmail = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+}
 
 // Load API endpoints from centralized config
 const AI_API = CONFIG.API_AI_URL || 'https://api.presibo.com/ai/openrouter.php';

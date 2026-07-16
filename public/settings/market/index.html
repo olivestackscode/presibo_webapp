@@ -1,0 +1,897 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HealthCarte - Your premium healthcare marketplace. Shop medical devices, beauty products, hospital equipment, and wellness kits.">
+    <title>Presibo HealthCarte - Premium Healthcare Marketplace</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin: 1rem 0 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+            outline: none;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Categories */
+        .categories {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 2rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Products Grid */
+        .products-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .product-image {
+            position: relative;
+            overflow: hidden;
+            height: 250px;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--success);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-category {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            color: #1e293b;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            color: var(--secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: var(--secondary);
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background: var(--danger);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .add-to-cart-btn {
+  background-color: cornflowerblue;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  margin-top: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-to-cart-btn:hover {
+  background-color: #3b6dd8;
+  transform: scale(1.03);
+}
+
+.add-to-cart-btn:active {
+  background-color: #2f58b8;
+  transform: scale(0.98);
+}
+
+        .btn-primary {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn-primary:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-favorite {
+            background: #f1f5f9;
+            color: var(--secondary);
+            border: none;
+            padding: 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50px;
+        }
+
+        .btn-favorite:hover {
+            background: #fee2e2;
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 3rem 0;
+        }
+
+        .page-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn.active,
+        .page-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .products-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+            .category-filters { justify-content: flex-start; overflow-x: auto; }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            z-index: 3000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Presibo HealthCarte</div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">Products</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="#" class="nav-link">Contact</a>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Your Health, Our Priority</h1>
+            <p>Discover premium medical devices, beauty products, and wellness solutions</p>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search for medical products, devices, beauty items...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="category-filters">
+            <button class="filter-btn active" data-category="all">All Products</button>
+            <button class="filter-btn" data-category="medical">Medical Devices</button>
+            <button class="filter-btn" data-category="beauty">Beauty & Care</button>
+            <button class="filter-btn" data-category="hospital">Hospital Equipment</button>
+            <button class="filter-btn" data-category="wellness">Wellness Kits</button>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="products-container">
+        <div class="products-grid" id="productsGrid">
+            <!-- Products will be dynamically generated -->
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be dynamically generated -->
+        </div>
+    </section>
+
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Order</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="cartDetails"></div>
+            <form id="cartForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="buyerName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" id="buyerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" id="buyerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Delivery Address</label>
+                    <input type="text" class="form-input" id="buyerAddress" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    Proceed to Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    </body>
+    <script>
+        // Product Data
+        const products = [
+            // Medical Devices
+            { id: 1, name: "Smart Blood Pressure Monitor", price: 56000, originalPrice: 65000, category: "medical", image: "/assets/img/file_00000000eb2861f7a88b234c61fed5f0.png", description: "Advanced digital BP monitor with Bluetooth and W-fi connectivity", badge: "", link: "https://presibo.com/market/product-01.html" },
+            { id: 2, name: "Digital Glucometer Kit", price: 65000, originalPrice: 75000, category: "medical", image: "https://app.presibo.com/photos/glucometer.jpg", description: "Accurate blood glucose monitoring system with Bluetooth and Wi-fi connectivity", badge: "",  link: "https://presibo.com/market/product-02.html" },
+            { id: 3, name: "Smart Heart Rate Monitor", price: 42500, originalPrice: 50000, category: "medical", image: "https://app.presibo.com/photos/heart-monitor.jpg", description: "Continuous heart rate tracking device with Bluetooth and Wi-fi connectivity", link: "https://app.presibo.com/market/product-03.html" },
+            { id: 4, name: "Digital Weight Scale", price: 86000, originalPrice: 95000, category: "medical", image: "https://app.presibo.com/photos/weight-monitor.jpg", description: "Smart body composition analyzer with Bluetooth and Wi-ficonnectivity",  link: "https://presibo.com/market/product-04.html" },
+            { id: 5, name: "Digital Eye Monitor", price: 69900, originalPrice: 80000, category: "medical", image: "https://app.presibo.com/photos/eye-monitor.jpg", description: "Advanced eye health monitoring device",  link: "https://presibo.com/market/product-05.html" },
+            { id: 6, name: "Portable ECG Machine", price: 73880, originalPrice: 85000, category: "medical", image: "https://app.presibo.com/photos/ecg.jpg", description: "Professional-grade electrocardiogram device", link: "product-06.html" },
+            { id: 7, name: "Digital Thermometer", price: 25000, originalPrice: 30000, category: "medical", image: "https://servicerequestmarket.online/img/Presibo-Digital-Thermometer.png", description: "Infrared contactless thermometer", link: "https://presibo.com/market/product-07.html" },
+            { id: 8, name: "Pulse Oximeter", price: 35000, originalPrice: 40000, category: "medical", image: "https://servicerequestmarket.online/img/Presibo-Pulse Oximeter.png", description: "Fingertip oxygen saturation monitor", link: "product-08.html" },
+            
+            // Beauty & Care
+            { id: 9, name: "LED Light Therapy Mask", price: 145000, originalPrice: 180000, category: "beauty", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400", description: "Professional skincare LED treatment", badge: "Premium" },
+            { id: 10, name: "Ultrasonic Skin Scrubber", price: 35000, originalPrice: 45000, category: "beauty", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400", description: "Deep pore cleansing device" },
+            { id: 11, name: "Hair Growth Laser Cap", price: 125000, originalPrice: 150000, category: "beauty", image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400", description: "Low-level laser therapy for hair growth" },
+            { id: 12, name: "Facial Steamer", price: 28000, originalPrice: 35000, category: "beauty", image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400", description: "Professional facial steaming device" },
+            { id: 13, name: "Electric Nail File Set", price: 15000, originalPrice: 20000, category: "beauty", image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400", description: "Professional manicure tool kit" },
+            { id: 14, name: "Anti-Aging Microcurrent Device", price: 85000, originalPrice: 100000, category: "beauty", image: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400", description: "Facial toning and lifting device" },
+            { id: 15, name: "UV Sanitizer Box", price: 45000, originalPrice: 55000, category: "beauty", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400", description: "UV-C sterilization for beauty tools" },
+            { id: 16, name: "Aromatherapy Diffuser", price: 32000, originalPrice: 40000, category: "beauty", image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400", description: "Essential oil ultrasonic diffuser" },
+            
+            // Hospital Equipment
+            { id: 17, name: "Digital Stethoscope", price: 185000, originalPrice: 220000, category: "hospital", image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400", description: "Electronic stethoscope with recording", badge: "Professional" },
+            { id: 18, name: "Medical Grade Nebulizer", price: 95000, originalPrice: 110000, category: "hospital", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400", description: "Respiratory therapy device" },
+            { id: 19, name: "Automatic Sphygmomanometer", price: 125000, originalPrice: 145000, category: "hospital", image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400", description: "Professional blood pressure monitor" },
+            { id: 20, name: "Medical Ventilator", price: 850000, originalPrice: 950000, category: "hospital", image: "https://images.unsplash.com/photo-1584432810601-6c7f27d2362b?w=400", description: "Portable mechanical ventilator" },
+            { id: 21, name: "Defibrillator AED", price: 450000, originalPrice: 520000, category: "hospital", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400", description: "Automated external defibrillator" },
+            { id: 22, name: "Patient Monitor", price: 320000, originalPrice: 380000, category: "hospital", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400", description: "Multi-parameter patient monitoring" },
+            { id: 23, name: "Infusion Pump", price: 280000, originalPrice: 320000, category: "hospital", image: "https://images.unsplash.com/photo-1584432810599-112d169bb33f?w=400", description: "Programmable IV infusion pump" },
+            { id: 24, name: "Surgical Light", price: 650000, originalPrice: 750000, category: "hospital", image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400", description: "LED surgical examination light" },
+            
+            // Wellness Kits
+            { id: 25, name: "Complete Diabetes Care Kit", price: 85000, originalPrice: 100000, category: "wellness", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400", description: "Comprehensive diabetes management kit" },
+            { id: 26, name: "First Aid Emergency Kit", price: 45000, originalPrice: 55000, category: "wellness", image: "https://images.unsplash.com/photo-1584432810601-6c7f27d2362b?w=400", description: "Complete emergency medical kit" },
+            { id: 27, name: "Blood Pressure Monitoring Kit", price: 65000, originalPrice: 75000, category: "wellness", image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400", description: "Home BP monitoring solution" },
+            { id: 28, name: "Senior Care Health Kit", price: 125000, originalPrice: 150000, category: "wellness", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400", description: "Elderly health monitoring bundle" },
+            { id: 29, name: "Pregnancy Care Kit", price: 95000, originalPrice: 110000, category: "wellness", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400", description: "Prenatal and postnatal care kit" },
+            { id: 30, name: "Heart Health Monitoring Kit", price: 115000, originalPrice: 130000, category: "wellness", image: "https://images.unsplash.com/photo-1584432810599-112d169bb33f?w=400", description: "Cardiac wellness monitoring bundle" },
+            { id: 31, name: "Weight Management Kit", price: 75000, originalPrice: 90000, category: "wellness", image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400", description: "Complete weight tracking solution" },
+            { id: 32, name: "Respiratory Health Kit", price: 105000, originalPrice: 120000, category: "wellness", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400", description: "Respiratory wellness monitoring bundle" }
+            ]
+            
+            
+
+    const productsPerPage = 8;
+    let currentPage = 1;
+    let currentCategory = "all";
+    let cartItems = [];
+
+    const productsGrid = document.getElementById("productsGrid");
+    const pagination = document.getElementById("pagination");
+    const cartCount = document.getElementById("cartCount");
+    const cartModal = document.getElementById("cartModal");
+    const cartDetails = document.getElementById("cartDetails");
+    const notification = document.getElementById("notification");
+
+    // Render Products
+    function renderProducts() {
+        const filtered = currentCategory === "all"
+            ? products
+            : products.filter(p => p.category === currentCategory);
+
+        const start = (currentPage - 1) * productsPerPage;
+        const paginatedProducts = filtered.slice(start, start + productsPerPage);
+
+        productsGrid.innerHTML = paginatedProducts.map(product => `
+            <div class="product-card">
+              <a href = "${product.link}">  <img src="${product.image}" alt="${product.name}" class="product-image" />
+</a>
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <div class="product-price">
+                    ₦${product.price.toLocaleString()} 
+                    <span class="original-price">₦${product.originalPrice.toLocaleString()}</span>
+                </div>
+                ${product.badge ? `<span class="badge">${product.badge}</span>` : ''}
+                <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Order</button>
+            </div>
+        `).join('');
+
+        renderPagination(filtered.length);
+    }
+
+    // Render Pagination
+    function renderPagination(total) {
+        const totalPages = Math.ceil(total / productsPerPage);
+        pagination.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement("button");
+            btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => {
+                currentPage = i;
+                renderProducts();
+            };
+            pagination.appendChild(btn);
+        }
+    }
+
+    // Filter Buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelector('.filter-btn.active').classList.remove('active');
+            btn.classList.add('active');
+            currentCategory = btn.dataset.category;
+            currentPage = 1;
+            renderProducts();
+        });
+    });
+
+    // Add to Cart
+    function addToCart(id) {
+        const product = products.find(p => p.id === id);
+        cartItems.push(product);
+        cartCount.textContent = cartItems.length;
+        openModal();
+        updateCartDetails();
+    }
+
+    // Toggle Cart Modal
+    function toggleCart() {
+        cartModal.style.display = "block";
+        updateCartDetails();
+    }
+
+    function openModal() {
+        cartModal.style.display = "block";
+    }
+
+    function closeModal() {
+        cartModal.style.display = "none";
+    }
+
+    // Update Cart Details
+    function updateCartDetails() {
+        if (cartItems.length === 0) {
+            cartDetails.innerHTML = "<p>Your cart is empty.</p>";
+            return;
+        }
+
+        let total = 0;
+        cartDetails.innerHTML = cartItems.map(item => {
+            total += item.price;
+            return `
+                <div class="cart-item">
+                    <strong>${item.name}</strong> - ₦${item.price.toLocaleString()}
+                </div>
+            `;
+        }).join('');
+        cartDetails.innerHTML += `<hr><strong>Total: ₦${total.toLocaleString()}</strong>`;
+    }
+
+    // Cart Form Submission
+    document.getElementById("cartForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = document.getElementById("buyerName").value;
+        const email = document.getElementById("buyerEmail").value;
+        const phone = document.getElementById("buyerPhone").value;
+        const address = document.getElementById("buyerAddress").value;
+
+        if (!name || !email || !phone || !address) {
+            showNotification("Please fill all fields.", "error");
+            return;
+        }
+
+        // Simulate order process
+        showNotification("Order placed successfully! Thank you.", "success");
+        cartItems = [];
+        cartCount.textContent = 0;
+        closeModal();
+        document.getElementById("cartForm").reset();
+    });
+
+    // Notification System
+    function showNotification(message, type) {
+        notification.textContent = message;
+        notification.className = `notification show ${type}`;
+        setTimeout(() => {
+            notification.className = "notification";
+        }, 3000);
+    }
+
+    // Initialize
+    renderProducts();
+</script>
+</html>
