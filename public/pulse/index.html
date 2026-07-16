@@ -240,21 +240,24 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
             border: none;
             color: white;
             width: 80px;
             height: 80px;
             border-radius: 50%;
             font-size: 30px;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             backdrop-filter: blur(10px);
             opacity: 0;
             transition: opacity 0.3s ease;
-            z-index: 5;
+            z-index: 20;
+            pointer-events: none;
         }
 
-        .post:hover .play-pause-btn {
+        .play-pause-btn.show {
             opacity: 1;
         }
 
@@ -353,6 +356,8 @@
         let timelinePosts = [];
         let currentPostIndex = 0;
         let likedPosts = new Set();
+        let isMutedGlobal = true;
+        let playBtnTimeout = null;
 
         async function fetchFeed() {
             try {
@@ -382,11 +387,12 @@
                     const firstPost = document.querySelector('.post');
                     const firstVideo = firstPost?.querySelector('video');
                     if (firstVideo) {
+                        firstVideo.muted = isMutedGlobal;
                         firstVideo.play().catch(() => {
                             // Auto-play blocked
-                            const playBtn = firstPost.querySelector('.play-pause-btn');
-                            if (playBtn) playBtn.style.opacity = '1';
                         });
+                        const playBtn = firstPost.querySelector('.play-pause-btn');
+                        if (playBtn) playBtn.classList.remove('show');
                     }
                 }, 500);
             } catch (err) {
@@ -413,9 +419,10 @@
                     mediaElement = document.createElement('video');
                     mediaElement.src = post.url;
                     mediaElement.loop = true;
-                    mediaElement.muted = true;
+                    mediaElement.muted = isMutedGlobal;
                     mediaElement.autoplay = false;
                     mediaElement.playsInline = true;
+                    mediaElement.addEventListener('click', () => togglePlayPause(index));
                 } else {
                     mediaElement = document.createElement('img');
                     mediaElement.src = post.url;
@@ -446,6 +453,12 @@
                     </div>
 
                     <div class="post-actions">
+                        ${post.type === 'video' ? `
+                        <button class="action-btn mute-btn ${isMutedGlobal ? 'muted' : ''}" onclick="toggleMuteAll()">
+                            <div class="action-icon">${isMutedGlobal ? '🔇' : '🔊'}</div>
+                            <span class="action-count">${isMutedGlobal ? 'Muted' : 'Unmuted'}</span>
+                        </button>
+                        ` : ''}
                         <button class="action-btn like-btn" onclick="toggleLike(${post.id})">
                             <div class="action-icon">❤️</div>
                             <span class="action-count like-count">${post.likes}</span>
@@ -463,7 +476,7 @@
                         </button>
                     </div>
 
-                    ${post.type === 'video' ? '<button class="play-pause-btn" onclick="togglePlayPause(' + index + ')">▶️</button>' : ''}
+                    ${post.type === 'video' ? '<div class="play-pause-btn">▶</div>' : ''}
                 `;
 
                 // Insert media element
@@ -542,14 +555,43 @@
             const post = document.querySelector(`[data-index="${index}"]`);
             const video = post.querySelector('video');
             const playBtn = post.querySelector('.play-pause-btn');
+            if (!video || !playBtn) return;
+
+            if (playBtnTimeout) {
+                clearTimeout(playBtnTimeout);
+                playBtnTimeout = null;
+            }
             
             if (video.paused) {
-                video.play();
-                playBtn.innerHTML = '⏸️';
+                video.play().catch(() => {});
+                playBtn.classList.remove('show');
             } else {
                 video.pause();
-                playBtn.innerHTML = '▶️';
+                playBtn.classList.add('show');
+                playBtnTimeout = setTimeout(() => {
+                    playBtn.classList.remove('show');
+                }, 3000);
             }
+        }
+
+        function toggleMuteAll() {
+            isMutedGlobal = !isMutedGlobal;
+            document.querySelectorAll('video').forEach(video => {
+                video.muted = isMutedGlobal;
+            });
+            document.querySelectorAll('.mute-btn').forEach(btn => {
+                const icon = btn.querySelector('.action-icon');
+                const text = btn.querySelector('.action-count');
+                if (isMutedGlobal) {
+                    icon.innerHTML = '🔇';
+                    text.textContent = 'Muted';
+                    btn.classList.add('muted');
+                } else {
+                    icon.innerHTML = '🔊';
+                    text.textContent = 'Unmuted';
+                    btn.classList.remove('muted');
+                }
+            });
         }
 
         function showComments(postId) {
@@ -605,7 +647,7 @@
                 if (prevVideo) {
                     prevVideo.pause();
                     const prevPlayBtn = prevPost.querySelector('.play-pause-btn');
-                    if (prevPlayBtn) prevPlayBtn.innerHTML = '▶️';
+                    if (prevPlayBtn) prevPlayBtn.classList.remove('show');
                 }
                 
                 currentPostIndex = newCurrentIndex;
@@ -615,14 +657,11 @@
                 const currentPost = posts[currentPostIndex];
                 const currentVideo = currentPost?.querySelector('video');
                 if (currentVideo) {
+                    currentVideo.muted = isMutedGlobal;
                     setTimeout(() => {
-                        currentVideo.play().catch(() => {
-                            // Auto-play blocked, show play button
-                            const playBtn = currentPost.querySelector('.play-pause-btn');
-                            if (playBtn) playBtn.style.opacity = '1';
-                        });
+                        currentVideo.play().catch(() => {});
                         const playBtn = currentPost.querySelector('.play-pause-btn');
-                        if (playBtn) playBtn.innerHTML = '⏸️';
+                        if (playBtn) playBtn.classList.remove('show');
                     }, 100);
                 }
             }
