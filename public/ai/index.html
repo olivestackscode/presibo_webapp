@@ -709,8 +709,21 @@ async function callAI(message) {
 
     const data = await res.json();
     console.log("✅ AI API response:", data);
-    if (data.status === 'success' && typeof data.reply === 'string') {
-      return { ok: true, reply: data.reply };
+    
+    let replyText = '';
+    if (data.status === 'success') {
+      if (typeof data.reply === 'string') {
+        replyText = data.reply;
+      } else if (data.choices && data.choices[0] && data.choices[0].message && typeof data.choices[0].message.content === 'string') {
+        replyText = data.choices[0].message.content;
+      }
+    } else if (data.choices && data.choices[0] && data.choices[0].message && typeof data.choices[0].message.content === 'string') {
+      // Direct OpenRouter/OpenAI fallback mapping
+      replyText = data.choices[0].message.content;
+    }
+    
+    if (replyText) {
+      return { ok: true, reply: replyText };
     } else {
       throw new Error('Invalid AI response format');
     }
