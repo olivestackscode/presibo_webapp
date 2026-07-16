@@ -1,184 +1,706 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pulse Feed – Presibo</title>
-  <meta name="description" content="Explore Pulse workouts, fitness inspiration, and trainer-led sessions on Presibo." />
-  <meta property="og:title" content="Pulse Feed – Presibo" />
-  <meta property="og:description" content="Stay healthy with Pulse workouts. Swipe through fitness videos and connect with trainers." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://presibo.com/cover.jpg" />
-  <meta property="og:url" content="https://presibo.com/pulse" />
-  <meta name="twitter:card" content="summary_large_image" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Basic Meta -->
+<title>Presibo Pulse – Quick Health Reels by Experts | Presibo</title>
+<meta name="description" content="Explore Presibo Pulse – an endless scroll of short health videos by Nigerian doctors, fitness trainers, and nutritionists. Your daily dose of wellness in 60 seconds.">
+<meta name="keywords" content="Presibo Pulse, health reels, Nigerian doctors, fitness tips, nutrition videos, wellness short videos, healthcare Nigeria, medical reels, fitness Nigeria, health tech Africa">
+<meta name="author" content="Presibo">
 
-  <!-- Tailwind + Bootstrap -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Presibo Pulse – Quick health reels in 60 Seconds">
+<meta property="og:description" content="Bite-sized videos by real experts: from workouts to doctor tips. Discover Nigeria’s first health & wellness short video stream.">
+<meta property="og:image" content="https://presibo.com/assets/pulse-thumbnail.jpg">
+<meta property="og:url" content="https://presibo.com/pulse">
+<meta property="og:site_name" content="Presibo">
 
-  <!-- Swiper -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Presibo Pulse – Quick Health Reels by Experts">
+<meta name="twitter:description" content="An endless feed of expert health videos. 60 seconds to a better you – from trusted Nigerian doctors, nutritionists & trainers.">
+<meta name="twitter:image" content="https://presibo.com/assets/pulse-thumbnail.jpg">
+<meta name="twitter:creator" content="@PresiboLife">
 
-  <style>
-    body { font-family: "Inter", sans-serif; background: #fff; }
-    .pulse-card { max-width: 420px; margin: 0 auto; }
-    .loading-screen { display:flex; align-items:center; justify-content:center; height:100vh; }
-    .dropdown-menu.show { display:block; }
-    .swiper { height:100vh; }
-    .pulse-video { width:100%; height:auto; border-radius:12px; }
-  </style>
+<!-- Mobile/App Specific -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#3366cc"> <!-- Cornflower blue -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #000;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .timeline-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .timeline-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .post {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: start;
+            background: #000;
+        }
+
+        .post-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                transparent 0%, 
+                transparent 60%, 
+                rgba(0,0,0,0.3) 80%, 
+                rgba(0,0,0,0.7) 100%
+            );
+            pointer-events: none;
+        }
+
+        .post-content {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            right: 80px;
+            color: white;
+            z-index: 10;
+        }
+
+        .trainer-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .trainer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        .trainer-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .trainer-details p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .post-description {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .post-hashtags {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .post-hashtags span {
+            color: #25d366;
+            margin-right: 8px;
+        }
+
+        .post-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-count {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .liked .action-icon {
+            background: rgba(255,75,75,0.8);
+            color: white;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(rgba(0,0,0,0.5), transparent);
+        }
+
+        .nav-back {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-title {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .nav-menu {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .play-pause-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+
+        .post:hover .play-pause-btn {
+            opacity: 1;
+        }
+
+        .progress-indicator {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: white;
+            width: 12px;
+            height: 12px;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .post-content {
+                bottom: 60px;
+                right: 70px;
+            }
+
+            .post-actions {
+                bottom: 80px;
+                right: 10px;
+                gap: 20px;
+            }
+
+            .action-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+        }
+
+        /* Smooth transitions for media loading */
+        .post-media {
+            transition: opacity 0.3s ease;
+        }
+
+        .post-media.loading {
+            opacity: 0.7;
+        }
+        
+        a {
+        	color: white;
+        	text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="sticky-top bg-white shadow-sm border-b">
-    <div class="container-fluid d-flex justify-content-between align-items-center py-2">
-      <div class="flex items-center">
-        <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="h-8 w-auto me-2">
-        <span class="fw-bold text-lg">Presibo Pulse</span>
-      </div>
-      <div class="flex items-center space-x-3">
-        <!-- Notifications -->
-        <button id="notificationBtn" class="btn btn-link text-dark">
-          <i class="bi bi-bell"></i>
-        </button>
-        <div id="notificationDropdown" class="dropdown-menu dropdown-menu-end p-2">
-          <span class="dropdown-item-text">No new notifications</span>
-        </div>
-        <!-- Profile -->
-        <div class="dropdown">
-          <button class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
-            <img src="https://via.placeholder.com/30" class="rounded-circle" alt="Profile">
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Logout</a></li>
-          </ul>
-        </div>
-      </div>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <button class="nav-back" onclick="goBack()">←</button>
+        <div class="nav-title">Presibo</div>
+        <button class="nav-menu" onclick="showMenu()">⋮</button>
     </div>
-  </header>
 
-  <!-- Loading -->
-  <div id="loadingScreen" class="loading-screen">
-    <div class="text-center">
-      <div class="spinner-border text-primary mb-3"></div>
-      <p>Loading Pulse feed...</p>
+    <!-- Progress Indicator -->
+    <div class="progress-indicator" id="progressIndicator">
+        <!-- Progress dots will be added by JavaScript -->
     </div>
-  </div>
 
-  <!-- Feed -->
-  <div id="pulseFeed" class="hidden">
-    <div class="swiper">
-      <div class="swiper-wrapper" id="swiperWrapper"></div>
+    <!-- Timeline Container -->
+    <div class="timeline-container" id="timelineContainer">
+        <!-- Posts will be populated by JavaScript -->
     </div>
-  </div>
 
-  <!-- Swiper + Bootstrap -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let timelinePosts = [];
+        let currentPostIndex = 0;
+        let likedPosts = new Set();
 
-  <script>
-    let endlessPosts = [];
-    let uiState = { liked: new Set() };
-    let swiper;
+        async function fetchFeed() {
+            try {
+                const res = await fetch("https://presibo-wl.vercel.app/pulse.json");
+                const data = await res.json();
+                timelinePosts = data.posts || [];
+                
+                // Sanitization of URLs and missing fields
+                timelinePosts.forEach(post => {
+                    if (post.url && post.url.includes("presibo-wl.vercel.app//")) {
+                        post.url = post.url.replace("presibo-wl.vercel.app//", "presibo-wl.vercel.app/");
+                    }
+                    if (post.trainer) {
+                        if (!post.trainer.avatar || post.trainer.avatar.length < 30) {
+                            post.trainer.avatar = `https://presibo-wl.vercel.app/photos/${post.trainer.id || 100}/avatar.jpg`;
+                        }
+                        if (post.trainer.name) {
+                            post.trainer.name = post.trainer.name.trim();
+                        }
+                    }
+                });
 
-    // Rearrange posts (shuffle groups of 3)
-    function rearrangePosts(posts) {
-      const arr = [...posts];
-      const groups = [];
-      for (let i = 0; i < arr.length; i += 3) {
-        groups.push(arr.slice(i, i + 3));
-      }
-      for (let i = groups.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [groups[i], groups[j]] = [groups[j], groups[i]];
-      }
-      return groups.flat();
-    }
+                createTimeline();
+                
+                // Auto-play first video if it exists
+                setTimeout(() => {
+                    const firstPost = document.querySelector('.post');
+                    const firstVideo = firstPost?.querySelector('video');
+                    if (firstVideo) {
+                        firstVideo.play().catch(() => {
+                            // Auto-play blocked
+                            const playBtn = firstPost.querySelector('.play-pause-btn');
+                            if (playBtn) playBtn.style.opacity = '1';
+                        });
+                    }
+                }, 500);
+            } catch (err) {
+                console.error("Failed to load pulse feed", err);
+            }
+        }
 
-    function createEndlessScroll(posts) {
-      return Array(10).fill().flatMap(() => rearrangePosts(posts));
-    }
+        function createTimeline() {
+            const container = document.getElementById('timelineContainer');
+            const progressIndicator = document.getElementById('progressIndicator');
+            
+            container.innerHTML = '';
+            progressIndicator.innerHTML = '';
 
-    function renderSlides() {
-      const wrapper = document.getElementById("swiperWrapper");
-      wrapper.innerHTML = "";
-      endlessPosts.forEach(post => {
-        const slide = document.createElement("div");
-        slide.className = "swiper-slide flex items-center justify-center";
+            timelinePosts.forEach((post, index) => {
+                // Create post element
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.setAttribute('data-index', index);
 
-        const liked = uiState.liked.has(post.id);
+                // Create media element
+                let mediaElement;
+                if (post.type === 'video') {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = post.url;
+                    mediaElement.loop = true;
+                    mediaElement.muted = true;
+                    mediaElement.autoplay = false;
+                    mediaElement.playsInline = true;
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = post.url;
+                    mediaElement.alt = post.title;
+                }
+                
+                mediaElement.className = 'post-media loading';
+                mediaElement.onload = () => mediaElement.classList.remove('loading');
 
-        slide.innerHTML = `
-          <div class="pulse-card p-4">
-            <div class="flex items-center mb-3">
-              <img src="${post.avatar}" alt="${post.trainer}" class="rounded-circle w-10 h-10 me-2">
-              <strong>${post.trainer}</strong>
-            </div>
-            <video class="pulse-video" src="${post.videoUrl}" loop muted playsinline></video>
-            <p class="mt-2">${post.content}</p>
-            <div class="flex space-x-3 mt-2">
-              <button class="like-btn text-sm" onclick="toggleLike(${post.id})">
-                ${liked ? "❤️" : "🤍"} ${post.likes + (liked ? 1 : 0)}
-              </button>
-            </div>
-            <div class="mt-1 text-muted">
-              ${(post.hashtags || []).join(" ")}
-            </div>
-          </div>
-        `;
-        wrapper.appendChild(slide);
-      });
-    }
+                // Create post HTML
+                postElement.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div class="post-overlay"></div>
+                    <div class="post-time">${post.time}</div>
+                    
+                    <div class="post-content">
+                        <div class="trainer-info">
+                            <a href="https://app.presibo.com/trainers/profile?id=${post.trainer.id}"><img src="${post.trainer.avatar}" alt="${post.trainer.name}" class="trainer-avatar"></a>
+                            <div class="trainer-details">
+                                <a href="https://app.presibo.com/trainers/profile?id=${post.trainer.id}"><h3>${post.trainer.name}</h3></a>
+                               <a href="https://app.presibo.com/trainers/profile?id=${post.trainer.id}"> <p>${post.trainer.username}</p></a>
+                            </div>
+                        </div>
+                        <div class="post-description">${post.description}</div>
+                        <div class="post-hashtags">
+                            ${post.hashtags.map(tag => `<span>${tag}</span>`).join('')}
+                        </div>
+                    </div>
 
-    function toggleLike(postId) {
-      if (uiState.liked.has(postId)) {
-        uiState.liked.delete(postId);
-      } else {
-        uiState.liked.add(postId);
-      }
-      renderSlides();
-      swiper.update();
-    }
+                    <div class="post-actions">
+                        <button class="action-btn like-btn" onclick="toggleLike(${post.id})">
+                            <div class="action-icon">❤️</div>
+                            <span class="action-count like-count">${post.likes}</span>
+                        </button>
+                        <button class="action-btn comment-btn" onclick="showComments(${post.id})">
+                            <div class="action-icon">💬</div>
+                            <span class="action-count">${post.comments}</span>
+                        </button>
+                        <button class="action-btn share-btn" onclick="sharePost(${post.id})">
+                            <div class="action-icon">📤</div>
+                            <span class="action-count">${post.shares}</span>
+                        </button>
+                        <button class="action-btn profile-btn" onclick="viewProf('${post.trainer.id}')">
+                           <a href="https://app.presibo.com/trainers/profile?id=${post.trainer.id}"><img src="${post.trainer.avatar}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></a>
+                        </button>
+                    </div>
 
-    function handleVideoPlayback(swiper) {
-      document.querySelectorAll('.pulse-video').forEach(v => v.pause());
-      const active = swiper.slides[swiper.activeIndex];
-      const vid = active?.querySelector(".pulse-video");
-      if (vid) vid.play();
-    }
+                    ${post.type === 'video' ? '<button class="play-pause-btn" onclick="togglePlayPause(' + index + ')">▶️</button>' : ''}
+                `;
 
-    async function loadFeed() {
-      try {
-        const res = await fetch("https://presibo-wl.vercel.app/pulse.json");
-        const posts = await res.json();
+                // Insert media element
+                postElement.insertBefore(mediaElement, postElement.firstChild);
+                container.appendChild(postElement);
 
-        endlessPosts = createEndlessScroll(posts);
-        renderSlides();
+                // Create progress dot
+                const progressDot = document.createElement('div');
+                progressDot.className = 'progress-dot';
+                if (index === 0) progressDot.classList.add('active');
+                progressIndicator.appendChild(progressDot);
+            });
 
-        document.getElementById("loadingScreen").classList.add("hidden");
-        document.getElementById("pulseFeed").classList.remove("hidden");
+            // Hide loading spinner when media loads
+            setTimeout(() => {
+                document.querySelectorAll('.loading-spinner').forEach(spinner => {
+                    spinner.style.display = 'none';
+                });
+            }, 1000);
+        }
 
-        swiper = new Swiper(".swiper", {
-          direction: "vertical",
-          loop: true,
-          on: { slideChange: () => handleVideoPlayback(swiper) }
+        function updateProgressIndicator() {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentPostIndex);
+            });
+        }
+
+        function toggleLike(postId) {
+            const likeBtn = event.target.closest('.like-btn');
+            const likeCount = likeBtn.querySelector('.like-count');
+            const post = timelinePosts.find(p => p.id === postId);
+            
+            if (likedPosts.has(postId)) {
+                likedPosts.delete(postId);
+                likeBtn.classList.remove('liked');
+                post.likes--;
+            } else {
+                likedPosts.add(postId);
+                likeBtn.classList.add('liked');
+                post.likes++;
+                
+                // Add heart animation
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.style.cssText = `
+                    position: absolute;
+                    font-size: 60px;
+                    pointer-events: none;
+                    z-index: 1000;
+                    animation: heartFloat 1s ease-out forwards;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                `;
+                
+                // Add heart float animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes heartFloat {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                        50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+                        100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                likeBtn.closest('.post').appendChild(heart);
+                setTimeout(() => heart.remove(), 1000);
+            }
+            
+            likeCount.textContent = post.likes;
+        }
+
+        function togglePlayPause(index) {
+            const post = document.querySelector(`[data-index="${index}"]`);
+            const video = post.querySelector('video');
+            const playBtn = post.querySelector('.play-pause-btn');
+            
+            if (video.paused) {
+                video.play();
+                playBtn.innerHTML = '⏸️';
+            } else {
+                video.pause();
+                playBtn.innerHTML = '▶️';
+            }
+        }
+
+        function showComments(postId) {
+            alert('Comments feature coming soon!');
+        }
+
+        function sharePost(postId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this fitness tip!',
+                    text: 'Amazing workout content from our trainer',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                alert('Share feature coming soon!');
+            }
+        }
+
+        function viewProf(id) {
+            window.location.href = `https://app.presibo.com/trainers/profile?id=${id}`;
+        }
+
+        // Handle back navigation safely
+        function goBack() {
+            // Check if there is history to go back to, else go to dashboard
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/dashboard';
+            }
+        }
+
+        function showMenu() {
+            alert('Menu options coming soon!');
+        }
+
+        // Handle scroll events
+        function handleScroll() {
+            const container = document.getElementById('timelineContainer');
+            const posts = document.querySelectorAll('.post');
+            const scrollTop = container.scrollTop;
+            const windowHeight = window.innerHeight;
+            
+            // Determine current post
+            let newCurrentIndex = Math.round(scrollTop / windowHeight);
+            newCurrentIndex = Math.max(0, Math.min(newCurrentIndex, posts.length - 1));
+            
+            if (newCurrentIndex !== currentPostIndex) {
+                // Pause previous video
+                const prevPost = posts[currentPostIndex];
+                const prevVideo = prevPost?.querySelector('video');
+                if (prevVideo) {
+                    prevVideo.pause();
+                    const prevPlayBtn = prevPost.querySelector('.play-pause-btn');
+                    if (prevPlayBtn) prevPlayBtn.innerHTML = '▶️';
+                }
+                
+                currentPostIndex = newCurrentIndex;
+                updateProgressIndicator();
+                
+                // Auto-play current video
+                const currentPost = posts[currentPostIndex];
+                const currentVideo = currentPost?.querySelector('video');
+                if (currentVideo) {
+                    setTimeout(() => {
+                        currentVideo.play().catch(() => {
+                            // Auto-play blocked, show play button
+                            const playBtn = currentPost.querySelector('.play-pause-btn');
+                            if (playBtn) playBtn.style.opacity = '1';
+                        });
+                        const playBtn = currentPost.querySelector('.play-pause-btn');
+                        if (playBtn) playBtn.innerHTML = '⏸️';
+                    }, 100);
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchFeed();
+            
+            const container = document.getElementById('timelineContainer');
+            let ticking = false;
+            
+            container.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        handleScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
         });
 
-        handleVideoPlayback(swiper);
-      } catch (err) {
-        console.error("Failed to load feed:", err);
-      }
-    }
+        // Handle keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const container = document.getElementById('timelineContainer');
+            const windowHeight = window.innerHeight;
+            
+            if (e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                container.scrollTo({
+                    top: (currentPostIndex + 1) * windowHeight,
+                    behavior: 'smooth'
+                });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                container.scrollTo({
+                    top: (currentPostIndex - 1) * windowHeight,
+                    behavior: 'smooth'
+                });
+            }
+        });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      loadFeed();
+        // Handle touch gestures for better mobile experience
+        let startY = 0;
+        let startTime = 0;
 
-      document.getElementById("notificationBtn").addEventListener("click", () => {
-        document.getElementById("notificationDropdown").classList.toggle("show");
-      });
-    });
-  </script>
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            startTime = Date.now();
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const endY = e.changedTouches[0].clientY;
+            const endTime = Date.now();
+            const deltaY = startY - endY;
+            const deltaTime = endTime - startTime;
+            
+            // Only handle quick swipes
+            if (deltaTime < 300 && Math.abs(deltaY) > 50) {
+                const container = document.getElementById('timelineContainer');
+                const windowHeight = window.innerHeight;
+                
+                if (deltaY > 0 && currentPostIndex < timelinePosts.length - 1) {
+                    // Swipe up - next post
+                    container.scrollTo({
+                        top: (currentPostIndex + 1) * windowHeight,
+                        behavior: 'smooth'
+                    });
+                } else if (deltaY < 0 && currentPostIndex > 0) {
+                    // Swipe down - previous post
+                    container.scrollTo({
+                        top: (currentPostIndex - 1) * windowHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
