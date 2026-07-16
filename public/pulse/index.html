@@ -362,6 +362,7 @@
 
     <script>
         let timelinePosts = [];
+        let originalTimelinePosts = [];
         let currentPostIndex = 0;
         let likedPosts = new Set();
         let isMutedGlobal = true;
@@ -388,6 +389,7 @@
                     }
                 });
 
+                originalTimelinePosts = JSON.parse(JSON.stringify(timelinePosts));
                 createTimeline();
                 
                 // Auto-play first video if it exists
@@ -506,6 +508,98 @@
             }, 1000);
         }
 
+        function appendRandomPosts(count = 5) {
+            if (!originalTimelinePosts || originalTimelinePosts.length === 0) return;
+            
+            const container = document.getElementById('timelineContainer');
+            const progressIndicator = document.getElementById('progressIndicator');
+            
+            for (let i = 0; i < count; i++) {
+                const randIndex = Math.floor(Math.random() * originalTimelinePosts.length);
+                const originalPost = originalTimelinePosts[randIndex];
+                
+                const newIndex = timelinePosts.length;
+                const newPost = JSON.parse(JSON.stringify(originalPost));
+                newPost.id = "rand_" + Date.now() + "_" + newIndex + "_" + Math.floor(Math.random() * 1000);
+                timelinePosts.push(newPost);
+                
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.setAttribute('data-index', newIndex);
+
+                let mediaElement;
+                if (newPost.type === 'video') {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = newPost.url;
+                    mediaElement.loop = true;
+                    mediaElement.muted = isMutedGlobal;
+                    mediaElement.autoplay = false;
+                    mediaElement.playsInline = true;
+                    mediaElement.addEventListener('click', () => togglePlayPause(newIndex));
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = newPost.url;
+                    mediaElement.alt = newPost.title;
+                }
+                
+                mediaElement.className = 'post-media loading';
+                mediaElement.onload = () => mediaElement.classList.remove('loading');
+
+                postElement.innerHTML = `
+                    <div class="loading-spinner" style="display: none;"></div>
+                    <div class="post-overlay"></div>
+                    <div class="post-time">${newPost.time}</div>
+                    
+                    <div class="post-content">
+                        <div class="trainer-info">
+                            <a href="https://app.presibo.com/trainers/profile?id=${newPost.trainer.id}"><img src="${newPost.trainer.avatar}" alt="${newPost.trainer.name}" class="trainer-avatar"></a>
+                            <div class="trainer-details">
+                                <a href="https://app.presibo.com/trainers/profile?id=${newPost.trainer.id}"><h3>${newPost.trainer.name}</h3></a>
+                               <a href="https://app.presibo.com/trainers/profile?id=${newPost.trainer.id}"> <p>${newPost.trainer.username}</p></a>
+                            </div>
+                        </div>
+                        <div class="post-description">${newPost.description}</div>
+                        <div class="post-hashtags">
+                            ${newPost.hashtags.map(tag => `<span>${tag}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="post-actions">
+                        ${newPost.type === 'video' ? `
+                        <button class="action-btn mute-btn ${isMutedGlobal ? 'muted' : ''}" onclick="toggleMuteAll()">
+                            <div class="action-icon"><i class="fas ${isMutedGlobal ? 'fa-volume-mute' : 'fa-volume-up'} text-white"></i></div>
+                            <span class="action-count text-[10px]">${isMutedGlobal ? 'Muted' : 'Unmuted'}</span>
+                        </button>
+                        ` : ''}
+                        <button class="action-btn like-btn" onclick="toggleLike('${newPost.id}')">
+                            <div class="action-icon">❤️</div>
+                            <span class="action-count like-count">${newPost.likes}</span>
+                        </button>
+                        <button class="action-btn comment-btn" onclick="showComments('${newPost.id}')">
+                            <div class="action-icon">💬</div>
+                            <span class="action-count">${newPost.comments}</span>
+                        </button>
+                        <button class="action-btn share-btn" onclick="sharePost('${newPost.id}')">
+                            <div class="action-icon">📤</div>
+                            <span class="action-count">${newPost.shares}</span>
+                        </button>
+                        <button class="action-btn profile-btn" onclick="viewProf('${newPost.trainer.id}')">
+                           <a href="https://app.presibo.com/trainers/profile?id=${newPost.trainer.id}"><img src="${newPost.trainer.avatar}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></a>
+                        </button>
+                    </div>
+
+                    ${newPost.type === 'video' ? '<div class="play-pause-btn"><i class="fas fa-play text-2xl text-white opacity-80"></i></div>' : ''}
+                `;
+
+                postElement.insertBefore(mediaElement, postElement.firstChild);
+                container.appendChild(postElement);
+
+                const progressDot = document.createElement('div');
+                progressDot.className = 'progress-dot';
+                progressIndicator.appendChild(progressDot);
+            }
+        }
+
         function updateProgressIndicator() {
             const dots = document.querySelectorAll('.progress-dot');
             dots.forEach((dot, index) => {
@@ -516,14 +610,14 @@
         function toggleLike(postId) {
             const likeBtn = event.target.closest('.like-btn');
             const likeCount = likeBtn.querySelector('.like-count');
-            const post = timelinePosts.find(p => p.id === postId);
+            const post = timelinePosts.find(p => String(p.id) === String(postId));
             
-            if (likedPosts.has(postId)) {
-                likedPosts.delete(postId);
+            if (likedPosts.has(String(postId))) {
+                likedPosts.delete(String(postId));
                 likeBtn.classList.remove('liked');
                 post.likes--;
             } else {
-                likedPosts.add(postId);
+                likedPosts.add(String(postId));
                 likeBtn.classList.add('liked');
                 post.likes++;
                 
@@ -667,6 +761,11 @@
                 
                 currentPostIndex = newCurrentIndex;
                 updateProgressIndicator();
+
+                // If approaching the end of current posts, append more at random
+                if (newCurrentIndex >= timelinePosts.length - 2) {
+                    appendRandomPosts(5);
+                }
                 
                 // Auto-play current video
                 const currentPost = posts[currentPostIndex];
