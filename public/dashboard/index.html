@@ -243,7 +243,7 @@
             <button id="profile-btn" class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
               <i class="fas fa-user-circle text-2xl"></i>
             </button>
-            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] hidden" id="profile-dropdown">
+            <div class="absolute top-10 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] z-50 hidden" id="profile-dropdown">
               <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
               <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
               <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
@@ -1285,8 +1285,25 @@
 
     // Initialize
     async function init() {
-      loadingDiv.classList.remove('hidden');
-      dashboardDiv.classList.add('hidden');
+      // 1. Load cached session info to show dashboard instantly
+      let cachedUser = {};
+      try {
+        const sessionStr = localStorage.getItem('user_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          cachedUser = {
+            FirstName: session.first_name || session.firstname || session.name || 'User',
+            wallet: parseInt(localStorage.getItem('cached_wallet_balance') || '0'),
+            email: session.email
+          };
+        }
+      } catch (e) {}
+
+      // Render dashboard with cached values first
+      renderDashboard(cachedUser);
+      renderMealTracking();
+      renderFoodRecommendations();
+      renderRotationFoods();
 
       // Load notification history
       try {
@@ -1295,13 +1312,6 @@
           notifications = JSON.parse(storedNotifs);
         }
       } catch(e) {}
-
-      // Fetch user data for first_name and session validation
-      const userData = await fetchUserData();
-      renderDashboard(userData || {});
-      renderMealTracking();
-      renderFoodRecommendations();
-      renderRotationFoods();
       renderNotifications();
       updateNotificationCount();
 
@@ -1313,6 +1323,16 @@
 
       // Set up background vital notification check every 30 minutes
       setInterval(run30MinuteVitalsCheck, 1800000);
+
+      // 2. Fetch updated user data from database in background
+      try {
+        const userData = await fetchUserData();
+        if (userData) {
+          renderDashboard(userData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch fresh user data in background:", err);
+      }
     }
 
     // Synchronous Event Listeners (Moved outside init for resilience)

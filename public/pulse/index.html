@@ -240,7 +240,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.5);
+            background: rgba(128,128,128,0.4);
             border: none;
             color: white;
             width: 80px;
@@ -476,7 +476,7 @@
                         </button>
                     </div>
 
-                    ${post.type === 'video' ? '<div class="play-pause-btn">▶</div>' : ''}
+                    ${post.type === 'video' ? '<div class="play-pause-btn"><i class="fas fa-play text-2xl text-white opacity-80"></i></div>' : ''}
                 `;
 
                 // Insert media element

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trainer Profile - Presibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.paystack.co/v1/inline.js" async></script>
+  <script src="/assets/js/config.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'trust-blue': '#3B82F6',
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <style>
+    .menu-link { color: black; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+    .menu-link:hover { color: #008753; }
+    .menu-link.active { background: #008753; color: white; }
+    .text-purple { color: #300b5b; }
+    .reel-thumb { position: relative; overflow: hidden; border-radius: 0.75rem; aspect-ratio: 9/16; cursor: pointer; }
+    .reel-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+    .reel-thumb:hover img { transform: scale(1.05); }
+    .reel-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; }
+    .reel-thumb:hover .reel-overlay { opacity: 1; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans pt-20">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+          <span class="font-bold text-purple">Presibo</span>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-6 mx-auto">
+          <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+          <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+          <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+          <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+          <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+          <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+          <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+          <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
+        </nav>
+
+        <div class="relative">
+          <button id="profile-btn" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+            <i class="fas fa-user-circle text-2xl"></i>
+          </button>
+          <div id="profile-dropdown" class="absolute top-12 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] z-50 hidden">
+            <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+            <a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-6xl mx-auto p-6 grid md:grid-cols-3 gap-8">
+    
+    <!-- Left Column: Trainer Details & Booking -->
+    <div class="md:col-span-1 space-y-6">
+      <!-- Trainer Card -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
+        <img id="trainer-avatar" class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-naija-green mb-4" src="" alt="Trainer">
+        <h2 id="trainer-name" class="text-xl font-bold text-gray-800">Loading...</h2>
+        <p id="trainer-specialty" class="text-sm font-semibold text-naija-green mt-1">...</p>
+        <p id="trainer-experience" class="text-xs text-gray-500 mt-0.5">...</p>
+        <p id="trainer-bio" class="text-xs text-gray-600 mt-4 leading-relaxed text-left border-t pt-4">...</p>
+      </div>
+
+      <!-- Booking Form Card -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h3 class="font-bold text-gray-800 text-base mb-4 flex items-center gap-2">
+          <i class="fas fa-calendar-alt text-naija-green"></i> Book Consultation
+        </h3>
+        <div class="text-xs text-gray-500 mb-3">Cost per session: <strong class="text-gray-800">100 credits</strong></div>
+        
+        <form id="booking-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Date</label>
+            <input type="date" id="booking-date" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-naija-green" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Time</label>
+            <input type="time" id="booking-time" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-naija-green" required />
+          </div>
+          <button type="submit" class="w-full bg-naija-green text-white font-bold py-3 rounded-xl text-sm hover:bg-naija-green/90 transition-colors shadow-sm mt-2">
+            Confirm & Book Now
+          </button>
+        </form>
+
+        <!-- Topup container (hidden initially) -->
+        <div id="topup-container" class="hidden mt-4 pt-4 border-t border-gray-100">
+          <div class="text-xs font-bold text-red-500 mb-2">Insufficient balance! Top up to book:</div>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <button class="topup-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2 text-xs font-semibold" data-amount="500">₦500</button>
+            <button class="topup-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2 text-xs font-semibold" data-amount="1000">₦1,000</button>
+            <button class="topup-btn bg-gray-50 hover:bg-green-50 text-gray-800 hover:text-naija-green border border-gray-200 hover:border-naija-green rounded-lg py-2 text-xs font-semibold" data-amount="5000">₦5,000</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Reel Thumbnails -->
+    <div class="md:col-span-2 space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+          <i class="fas fa-play-circle text-naija-green"></i> Trainer's Pulse Reels
+        </h3>
+        
+        <!-- Reels Grid -->
+        <div id="reels-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <!-- Loaded dynamically -->
+          <div class="col-span-full text-center text-xs text-gray-400 py-8">No reels posted by this trainer yet.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Popup Notification Modal -->
+  <div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-96 text-center relative max-w-[90%] border border-gray-100">
+      <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold text-gray-400 hover:text-gray-600">&times;</span>
+      <h2 id="popupTitle" class="text-lg font-bold mb-2"></h2>
+      <p id="popupMessage" class="text-sm text-gray-600 mb-4"></p>
+      <button id="popupBtn" class="bg-naija-green text-white px-6 py-2.5 rounded-lg hover:bg-naija-green/90 font-bold w-full">OK</button>
+    </div>
+  </div>
+
+  <script>
+    // Session retrieval
+    let email = '';
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        email = session.email;
+      }
+    } catch (e) {}
+
+    if (!email) {
+      email = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+    }
+    if (!email) {
+      window.location.href = '/';
+    }
+
+    // Get Trainer ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const trainerId = urlParams.get('id') || '100';
+
+    let selectedTrainer = null;
+
+    async function loadProfile() {
+      // 1. Fetch Trainer Details
+      try {
+        const res = await fetch("https://presibo-wl.vercel.app/trainers.json");
+        const data = await res.json();
+        const trainerData = data.users.find(t => String(t.id) === trainerId);
+        
+        if (trainerData) {
+          selectedTrainer = {
+            id: String(trainerData.id),
+            name: `${trainerData.firstname} ${trainerData.lastname}`,
+            specialization: trainerData.specialization || "Fitness Trainer",
+            experience: `${trainerData.years || 2} years`,
+            bio: `Specialist trainer operating in ${trainerData.location || 'Lekki, Lagos'}. Active cases: ${trainerData.cases || '0'}. Distance: ${trainerData.distance || 'nearby'}.`,
+            image: `https://presibo-wl.vercel.app/photos/${trainerData.id}/avatar.jpg`
+          };
+        }
+      } catch (e) {
+        console.error("Failed to load trainer from API, falling back:", e);
+      }
+
+      // Fallback details if not found
+      if (!selectedTrainer) {
+        const fallbacks = [
+          { id: '100', name: 'Precious Edwin', specialization: 'Fitness Trainer', experience: '2 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 3. Distance: 13 km.', image: 'https://presibo-wl.vercel.app/photos/100/avatar.jpg' },
+          { id: '102', name: 'Ebiweni Zikenah', specialization: 'Fitness Trainer', experience: '2 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 8. Distance: 8 km.', image: 'https://presibo-wl.vercel.app/photos/102/avatar.jpg' },
+          { id: '103', name: 'Naomi Anyiema', specialization: 'Fitness Trainer', experience: '1 years', bio: 'Specialist trainer operating in Lekki, Lagos. Active cases: 4. Distance: 7 km.', image: 'https://presibo-wl.vercel.app/photos/103/avatar.jpg' },
+          { id: '104', name: 'Matthew King', specialization: 'Fitness Trainer', experience: '3 years', bio: 'Specialist trainer operating in GRA, Enugu. Active cases: 3. Distance: 9 km.', image: 'https://presibo-wl.vercel.app/photos/104/avatar.jpg' }
+        ];
+        selectedTrainer = fallbacks.find(t => t.id === trainerId) || fallbacks[0];
+      }
+
+      // Render Trainer details
+      document.getElementById('trainer-avatar').src = selectedTrainer.image;
+      document.getElementById('trainer-name').textContent = selectedTrainer.name;
+      document.getElementById('trainer-specialty').textContent = selectedTrainer.specialization;
+      document.getElementById('trainer-experience').textContent = `${selectedTrainer.experience} experience`;
+      document.getElementById('trainer-bio').textContent = selectedTrainer.bio;
+
+      // 2. Fetch Trainer's Reels
+      try {
+        const res = await fetch("https://presibo-wl.vercel.app/pulse.json");
+        const data = await res.json();
+        const reels = (data.posts || []).filter(post => String(post.trainer.id) === trainerId);
+        
+        const grid = document.getElementById('reels-grid');
+        if (reels.length > 0) {
+          grid.innerHTML = reels.map(r => `
+            <div class="reel-thumb" onclick="window.location.href='/pulse'">
+              <img src="${r.thumbnail || r.url}" alt="${r.title}">
+              <div class="reel-overlay">
+                <i class="fas fa-play text-white text-2xl"></i>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error("Failed to load trainer reels:", err);
+      }
+    }
+
+    // Booking Submission logic
+    document.getElementById('booking-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = document.getElementById('booking-date').value;
+      const time = document.getElementById('booking-time').value;
+
+      let currentBalance = parseInt(localStorage.getItem('cached_wallet_balance') || '0');
+      if (currentBalance < 100) {
+        document.getElementById('topup-container').classList.remove('hidden');
+        showPopup("Insufficient Balance", "Consultation requires 100 credits. Please select a top-up option below.");
+        return;
+      }
+
+      currentBalance -= 100;
+      localStorage.setItem('cached_wallet_balance', currentBalance);
+
+      // Save consultation to local meetings history
+      const meetingsKey = `consultations_${email}`;
+      let consultations = JSON.parse(localStorage.getItem(meetingsKey) || '[]');
+      consultations.push({
+        id: Date.now(),
+        doctorId: selectedTrainer.id,
+        doctorName: selectedTrainer.name,
+        specialty: selectedTrainer.specialization,
+        date: date,
+        time: time,
+        status: 'Scheduled',
+        cost: 100,
+        roomUrl: `https://meet.jit.si/presibo-consultation-${selectedTrainer.id}-${Date.now()}`
+      });
+      localStorage.setItem(meetingsKey, JSON.stringify(consultations));
+
+      showPopup("Booking Successful", `Consultation booked with ${selectedTrainer.name} on ${date} at ${time}. Confirmation email dispatched.`);
+    });
+
+    // Paystack Topup Handler
+    function handleTopup(amount) {
+      if (!window.PaystackPop) {
+        alert("Payment system is loading, please try again.");
+        return;
+      }
+      
+      const userEmail = email || "patient@presibo.com";
+      const handler = PaystackPop.setup({
+        key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+        email: userEmail,
+        amount: amount * 100, // Convert to kobo
+        currency: 'NGN',
+        ref: 'topup_trainer_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          let currentBalance = parseInt(localStorage.getItem('cached_wallet_balance') || '0');
+          currentBalance += amount;
+          localStorage.setItem('cached_wallet_balance', currentBalance);
+          alert(`Successfully topped up ₦${amount}! Current wallet balance: ₦${currentBalance}`);
+          window.location.reload();
+        },
+        onClose: function() {
+          console.log('Payment closed');
+        }
+      });
+      handler.openIframe();
+    }
+
+    // Bind Topup buttons
+    document.querySelectorAll('.topup-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const amount = parseInt(e.target.dataset.amount);
+        handleTopup(amount);
+      });
+    });
+
+    function showPopup(title, message) {
+      const modal = document.getElementById('popupModal');
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupMessage').textContent = message;
+      modal.classList.remove('hidden');
+
+      const close = () => modal.classList.add('hidden');
+      document.getElementById('popupClose').onclick = close;
+      document.getElementById('popupBtn').onclick = close;
+    }
+
+    // Dropdown toggle
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    if (profileBtn && profileDropdown) {
+      profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+    }
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    }
+
+    document.addEventListener('click', (e) => {
+      if (profileBtn && !profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    // Initialize Page
+    loadProfile();
+  </script>
+</body>
+</html>
