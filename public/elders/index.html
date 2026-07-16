@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elders Care Service - Presibo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.paystack.co/v1/inline.js" async></script>
+  <script src="/assets/js/config.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'trust-blue': '#3B82F6',
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <style>
+    .menu-link { color: black; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+    .menu-link:hover { color: #008753; }
+    .menu-link.active { background: #008753; color: white; }
+    .text-purple { color: #300b5b; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans pt-20">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-8 h-8">
+          <span class="font-bold text-purple">Presibo</span>
+        </div>
+
+        <!-- Desktop Menu Links -->
+        <nav class="hidden md:flex space-x-6 mx-auto">
+          <a href="/dashboard" class="menu-link text-sm font-semibold hover:text-naija-green">Dashboard</a>
+          <a href="/track" class="menu-link text-sm font-semibold hover:text-naija-green">Track</a>
+          <a href="/fitness" class="menu-link text-sm font-semibold hover:text-naija-green">Fitness</a>
+          <a href="/food" class="menu-link text-sm font-semibold hover:text-naija-green">FoodSquare</a>
+          <a href="/doctors" class="menu-link text-sm font-semibold hover:text-naija-green">Doctors</a>
+          <a href="/trainers" class="menu-link text-sm font-semibold hover:text-naija-green">Trainers</a>
+          <a href="/meetings" class="menu-link text-sm font-semibold hover:text-naija-green">Meetings</a>
+          <a href="/settings" class="menu-link text-sm font-semibold hover:text-naija-green">Settings</a>
+        </nav>
+
+        <div class="relative">
+          <button id="profile-btn" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+            <i class="fas fa-user-circle text-2xl"></i>
+          </button>
+          <div id="profile-dropdown" class="absolute top-12 right-0 bg-white border rounded-lg shadow-lg min-w-[200px] z-50 hidden">
+            <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+            <a href="/logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a href="/dashboard" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+        <a href="/track" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Track</a>
+        <a href="/fitness" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Fitness</a>
+        <a href="/food" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">FoodSquare</a>
+        <a href="/doctors" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Doctors</a>
+        <a href="/trainers" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Trainers</a>
+        <a href="/meetings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Meetings</a>
+        <a href="/settings" class="menu-link block px-3 py-2 rounded-md text-base font-semibold text-gray-700 hover:bg-gray-50">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white py-12 px-6 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl md:text-5xl font-extrabold mb-4">Elder Care Services</h1>
+      <p class="text-base md:text-lg opacity-90 leading-relaxed">
+        Comprehensive care and monitoring for your elderly loved ones. Choose the plan that best fits your family's needs.
+      </p>
+      <div id="active-plan-badge" class="hidden mt-6 inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-4 py-1.5 rounded-full text-sm font-semibold">
+        <i class="fas fa-crown"></i> Active Plan: <span id="active-plan-name">None</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Benefits Section -->
+  <section class="max-w-6xl mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Elderly Care Benefits</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      
+      <!-- Benefit 1 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 text-xl mb-4">
+          <i class="fas fa-satellite-dish"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Remote Monitoring</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          24/7 health tracking for vital signs. Family and caregivers get alerts if attention is needed. Blood pressure, glucose, heart rate monitored continuously.
+        </p>
+      </div>
+
+      <!-- Benefit 2 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center text-teal-700 text-xl mb-4">
+          <i class="fas fa-pills"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Medication Management</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Never miss a dose. Automated reminders, pill organizers, and family notifications. Pharmacist review of all medications to prevent interactions.
+        </p>
+      </div>
+
+      <!-- Benefit 3 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-700 text-xl mb-4">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Geriatric Specialists</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Access to doctors specializing in elder care. Regular check-ups, chronic disease management, and age-appropriate screenings.
+        </p>
+      </div>
+
+      <!-- Benefit 4 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-700 text-xl mb-4">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Caregiver Support</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Resources and respite for family caregivers. Support groups, training, and professional backup when you need a break.
+        </p>
+      </div>
+
+      <!-- Benefit 5 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-red-700 text-xl mb-4">
+          <i class="fas fa-ambulance"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Emergency Response</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Fast access to emergency care. One-touch SOS button connects to medical team. Coordinated hospital admission when needed.
+        </p>
+      </div>
+
+      <!-- Benefit 6 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-700 text-xl mb-4">
+          <i class="fas fa-home"></i>
+        </div>
+        <h3 class="font-bold text-gray-800 mb-2">Home Care Coordination</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Arrange nurses, aides, and therapists for in-home care. Seamless coordination between all care providers.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- For Families Section -->
+  <section class="bg-slate-100 py-12 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <span class="text-xs uppercase font-extrabold text-emerald-700 tracking-wider">For Families</span>
+        <h2 class="text-3xl font-extrabold text-gray-800 mt-2">Peace of mind for those you love</h2>
+        <p class="text-sm text-gray-500 mt-1 max-w-xl mx-auto">
+          Stay connected to your loved one's health, even from afar. Get updates, alerts, and coordinate care with the whole family.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <i class="fas fa-mobile-alt text-2xl text-emerald-600 mb-3"></i>
+          <h4 class="font-bold text-gray-800 mb-1">Family Portal</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">View health updates, receive alerts, and message the care team. Multiple family members can stay informed.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <i class="fas fa-phone-alt text-2xl text-emerald-600 mb-3"></i>
+          <h4 class="font-bold text-gray-800 mb-1">24/7 Helpline</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Nurses available around the clock for questions and concerns. Never feel alone in managing care.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <i class="fas fa-clipboard-list text-2xl text-emerald-600 mb-3"></i>
+          <h4 class="font-bold text-gray-800 mb-1">Care Plans</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Comprehensive care plans updated regularly. Clear documentation of medications, conditions, and preferences.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Plans Section -->
+  <section class="max-w-6xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-extrabold text-gray-800">Elder Care Plans</h2>
+      <p class="text-sm text-gray-500 mt-1">Select the care package that fits your family best</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      
+      <!-- Plan 1: Care -->
+      <div class="bg-white border rounded-2xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Care</h3>
+          <div class="text-2xl font-extrabold text-emerald-700 mb-4">₦15,000<span class="text-xs text-gray-400 font-normal">/month</span></div>
+          <p class="text-xs text-gray-500 mb-6">Essential elder care monitoring and support</p>
+          <ul class="space-y-3 border-t pt-4 text-xs text-gray-600">
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Digital medical records</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Medication reminders</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> 1 family profile</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Basic health monitoring</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Emergency contact system</li>
+          </ul>
+        </div>
+        <button onclick="subscribePlan('Care', 15000)" class="w-full bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs hover:bg-emerald-800 transition-colors mt-8">
+          Subscribe to Care
+        </button>
+      </div>
+
+      <!-- Plan 2: Thrive -->
+      <div class="bg-white border-2 border-emerald-600 rounded-2xl p-6 shadow-md flex flex-col justify-between relative">
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider shadow">
+          Most Popular
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2 mt-2">Thrive</h3>
+          <div class="text-2xl font-extrabold text-emerald-700 mb-4">₦30,000<span class="text-xs text-gray-400 font-normal">/month</span></div>
+          <p class="text-xs text-gray-500 mb-6">Comprehensive elder care with priority support</p>
+          <ul class="space-y-3 border-t pt-4 text-xs text-gray-600">
+            <li class="flex items-center gap-2 font-semibold text-emerald-700"><i class="fas fa-check-double"></i> All Care benefits</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Priority doctor booking</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Home monitoring kits</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Dedicated case manager</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> 2 family profiles</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> 1 weekly video consultation</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> 24/7 support hotline</li>
+          </ul>
+        </div>
+        <button onclick="subscribePlan('Thrive', 30000)" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl text-xs hover:bg-emerald-700 transition-colors mt-8 shadow-sm">
+          Subscribe to Thrive
+        </button>
+      </div>
+
+      <!-- Plan 3: Vital -->
+      <div class="bg-white border rounded-2xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Vital</h3>
+          <div class="text-2xl font-extrabold text-emerald-700 mb-4">₦50,000<span class="text-xs text-gray-400 font-normal">/month</span></div>
+          <p class="text-xs text-gray-500 mb-6">Premium elder care with home visit services</p>
+          <ul class="space-y-3 border-t pt-4 text-xs text-gray-600">
+            <li class="flex items-center gap-2 font-semibold text-emerald-700"><i class="fas fa-check-double"></i> All Thrive benefits</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> 3 family profiles</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Home visit option</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Advanced health monitoring</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Specialist consultations</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Personal care coordinator</li>
+            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-600"></i> Monthly health reports</li>
+          </ul>
+        </div>
+        <button onclick="subscribePlan('Vital', 50000)" class="w-full bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs hover:bg-emerald-800 transition-colors mt-8">
+          Subscribe to Vital
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Why Choose Section -->
+  <section class="max-w-5xl mx-auto px-6 py-12 border-t">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Why Choose Our Elder Care Services?</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="flex gap-4">
+        <div class="text-emerald-700 text-xl"><i class="fas fa-shield-alt"></i></div>
+        <div>
+          <h4 class="font-bold text-gray-800 text-sm mb-1">Trusted Care</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Professional healthcare providers with years of experience in elder care</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="text-emerald-700 text-xl"><i class="fas fa-clock"></i></div>
+        <div>
+          <h4 class="font-bold text-gray-800 text-sm mb-1">24/7 Monitoring</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Round-the-clock health monitoring and emergency response</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="text-emerald-700 text-xl"><i class="fas fa-users-cog"></i></div>
+        <div>
+          <h4 class="font-bold text-gray-800 text-sm mb-1">Family Involvement</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Keep family members informed and involved in care decisions</p>
+        </div>
+      </div>
+      <div class="flex gap-4">
+        <div class="text-emerald-700 text-xl"><i class="fas fa-hand-holding-heart"></i></div>
+        <div>
+          <h4 class="font-bold text-gray-800 text-sm mb-1">Home-Based Care</h4>
+          <p class="text-xs text-gray-500 leading-relaxed">Comfort of home with professional medical care coordinators</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success/Error modal alert popup -->
+  <div id="popupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-96 text-center relative max-w-[90%] border border-gray-100">
+      <span id="popupClose" class="absolute top-2 right-3 cursor-pointer text-xl font-bold text-gray-400 hover:text-gray-600">&times;</span>
+      <h2 id="popupTitle" class="text-lg font-bold mb-2"></h2>
+      <p id="popupMessage" class="text-sm text-gray-600 mb-4"></p>
+      <button id="popupBtn" class="bg-emerald-700 text-white px-6 py-2.5 rounded-lg hover:bg-emerald-850 font-bold w-full">OK</button>
+    </div>
+  </div>
+
+  <script>
+    let email = '';
+    try {
+      const sessionStr = localStorage.getItem('user_session');
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        email = session.email;
+      }
+    } catch (e) {}
+
+    if (!email) {
+      email = sessionStorage.getItem('email') || localStorage.getItem('email') || '';
+    }
+    if (!email) {
+      window.location.href = '/';
+    }
+
+    // Load active plan if exists
+    function loadActivePlan() {
+      const activePlan = localStorage.getItem(`active_elders_plan_${email}`);
+      const badge = document.getElementById('active-plan-badge');
+      const badgeName = document.getElementById('active-plan-name');
+      if (activePlan) {
+        badgeName.textContent = activePlan;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // Subscribe to Plan
+    function subscribePlan(planName, priceNgn) {
+      if (!window.PaystackPop) {
+        alert("Payment gateway is loading. Please wait a moment.");
+        return;
+      }
+
+      const handler = PaystackPop.setup({
+        key: CONFIG.PAYSTACK_PUBLIC_KEY || 'pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b',
+        email: email,
+        amount: priceNgn * 100, // Convert to kobo
+        currency: 'NGN',
+        ref: 'elders_' + planName.toLowerCase() + '_' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          // Save active plan to local storage
+          localStorage.setItem(`active_elders_plan_${email}`, planName);
+          showPopup("Subscription Successful", `You have successfully subscribed to the Presibo Elders ${planName} plan. Coordinated care begins immediately.`);
+          loadActivePlan();
+        },
+        onClose: function() {
+          console.log('Payment window closed');
+        }
+      });
+      handler.openIframe();
+    }
+
+    function showPopup(title, message) {
+      const modal = document.getElementById('popupModal');
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupMessage').textContent = message;
+      modal.classList.remove('hidden');
+
+      const close = () => modal.classList.add('hidden');
+      document.getElementById('popupClose').onclick = close;
+      document.getElementById('popupBtn').onclick = close;
+    }
+
+    // Navigation and Dropdown
+    const profileBtn = document.getElementById('profile-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    if (profileBtn && profileDropdown) {
+      profileBtn.addEventListener('click', () => profileDropdown.classList.toggle('hidden'));
+    }
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    }
+
+    document.addEventListener('click', (e) => {
+      if (profileBtn && !profileBtn.contains(e.target)) profileDropdown.classList.add('hidden');
+    });
+
+    loadActivePlan();
+  </script>
+</body>
+</html>
