@@ -23,3 +23,4 @@ yarn-error.log*
 .env.*
 !/.env
 !.env.sample
+openrouter.php
