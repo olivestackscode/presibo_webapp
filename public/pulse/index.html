@@ -189,11 +189,15 @@
         }
 
         .mute-btn .action-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             font-size: 14px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.25);
             margin-bottom: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .top-nav {
@@ -248,17 +252,16 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(128,128,128,0.4);
-            border: none;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             color: white;
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            font-size: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 20;
@@ -365,7 +368,7 @@
         let originalTimelinePosts = [];
         let currentPostIndex = 0;
         let likedPosts = new Set();
-        let isMutedGlobal = true;
+        let isMutedGlobal = false;
         let playBtnTimeout = null;
 
         async function fetchFeed() {
@@ -659,25 +662,19 @@
             const playBtn = post.querySelector('.play-pause-btn');
             if (!video || !playBtn) return;
 
-            if (playBtnTimeout) {
-                clearTimeout(playBtnTimeout);
-                playBtnTimeout = null;
-            }
-            
             if (video.paused) {
-                video.play().catch(() => {});
-                playBtn.innerHTML = '<i class="fas fa-play text-2xl text-white opacity-90"></i>';
-                playBtn.classList.add('show');
-                playBtnTimeout = setTimeout(() => {
-                    playBtn.classList.remove('show');
-                }, 800);
+                video.muted = isMutedGlobal;
+                video.play()
+                    .then(() => {
+                        playBtn.classList.remove('show');
+                    })
+                    .catch((err) => {
+                        console.error("Manual playback failed:", err);
+                    });
             } else {
                 video.pause();
-                playBtn.innerHTML = '<i class="fas fa-pause text-2xl text-white opacity-90"></i>';
+                playBtn.innerHTML = '<i class="fas fa-play text-2xl text-white"></i>';
                 playBtn.classList.add('show');
-                playBtnTimeout = setTimeout(() => {
-                    playBtn.classList.remove('show');
-                }, 800);
             }
         }
 
@@ -773,9 +770,18 @@
                 if (currentVideo) {
                     currentVideo.muted = isMutedGlobal;
                     setTimeout(() => {
-                        currentVideo.play().catch(() => {});
-                        const playBtn = currentPost.querySelector('.play-pause-btn');
-                        if (playBtn) playBtn.classList.remove('show');
+                        currentVideo.play()
+                            .then(() => {
+                                const playBtn = currentPost.querySelector('.play-pause-btn');
+                                if (playBtn) playBtn.classList.remove('show');
+                            })
+                            .catch(() => {
+                                const playBtn = currentPost.querySelector('.play-pause-btn');
+                                if (playBtn) {
+                                    playBtn.innerHTML = '<i class="fas fa-play text-2xl text-white"></i>';
+                                    playBtn.classList.add('show');
+                                }
+                            });
                     }, 100);
                 }
             }
