@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Presibo - My Device</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  >
+
+  <style>
+    body {
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    .scan-ring {
+      animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      70% {
+        transform: scale(1.12);
+        opacity: 0.35;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .progress-bar {
+      transition: width 1s linear;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white border-b shadow-sm">
+    <div class="max-w-3xl mx-auto px-5">
+      <div class="h-16 flex items-center justify-between">
+
+        <div class="flex items-center gap-3">
+          <img
+            src="/assets/img/new_presibo_icon.png"
+            class="w-9 h-9"
+            alt="Presibo"
+          >
+
+          <div>
+            <h1 class="font-bold text-gray-900">My Device</h1>
+            <p class="text-xs text-gray-500">Blood Pressure Monitor</p>
+          </div>
+        </div>
+
+        <a
+          href="/dashboard"
+          class="text-gray-500 hover:text-gray-800"
+        >
+          <i class="fas fa-arrow-left"></i>
+        </a>
+
+      </div>
+    </div>
+  </header>
+
+
+  <main class="max-w-3xl mx-auto px-5 py-6 space-y-5">
+
+    <!-- Device Card -->
+    <section class="bg-white rounded-2xl shadow-sm border p-6">
+
+      <div class="flex items-center justify-between">
+
+        <div class="flex items-center gap-4">
+
+          <div
+            id="deviceIcon"
+            class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center"
+          >
+            <i class="fas fa-heart-pulse text-purple-700 text-2xl"></i>
+          </div>
+
+          <div>
+            <h2
+              id="deviceName"
+              class="font-bold text-gray-900"
+            >
+              No device connected
+            </h2>
+
+            <div class="flex items-center gap-2 mt-1">
+
+              <span
+                id="connectionDot"
+                class="w-2 h-2 rounded-full bg-gray-400"
+              ></span>
+
+              <span
+                id="connectionStatus"
+                class="text-sm text-gray-500"
+              >
+                Ready to connect
+              </span>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Scan Button -->
+      <button
+        id="scanBtn"
+        onclick="startScan()"
+        class="w-full mt-6 bg-purple-700 hover:bg-purple-800 text-white py-3.5 rounded-xl font-semibold transition"
+      >
+        <i class="fas fa-bluetooth-b mr-2"></i>
+        Scan for My BP Device
+      </button>
+
+      <p class="text-xs text-gray-500 text-center mt-3">
+        Make sure your BP monitor is switched on and nearby.
+      </p>
+
+    </section>
+
+    <!-- Order Device -->
+    <section class="bg-purple-50 border border-purple-100 rounded-2xl p-5">
+      <div class="flex items-start gap-4">
+        <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <i class="fas fa-cart-shopping text-purple-700"></i>
+        </div>
+
+        <div class="flex-1">
+          <h2 class="font-bold text-gray-900">
+            Don't have a Presibo BP Monitor?
+          </h2>
+
+          <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+            Order your Presibo device and start tracking your blood pressure
+            directly in the Presibo app.
+          </p>
+
+          <button
+            type="button"
+            onclick="openMarket()"
+            class="mt-4 inline-flex items-center justify-center gap-2 bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-xl font-semibold transition"
+          >
+            Order Your Device
+            <i class="fas fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Scanning -->
+    <section
+      id="scanningCard"
+      class="hidden bg-white rounded-2xl shadow-sm border p-6 text-center"
+    >
+
+      <div
+        class="scan-ring mx-auto w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center"
+      >
+        <i class="fas fa-bluetooth-b text-purple-700 text-3xl"></i>
+      </div>
+
+      <h3 class="font-bold text-lg mt-5">
+        Looking for your BP reading
+      </h3>
+
+      <p
+        id="scanMessage"
+        class="text-sm text-gray-500 mt-2"
+      >
+        Connect your device and take a reading.
+      </p>
+
+      <div class="mt-5">
+
+        <div class="flex justify-between text-xs text-gray-500 mb-2">
+          <span>Measurement window</span>
+          <span id="timerText">30s</span>
+        </div>
+
+        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            id="progressBar"
+            class="progress-bar h-full bg-purple-700 rounded-full"
+            style="width: 0%"
+          ></div>
+        </div>
+
+      </div>
+
+      <button
+        onclick="stopScan()"
+        class="mt-5 text-sm text-gray-500 hover:text-gray-800"
+      >
+        Cancel
+      </button>
+
+    </section>
+
+
+    <!-- Current Result -->
+    <section
+      id="resultCard"
+      class="hidden bg-white rounded-2xl shadow-sm border p-6"
+    >
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">
+            Latest Reading
+          </p>
+
+          <p
+            id="resultTime"
+            class="text-xs text-gray-400 mt-1"
+          ></p>
+        </div>
+
+        <div
+          id="resultStatus"
+          class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"
+        >
+          Normal
+        </div>
+
+      </div>
+
+
+      <div class="text-center py-5">
+
+        <div class="flex justify-center items-end gap-2">
+
+          <span
+            id="systolic"
+            class="text-6xl font-extrabold text-gray-900"
+          >
+            --
+          </span>
+
+          <span class="text-2xl text-gray-400 mb-2">
+            /
+          </span>
+
+          <span
+            id="diastolic"
+            class="text-5xl font-bold text-gray-700 mb-1"
+          >
+            --
+          </span>
+
+        </div>
+
+        <p class="text-sm text-gray-500 mt-2">
+          mmHg
+        </p>
+
+      </div>
+
+
+      <div class="grid grid-cols-2 gap-3 mt-3">
+
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-500">Systolic</p>
+          <p
+            id="systolicSmall"
+            class="text-xl font-bold text-gray-900 mt-1"
+          >
+            --
+          </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-500">Diastolic</p>
+          <p
+            id="diastolicSmall"
+            class="text-xl font-bold text-gray-900 mt-1"
+          >
+            --
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- History -->
+    <section class="bg-white rounded-2xl shadow-sm border p-6">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div>
+          <h2 class="font-bold text-gray-900">
+            BP History
+          </h2>
+
+          <p class="text-xs text-gray-500 mt-1">
+            Your last 10 readings
+          </p>
+        </div>
+
+        <i class="fas fa-clock-rotate-left text-gray-400"></i>
+
+      </div>
+
+
+      <div
+        id="historyList"
+        class="divide-y"
+      ></div>
+
+      <div
+        id="emptyHistory"
+        class="text-center py-8"
+      >
+
+        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+          <i class="fas fa-heart-pulse text-gray-400"></i>
+        </div>
+
+        <p class="text-sm font-medium text-gray-600 mt-3">
+          No readings yet
+        </p>
+
+        <p class="text-xs text-gray-400 mt-1">
+          Your BP readings will appear here.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- Info -->
+    <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
+
+      <div class="flex gap-3">
+
+        <i class="fas fa-circle-info text-purple-700 mt-0.5"></i>
+
+        <p class="text-xs text-purple-900 leading-relaxed">
+          Keep your BP monitor close to your phone while connecting.
+          Once your Presibo BP Monitor is connected, your readings
+          will appear here automatically.
+        </p>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+
+
+
+<script>
+/*
+ * PRESIBO MY DEVICE — NO DEVICE VERSION
+ *
+ * Intended state:
+ * - No BP device connected
+ * - No BP readings
+ * - No mock history
+ * - User can order a Presibo BP Monitor from the marketplace
+ * - Scan button can be used when the user gets a device
+ */
+
+const MARKET_URL = "https://presibo.com/market";
+
+function setNoDeviceState() {
+  const deviceName = document.getElementById("deviceName");
+  const connectionStatus = document.getElementById("connectionStatus");
+  const connectionDot = document.getElementById("connectionDot");
+  const resultCard = document.getElementById("resultCard");
+  const historyList = document.getElementById("historyList");
+  const emptyHistory = document.getElementById("emptyHistory");
+  const scanMessage = document.getElementById("scanMessage");
+  const scanCard = document.getElementById("scanningCard");
+
+  if (deviceName) {
+    deviceName.textContent = "No device connected";
+  }
+
+  if (connectionStatus) {
+    connectionStatus.textContent = "Not connected";
+  }
+
+  if (connectionDot) {
+    connectionDot.className = "w-2 h-2 rounded-full bg-gray-400";
+  }
+
+  // No reading should be displayed until a real device is connected.
+  if (resultCard) {
+    resultCard.classList.add("hidden");
+  }
+
+  // No history for users without a device.
+  if (historyList) {
+    historyList.innerHTML = "";
+  }
+
+  if (emptyHistory) {
+    emptyHistory.classList.remove("hidden");
+    emptyHistory.innerHTML = `
+      <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+        <i class="fas fa-heart-pulse text-gray-400 text-lg"></i>
+      </div>
+      <p class="text-sm font-semibold text-gray-700 mt-3">
+        No BP readings yet
+      </p>
+      <p class="text-xs text-gray-400 mt-1 max-w-xs mx-auto">
+        Connect a Presibo BP Monitor to start recording your blood pressure readings.
+      </p>
+    `;
+  }
+
+  if (scanCard) {
+    scanCard.classList.add("hidden");
+  }
+
+  if (scanMessage) {
+    scanMessage.textContent =
+      "Make sure your Presibo BP Monitor is switched on and nearby.";
+  }
+}
+
+function openMarket() {
+  window.location.href = MARKET_URL;
+}
+
+function startScan() {
+  const scanCard = document.getElementById("scanningCard");
+  const scanMessage = document.getElementById("scanMessage");
+  const scanButton = document.getElementById("scanBtn");
+  const timerText = document.getElementById("timerText");
+  const progressBar = document.getElementById("progressBar");
+
+  // This is a UI-only scan state for now.
+  // It does not create fake readings.
+  if (!navigator.bluetooth) {
+    scanCard.classList.remove("hidden");
+    scanMessage.textContent =
+      "Bluetooth is not available in this browser. Connect your Presibo BP Monitor using a supported device/browser.";
+    timerText.textContent = "—";
+    progressBar.style.width = "0%";
+    return;
+  }
+
+  scanCard.classList.remove("hidden");
+  scanButton.disabled = true;
+  scanButton.classList.add("opacity-50", "cursor-not-allowed");
+
+  scanMessage.textContent =
+    "Searching for your Presibo BP Monitor...";
+
+  timerText.textContent = "30s";
+  progressBar.style.width = "0%";
+
+  /*
+   * Real Bluetooth connection can be added here once the
+   * Presibo BP monitor's Bluetooth service/characteristic
+   * details are available.
+   *
+   * IMPORTANT:
+   * No fake reading is generated.
+   */
+
+  let seconds = 30;
+
+  const timer = setInterval(() => {
+    seconds--;
+
+    timerText.textContent = `${seconds}s`;
+
+    const progress = ((30 - seconds) / 30) * 100;
+    progressBar.style.width = `${progress}%`;
+
+    if (seconds <= 0) {
+      clearInterval(timer);
+
+      scanMessage.textContent =
+        "No compatible Presibo BP Monitor was connected.";
+
+      scanButton.disabled = false;
+      scanButton.classList.remove("opacity-50", "cursor-not-allowed");
+
+      setTimeout(() => {
+        scanCard.classList.add("hidden");
+        timerText.textContent = "30s";
+        progressBar.style.width = "0%";
+      }, 2500);
+    }
+  }, 1000);
+}
+
+function stopScan() {
+  document.getElementById("scanningCard")?.classList.add("hidden");
+
+  const scanButton = document.getElementById("scanBtn");
+
+  if (scanButton) {
+    scanButton.disabled = false;
+    scanButton.classList.remove("opacity-50", "cursor-not-allowed");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", setNoDeviceState);
+</script>
