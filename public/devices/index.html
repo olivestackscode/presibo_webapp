@@ -347,15 +347,22 @@
 
 
 <script>
-/* ================================
-   MOCK DEVICE DATA
-================================ */
+
+/* ==========================================
+   MOCK DEVICE
+========================================== */
 
 const MOCK_DEVICE = {
   name: "Presibo BP Monitor",
   status: "Connected",
   battery: 82
 };
+
+
+/* ==========================================
+   10 MOCK BP HISTORY READINGS
+   Newest reading is first
+========================================== */
 
 const MOCK_HISTORY = [
   {
@@ -411,49 +418,77 @@ const MOCK_HISTORY = [
 ];
 
 
-/* ================================
-   LOAD MOCK DEVICE
-================================ */
+/* ==========================================
+   DEVICE
+========================================== */
 
 function loadMockDevice() {
 
-  document.getElementById("deviceName").textContent =
-    MOCK_DEVICE.name;
+  const deviceName =
+    document.getElementById("deviceName");
 
-  document.getElementById("connectionStatus").textContent =
-    MOCK_DEVICE.status;
+  const connectionStatus =
+    document.getElementById("connectionStatus");
 
-  document.getElementById("connectionDot").className =
-    "w-2 h-2 rounded-full bg-green-500";
+  const connectionDot =
+    document.getElementById("connectionDot");
+
+
+  if (deviceName) {
+    deviceName.textContent = MOCK_DEVICE.name;
+  }
+
+
+  if (connectionStatus) {
+    connectionStatus.textContent = MOCK_DEVICE.status;
+  }
+
+
+  if (connectionDot) {
+    connectionDot.className =
+      "w-2 h-2 rounded-full bg-green-500";
+  }
 
 }
 
 
-/* ================================
-   SHOW MOCK LATEST READING
-================================ */
+/* ==========================================
+   LATEST READING
+========================================== */
 
 function loadMockLatestReading() {
 
+  /*
+   * Always use the newest reading.
+   */
+
   const latest = MOCK_HISTORY[0];
 
-  document.getElementById("resultCard")
+
+  document
+    .getElementById("resultCard")
     .classList.remove("hidden");
+
 
   document.getElementById("systolic").textContent =
     latest.systolic;
 
+
   document.getElementById("diastolic").textContent =
     latest.diastolic;
+
 
   document.getElementById("systolicSmall").textContent =
     `${latest.systolic} mmHg`;
 
+
   document.getElementById("diastolicSmall").textContent =
     `${latest.diastolic} mmHg`;
 
+
   document.getElementById("resultTime").textContent =
     latest.displayTime;
+
 
   updateBPStatus(
     latest.systolic,
@@ -463,9 +498,9 @@ function loadMockLatestReading() {
 }
 
 
-/* ================================
-   MOCK HISTORY
-================================ */
+/* ==========================================
+   HISTORY
+========================================== */
 
 function loadMockHistory() {
 
@@ -475,10 +510,29 @@ function loadMockHistory() {
   const empty =
     document.getElementById("emptyHistory");
 
+
+  if (!list) return;
+
+
+  /*
+   * Clear existing history.
+   */
+
   list.innerHTML = "";
 
-  empty.classList.add("hidden");
 
+  /*
+   * Hide empty state.
+   */
+
+  if (empty) {
+    empty.classList.add("hidden");
+  }
+
+
+  /*
+   * Render ALL 10 readings.
+   */
 
   MOCK_HISTORY.forEach((reading, index) => {
 
@@ -492,6 +546,7 @@ function loadMockHistory() {
     const row =
       document.createElement("div");
 
+
     row.className =
       "py-4 flex items-center justify-between";
 
@@ -500,11 +555,15 @@ function loadMockHistory() {
 
       <div class="flex items-center gap-3">
 
-        <div class="w-10 h-10 rounded-full bg-purple-50
-                    flex items-center justify-center">
-
-          <i class="fas fa-heart-pulse text-purple-700"></i>
-
+        <div
+          class="w-10 h-10 rounded-full
+                 bg-purple-50
+                 flex items-center justify-center"
+        >
+          <i
+            class="fas fa-heart-pulse
+                   text-purple-700"
+          ></i>
         </div>
 
 
@@ -514,13 +573,21 @@ function loadMockHistory() {
 
             ${reading.systolic}/${reading.diastolic}
 
-            <span class="text-xs font-normal text-gray-400">
+            <span
+              class="text-xs font-normal
+                     text-gray-400"
+            >
               mmHg
             </span>
 
           </div>
 
-          <div class="text-xs text-gray-500 mt-1">
+
+          <div
+            class="text-xs
+                   text-gray-500
+                   mt-1"
+          >
             ${reading.displayTime}
           </div>
 
@@ -529,14 +596,14 @@ function loadMockHistory() {
       </div>
 
 
-      <span class="${status.classes}
-                   px-2.5 py-1
-                   rounded-full
-                   text-xs
-                   font-semibold">
-
+      <span
+        class="${status.classes}
+                px-2.5 py-1
+                rounded-full
+                text-xs
+                font-semibold"
+      >
         ${status.label}
-
       </span>
 
     `;
@@ -546,39 +613,141 @@ function loadMockHistory() {
 
   });
 
+
+  /*
+   * Make sure exactly 10 are shown.
+   */
+
+  console.log(
+    `Presibo: ${MOCK_HISTORY.length} mock BP readings loaded`
+  );
+
 }
 
 
-/* ================================
-   MOCK SCAN
-================================ */
+/* ==========================================
+   BP STATUS
+========================================== */
+
+function getBPStatus(
+  systolic,
+  diastolic
+) {
+
+  if (
+    systolic >= 140 ||
+    diastolic >= 90
+  ) {
+
+    return {
+      label: "High",
+      classes: "bg-red-100 text-red-700"
+    };
+
+  }
+
+
+  if (
+    systolic >= 120 ||
+    diastolic >= 80
+  ) {
+
+    return {
+      label: "Elevated",
+      classes: "bg-yellow-100 text-yellow-700"
+    };
+
+  }
+
+
+  return {
+    label: "Normal",
+    classes: "bg-green-100 text-green-700"
+  };
+
+}
+
+
+/* ==========================================
+   LATEST RESULT STATUS
+========================================== */
+
+function updateBPStatus(
+  systolic,
+  diastolic
+) {
+
+  const status =
+    document.getElementById("resultStatus");
+
+
+  if (!status) return;
+
+
+  const result =
+    getBPStatus(
+      systolic,
+      diastolic
+    );
+
+
+  status.textContent =
+    result.label;
+
+
+  status.className =
+    `px-3 py-1 rounded-full
+     text-xs font-semibold
+     ${result.classes}`;
+
+}
+
+
+/* ==========================================
+   MOCK 30 SECOND SCAN
+========================================== */
 
 function startScan() {
 
   const scanCard =
     document.getElementById("scanningCard");
 
+  const scanButton =
+    document.getElementById("scanBtn");
+
+  const scanMessage =
+    document.getElementById("scanMessage");
+
+  const timerText =
+    document.getElementById("timerText");
+
+  const progressBar =
+    document.getElementById("progressBar");
+
+
   scanCard.classList.remove("hidden");
 
+  scanButton.disabled = true;
 
-  document.getElementById("scanMessage")
-    .textContent =
-    "Presibo BP Monitor found. Connecting...";
+  scanButton.classList.add(
+    "opacity-50",
+    "cursor-not-allowed"
+  );
 
 
-  document.getElementById("scanBtn")
-    .disabled = true;
+  scanMessage.textContent =
+    "Presibo BP Monitor connected. Waiting for reading...";
 
 
   let seconds = 30;
 
 
-  document.getElementById("timerText")
-    .textContent = "30s";
+  timerText.textContent =
+    "30s";
 
 
-  document.getElementById("progressBar")
-    .style.width = "0%";
+  progressBar.style.width =
+    "0%";
 
 
   const timer =
@@ -587,8 +756,7 @@ function startScan() {
       seconds--;
 
 
-      document.getElementById("timerText")
-        .textContent =
+      timerText.textContent =
         `${seconds}s`;
 
 
@@ -596,8 +764,7 @@ function startScan() {
         ((30 - seconds) / 30) * 100;
 
 
-      document.getElementById("progressBar")
-        .style.width =
+      progressBar.style.width =
         `${progress}%`;
 
 
@@ -605,19 +772,73 @@ function startScan() {
 
         clearInterval(timer);
 
-        document.getElementById("scanMessage")
-          .textContent =
+
+        scanMessage.textContent =
           "Reading received successfully.";
 
+
+        /*
+         * Simulate a NEW reading.
+         */
+
+        const newReading = {
+
+          systolic:
+            115 +
+            Math.floor(
+              Math.random() * 15
+            ),
+
+          diastolic:
+            72 +
+            Math.floor(
+              Math.random() * 12
+            ),
+
+          displayTime:
+            "Just now"
+
+        };
+
+
+        /*
+         * Add new reading to beginning.
+         */
+
+        MOCK_HISTORY.unshift(
+          newReading
+        );
+
+
+        /*
+         * Keep maximum of 10.
+         */
+
+        MOCK_HISTORY.splice(
+          10
+        );
+
+
+        /*
+         * Update both current result
+         * and the complete history.
+         */
 
         setTimeout(() => {
 
           scanCard.classList.add("hidden");
 
-          document.getElementById("scanBtn")
-            .disabled = false;
+          scanButton.disabled = false;
+
+          scanButton.classList.remove(
+            "opacity-50",
+            "cursor-not-allowed"
+          );
+
 
           loadMockLatestReading();
+
+          loadMockHistory();
 
         }, 700);
 
@@ -628,9 +849,9 @@ function startScan() {
 }
 
 
-/* ================================
-   INITIALIZE MOCK PAGE
-================================ */
+/* ==========================================
+   INITIALIZE
+========================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -644,4 +865,6 @@ document.addEventListener(
 
   }
 );
+
 </script>
+</html>
