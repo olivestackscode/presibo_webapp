@@ -1,1323 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Presibo - My Device</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  >
-
-  <style>
-    body {
-      font-family: Inter, Arial, sans-serif;
-    }
-
-    .scan-ring {
-      animation: pulse-ring 1.5s infinite;
-    }
-
-    @keyframes pulse-ring {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      70% {
-        transform: scale(1.12);
-        opacity: 0.35;
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .progress-bar {
-      transition: width 1s linear;
-    }
-  </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen">
-
-  <!-- Header -->
-  <header class="bg-white border-b shadow-sm">
-    <div class="max-w-3xl mx-auto px-5">
-      <div class="h-16 flex items-center justify-between">
-
-        <div class="flex items-center gap-3">
-          <img
-            src="/assets/img/new_presibo_icon.png"
-            class="w-9 h-9"
-            alt="Presibo"
-          >
-
-          <div>
-            <h1 class="font-bold text-gray-900">My Device</h1>
-            <p class="text-xs text-gray-500">Blood Pressure Monitor</p>
-          </div>
-        </div>
-
-        <a
-          href="/dashboard"
-          class="text-gray-500 hover:text-gray-800"
-        >
-          <i class="fas fa-arrow-left"></i>
-        </a>
-
-      </div>
-    </div>
-  </header>
-
-
-  <main class="max-w-3xl mx-auto px-5 py-6 space-y-5">
-
-    <!-- Device Card -->
-    <section class="bg-white rounded-2xl shadow-sm border p-6">
-
-      <div class="flex items-center justify-between">
-
-        <div class="flex items-center gap-4">
-
-          <div
-            id="deviceIcon"
-            class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center"
-          >
-            <i class="fas fa-heart-pulse text-purple-700 text-2xl"></i>
-          </div>
-
-          <div>
-            <h2
-              id="deviceName"
-              class="font-bold text-gray-900"
-            >
-              No device connected
-            </h2>
-
-            <div class="flex items-center gap-2 mt-1">
-
-              <span
-                id="connectionDot"
-                class="w-2 h-2 rounded-full bg-gray-400"
-              ></span>
-
-              <span
-                id="connectionStatus"
-                class="text-sm text-gray-500"
-              >
-                Ready to connect
-              </span>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Scan Button -->
-      <button
-        id="scanBtn"
-        onclick="startScan()"
-        class="w-full mt-6 bg-purple-700 hover:bg-purple-800 text-white py-3.5 rounded-xl font-semibold transition"
-      >
-        <i class="fas fa-bluetooth-b mr-2"></i>
-        Scan for BP Device
-      </button>
-
-      <p class="text-xs text-gray-500 text-center mt-3">
-        Make sure your BP monitor is switched on and nearby.
-      </p>
-
-    </section>
-
-
-    <!-- Scanning -->
-    <section
-      id="scanningCard"
-      class="hidden bg-white rounded-2xl shadow-sm border p-6 text-center"
-    >
-
-      <div
-        class="scan-ring mx-auto w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center"
-      >
-        <i class="fas fa-bluetooth-b text-purple-700 text-3xl"></i>
-      </div>
-
-      <h3 class="font-bold text-lg mt-5">
-        Looking for your BP reading
-      </h3>
-
-      <p
-        id="scanMessage"
-        class="text-sm text-gray-500 mt-2"
-      >
-        Connect your device and take a reading.
-      </p>
-
-      <div class="mt-5">
-
-        <div class="flex justify-between text-xs text-gray-500 mb-2">
-          <span>Measurement window</span>
-          <span id="timerText">30s</span>
-        </div>
-
-        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            id="progressBar"
-            class="progress-bar h-full bg-purple-700 rounded-full"
-            style="width: 0%"
-          ></div>
-        </div>
-
-      </div>
-
-      <button
-        onclick="stopScan()"
-        class="mt-5 text-sm text-gray-500 hover:text-gray-800"
-      >
-        Cancel
-      </button>
-
-    </section>
-
-
-    <!-- Current Result -->
-    <section
-      id="resultCard"
-      class="hidden bg-white rounded-2xl shadow-sm border p-6"
-    >
-
-      <div class="flex items-center justify-between mb-5">
-
-        <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">
-            Latest Reading
-          </p>
-
-          <p
-            id="resultTime"
-            class="text-xs text-gray-400 mt-1"
-          ></p>
-        </div>
-
-        <div
-          id="resultStatus"
-          class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"
-        >
-          Normal
-        </div>
-
-      </div>
-
-
-      <div class="text-center py-5">
-
-        <div class="flex justify-center items-end gap-2">
-
-          <span
-            id="systolic"
-            class="text-6xl font-extrabold text-gray-900"
-          >
-            --
-          </span>
-
-          <span class="text-2xl text-gray-400 mb-2">
-            /
-          </span>
-
-          <span
-            id="diastolic"
-            class="text-5xl font-bold text-gray-700 mb-1"
-          >
-            --
-          </span>
-
-        </div>
-
-        <p class="text-sm text-gray-500 mt-2">
-          mmHg
-        </p>
-
-      </div>
-
-
-      <div class="grid grid-cols-2 gap-3 mt-3">
-
-        <div class="bg-gray-50 rounded-xl p-4 text-center">
-          <p class="text-xs text-gray-500">Systolic</p>
-          <p
-            id="systolicSmall"
-            class="text-xl font-bold text-gray-900 mt-1"
-          >
-            --
-          </p>
-        </div>
-
-        <div class="bg-gray-50 rounded-xl p-4 text-center">
-          <p class="text-xs text-gray-500">Diastolic</p>
-          <p
-            id="diastolicSmall"
-            class="text-xl font-bold text-gray-900 mt-1"
-          >
-            --
-          </p>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- History -->
-    <section class="bg-white rounded-2xl shadow-sm border p-6">
-
-      <div class="flex items-center justify-between mb-5">
-
-        <div>
-          <h2 class="font-bold text-gray-900">
-            BP History
-          </h2>
-
-          <p class="text-xs text-gray-500 mt-1">
-            Your last 10 readings
-          </p>
-        </div>
-
-        <i class="fas fa-clock-rotate-left text-gray-400"></i>
-
-      </div>
-
-
-      <div
-        id="historyList"
-        class="divide-y"
-      ></div>
-
-      <div
-        id="emptyHistory"
-        class="text-center py-8"
-      >
-
-        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-          <i class="fas fa-heart-pulse text-gray-400"></i>
-        </div>
-
-        <p class="text-sm font-medium text-gray-600 mt-3">
-          No readings yet
-        </p>
-
-        <p class="text-xs text-gray-400 mt-1">
-          Your BP readings will appear here.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- Info -->
-    <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
-
-      <div class="flex gap-3">
-
-        <i class="fas fa-circle-info text-purple-700 mt-0.5"></i>
-
-        <p class="text-xs text-purple-900 leading-relaxed">
-          Keep your BP monitor close to your phone while connecting.
-          After a measurement is received, Presibo automatically saves
-          the reading to your BP history.
-        </p>
-
-      </div>
-
-    </div>
-
-  </main>
-
-
 <script>
+/* ================================
+   MOCK DEVICE DATA
+================================ */
 
-  /*
-   * ============================================================
-   * PRESIBO BP DEVICE
-   * Bluetooth Health Device Profile
-   *
-   * Blood Pressure Service:
-   *     0x1810
-   *
-   * Blood Pressure Measurement:
-   *     0x2A35
-   * ============================================================
-   */
+const MOCK_DEVICE = {
+  name: "Presibo BP Monitor",
+  status: "Connected",
+  battery: 82
+};
 
-
-  const BP_SERVICE = '00001810-0000-1000-8000-00805f9b34fb';
-
-  const BP_MEASUREMENT_CHARACTERISTIC =
-    '00002a35-0000-1000-8000-00805f9b34fb';
-
-
-  let bluetoothDevice = null;
-  let measurementCharacteristic = null;
-
-  let scanTimer = null;
-  let scanSeconds = 30;
-
-  let currentMeasurementReceived = false;
-
-
-  /*
-   * ------------------------------------------------------------
-   * USER SESSION
-   * ------------------------------------------------------------
-   */
-
-  function getUserEmail() {
-
-    try {
-
-      const session =
-        JSON.parse(localStorage.getItem('user_session') || '{}');
-
-      return (
-        session.email ||
-        sessionStorage.getItem('email') ||
-        localStorage.getItem('email') ||
-        'guest'
-      );
-
-    } catch {
-
-      return 'guest';
-
-    }
-
+const MOCK_HISTORY = [
+  {
+    systolic: 118,
+    diastolic: 76,
+    displayTime: "Today, 2:14 PM"
+  },
+  {
+    systolic: 121,
+    diastolic: 79,
+    displayTime: "Today, 9:32 AM"
+  },
+  {
+    systolic: 124,
+    diastolic: 81,
+    displayTime: "Yesterday, 7:48 PM"
+  },
+  {
+    systolic: 117,
+    diastolic: 75,
+    displayTime: "Yesterday, 8:15 AM"
+  },
+  {
+    systolic: 126,
+    diastolic: 83,
+    displayTime: "Aug 8, 2026, 6:42 PM"
+  },
+  {
+    systolic: 120,
+    diastolic: 78,
+    displayTime: "Aug 8, 2026, 8:05 AM"
+  },
+  {
+    systolic: 128,
+    diastolic: 84,
+    displayTime: "Aug 7, 2026, 7:21 PM"
+  },
+  {
+    systolic: 119,
+    diastolic: 77,
+    displayTime: "Aug 7, 2026, 8:11 AM"
+  },
+  {
+    systolic: 122,
+    diastolic: 80,
+    displayTime: "Aug 6, 2026, 7:36 PM"
+  },
+  {
+    systolic: 116,
+    diastolic: 74,
+    displayTime: "Aug 6, 2026, 8:03 AM"
   }
+];
 
 
-  const userEmail = getUserEmail();
+/* ================================
+   LOAD MOCK DEVICE
+================================ */
 
+function loadMockDevice() {
 
-  /*
-   * ------------------------------------------------------------
-   * STORAGE
-   * ------------------------------------------------------------
-   */
+  document.getElementById("deviceName").textContent =
+    MOCK_DEVICE.name;
 
-  function historyKey() {
+  document.getElementById("connectionStatus").textContent =
+    MOCK_DEVICE.status;
 
-    return `presibo_bp_history_${userEmail}`;
+  document.getElementById("connectionDot").className =
+    "w-2 h-2 rounded-full bg-green-500";
 
-  }
+}
 
 
-  function getHistory() {
+/* ================================
+   SHOW MOCK LATEST READING
+================================ */
 
-    try {
+function loadMockLatestReading() {
 
-      return JSON.parse(
-        localStorage.getItem(historyKey()) || '[]'
-      );
+  const latest = MOCK_HISTORY[0];
 
-    } catch {
+  document.getElementById("resultCard")
+    .classList.remove("hidden");
 
-      return [];
+  document.getElementById("systolic").textContent =
+    latest.systolic;
 
-    }
+  document.getElementById("diastolic").textContent =
+    latest.diastolic;
 
-  }
+  document.getElementById("systolicSmall").textContent =
+    `${latest.systolic} mmHg`;
 
+  document.getElementById("diastolicSmall").textContent =
+    `${latest.diastolic} mmHg`;
 
-  function saveHistory(history) {
+  document.getElementById("resultTime").textContent =
+    latest.displayTime;
 
-    /*
-     * Keep only the most recent 10 readings.
-     */
-    history = history.slice(0, 10);
+  updateBPStatus(
+    latest.systolic,
+    latest.diastolic
+  );
 
-    localStorage.setItem(
-      historyKey(),
-      JSON.stringify(history)
-    );
+}
 
-  }
 
+/* ================================
+   MOCK HISTORY
+================================ */
 
-  /*
-   * ------------------------------------------------------------
-   * START BLUETOOTH SCAN
-   * ------------------------------------------------------------
-   */
+function loadMockHistory() {
 
-  async function startScan() {
+  const list =
+    document.getElementById("historyList");
 
-    if (!navigator.bluetooth) {
+  const empty =
+    document.getElementById("emptyHistory");
 
-      alert(
-        'Bluetooth is not supported in this browser. ' +
-        'Please use Chrome or another browser with Web Bluetooth support.'
-      );
+  list.innerHTML = "";
 
-      return;
+  empty.classList.add("hidden");
 
-    }
 
+  MOCK_HISTORY.forEach((reading, index) => {
 
-    stopScan();
-
-    currentMeasurementReceived = false;
-
-    showScanning(true);
-
-    setConnectionStatus(
-      'Scanning...',
-      'bg-yellow-400'
-    );
-
-
-    try {
-
-      /*
-       * Ask the browser to find a BP monitor.
-       *
-       * The user will select their device from the
-       * browser's Bluetooth device picker.
-       */
-
-      bluetoothDevice =
-        await navigator.bluetooth.requestDevice({
-
-          filters: [
-            {
-              services: [BP_SERVICE]
-            }
-          ],
-
-          optionalServices: [
-            BP_SERVICE
-          ]
-
-        });
-
-
-      if (!bluetoothDevice) {
-
-        throw new Error('No device selected.');
-
-      }
-
-
-      bluetoothDevice.addEventListener(
-        'gattserverdisconnected',
-        handleDisconnect
-      );
-
-
-      document.getElementById('deviceName').textContent =
-        bluetoothDevice.name || 'Blood Pressure Monitor';
-
-
-      setConnectionStatus(
-        'Connecting...',
-        'bg-yellow-400'
-      );
-
-
-      await connectToDevice();
-
-
-      /*
-       * Start the 30-second measurement window.
-       */
-
-      startMeasurementTimer();
-
-
-    } catch (error) {
-
-      console.error('Bluetooth error:', error);
-
-      showScanning(false);
-
-      setConnectionStatus(
-        'Not connected',
-        'bg-gray-400'
-      );
-
-      document.getElementById('scanMessage').textContent =
-        error.message || 'Unable to connect to the device.';
-
-    }
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * CONNECT
-   * ------------------------------------------------------------
-   */
-
-  async function connectToDevice() {
-
-    const server =
-      await bluetoothDevice.gatt.connect();
-
-
-    const service =
-      await server.getPrimaryService(BP_SERVICE);
-
-
-    measurementCharacteristic =
-      await service.getCharacteristic(
-        BP_MEASUREMENT_CHARACTERISTIC
-      );
-
-
-    await measurementCharacteristic.startNotifications();
-
-
-    measurementCharacteristic.addEventListener(
-      'characteristicvaluechanged',
-      handleBPMeasurement
-    );
-
-
-    setConnectionStatus(
-      'Connected',
-      'bg-green-500'
-    );
-
-
-    document.getElementById('scanMessage').textContent =
-      'Device connected. Waiting for your BP reading...';
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * BP MEASUREMENT
-   * ------------------------------------------------------------
-   */
-
-  function handleBPMeasurement(event) {
-
-    try {
-
-      const value =
-        event.target.value;
-
-
-      const reading =
-        parseBPMeasurement(value);
-
-
-      if (!reading) return;
-
-
-      console.log('BP Reading:', reading);
-
-
-      currentMeasurementReceived = true;
-
-
-      saveBPReading(
+    const status =
+      getBPStatus(
         reading.systolic,
         reading.diastolic
       );
 
 
-      /*
-       * A reading has been received.
-       * We can stop the 30-second timer.
-       */
+    const row =
+      document.createElement("div");
 
-      stopScan();
+    row.className =
+      "py-4 flex items-center justify-between";
 
 
-    } catch (error) {
+    row.innerHTML = `
 
-      console.error(
-        'Unable to parse BP reading:',
-        error
-      );
+      <div class="flex items-center gap-3">
 
-    }
+        <div class="w-10 h-10 rounded-full bg-purple-50
+                    flex items-center justify-center">
 
-  }
+          <i class="fas fa-heart-pulse text-purple-700"></i>
 
+        </div>
 
-  /*
-   * ------------------------------------------------------------
-   * STANDARD IEEE 11073 SFLOAT PARSER
-   * ------------------------------------------------------------
-   */
 
-  function parseSFLOAT(bytes, offset) {
+        <div>
 
-    const raw =
-      bytes.getInt16(offset, true);
+          <div class="font-bold text-gray-900">
 
+            ${reading.systolic}/${reading.diastolic}
 
-    let mantissa =
-      raw & 0x0FFF;
-
-
-    let exponent =
-      raw >> 12;
-
-
-    /*
-     * Sign extend 12-bit mantissa.
-     */
-
-    if (mantissa & 0x0800) {
-
-      mantissa =
-        mantissa - 0x1000;
-
-    }
-
-
-    /*
-     * Sign extend 4-bit exponent.
-     */
-
-    if (exponent & 0x0008) {
-
-      exponent =
-        exponent - 0x0010;
-
-    }
-
-
-    return mantissa *
-      Math.pow(10, exponent);
-
-  }
-
-
-  function parseBPMeasurement(dataView) {
-
-    if (!dataView || dataView.byteLength < 7) {
-
-      return null;
-
-    }
-
-
-    /*
-     * Byte 0:
-     *
-     * bit 0 = units
-     * 0 = mmHg
-     * 1 = kPa
-     */
-
-    const flags =
-      dataView.getUint8(0);
-
-
-    const isKPa =
-      (flags & 0x01) !== 0;
-
-
-    let offset = 1;
-
-
-    let systolic =
-      parseSFLOAT(dataView, offset);
-
-    offset += 2;
-
-
-    let diastolic =
-      parseSFLOAT(dataView, offset);
-
-    offset += 2;
-
-
-    /*
-     * MAP is the next SFLOAT.
-     * We don't currently display it.
-     */
-
-    offset += 2;
-
-
-    /*
-     * Convert kPa to mmHg if necessary.
-     */
-
-    if (isKPa) {
-
-      systolic *= 7.50062;
-
-      diastolic *= 7.50062;
-
-    }
-
-
-    return {
-
-      systolic:
-        Math.round(systolic),
-
-      diastolic:
-        Math.round(diastolic)
-
-    };
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * 30 SECOND TIMER
-   * ------------------------------------------------------------
-   */
-
-  function startMeasurementTimer() {
-
-    scanSeconds = 30;
-
-    updateTimer();
-
-
-    scanTimer =
-      setInterval(() => {
-
-        scanSeconds--;
-
-        updateTimer();
-
-
-        if (scanSeconds <= 0) {
-
-          finishScan();
-
-        }
-
-      }, 1000);
-
-  }
-
-
-  function updateTimer() {
-
-    document.getElementById('timerText')
-      .textContent =
-      `${scanSeconds}s`;
-
-
-    const percentage =
-      ((30 - scanSeconds) / 30) * 100;
-
-
-    document.getElementById('progressBar')
-      .style.width =
-      `${percentage}%`;
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * FINISH SCAN
-   * ------------------------------------------------------------
-   */
-
-  function finishScan() {
-
-    clearInterval(scanTimer);
-
-    scanTimer = null;
-
-
-    showScanning(false);
-
-
-    if (currentMeasurementReceived) {
-
-      document.getElementById('scanMessage')
-        .textContent =
-        'Reading received successfully.';
-
-    } else {
-
-      document.getElementById('scanMessage')
-        .textContent =
-        'No BP reading was received. Please take another reading.';
-
-    }
-
-  }
-
-
-  function stopScan() {
-
-    if (scanTimer) {
-
-      clearInterval(scanTimer);
-
-      scanTimer = null;
-
-    }
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * SAVE READING
-   * ------------------------------------------------------------
-   */
-
-  function saveBPReading(
-    systolic,
-    diastolic
-  ) {
-
-    const now =
-      new Date();
-
-
-    const reading = {
-
-      systolic,
-      diastolic,
-
-      value:
-        `${systolic}/${diastolic}`,
-
-      timestamp:
-        now.toISOString(),
-
-      displayTime:
-        now.toLocaleString(
-          'en-NG',
-          {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          }
-        )
-
-    };
-
-
-    let history =
-      getHistory();
-
-
-    /*
-     * Newest reading first.
-     */
-
-    history.unshift(reading);
-
-
-    /*
-     * Maximum of 10 results.
-     */
-
-    saveHistory(history);
-
-
-    /*
-     * Display result.
-     */
-
-    displayCurrentResult(reading);
-
-
-    /*
-     * Update history list.
-     */
-
-    renderHistory();
-
-
-    /*
-     * Keep compatibility with the current
-     * Presibo dashboard's local track data.
-     */
-
-    updatePresiboTrackData(reading);
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * CURRENT RESULT
-   * ------------------------------------------------------------
-   */
-
-  function displayCurrentResult(reading) {
-
-    document.getElementById('resultCard')
-      .classList.remove('hidden');
-
-
-    document.getElementById('systolic')
-      .textContent =
-      reading.systolic;
-
-
-    document.getElementById('diastolic')
-      .textContent =
-      reading.diastolic;
-
-
-    document.getElementById('systolicSmall')
-      .textContent =
-      `${reading.systolic} mmHg`;
-
-
-    document.getElementById('diastolicSmall')
-      .textContent =
-      `${reading.diastolic} mmHg`;
-
-
-    document.getElementById('resultTime')
-      .textContent =
-      reading.displayTime;
-
-
-    updateBPStatus(
-      reading.systolic,
-      reading.diastolic
-    );
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * BP STATUS
-   * ------------------------------------------------------------
-   */
-
-  function updateBPStatus(
-    systolic,
-    diastolic
-  ) {
-
-    const status =
-      document.getElementById('resultStatus');
-
-
-    let label =
-      'Normal';
-
-
-    let classes =
-      'bg-green-100 text-green-700';
-
-
-    if (
-      systolic >= 140 ||
-      diastolic >= 90
-    ) {
-
-      label = 'High';
-
-      classes =
-        'bg-red-100 text-red-700';
-
-    }
-
-    else if (
-      systolic >= 120 ||
-      diastolic >= 80
-    ) {
-
-      label = 'Elevated';
-
-      classes =
-        'bg-yellow-100 text-yellow-700';
-
-    }
-
-
-    status.textContent =
-      label;
-
-
-    status.className =
-      `px-3 py-1 rounded-full text-xs font-semibold ${classes}`;
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * HISTORY
-   * ------------------------------------------------------------
-   */
-
-  function renderHistory() {
-
-    const history =
-      getHistory();
-
-
-    const list =
-      document.getElementById('historyList');
-
-
-    const empty =
-      document.getElementById('emptyHistory');
-
-
-    list.innerHTML = '';
-
-
-    if (!history.length) {
-
-      empty.classList.remove('hidden');
-
-      return;
-
-    }
-
-
-    empty.classList.add('hidden');
-
-
-    history.forEach(
-      (reading, index) => {
-
-        const row =
-          document.createElement('div');
-
-
-        row.className =
-          'py-4 flex items-center justify-between';
-
-
-        const status =
-          getBPStatus(
-            reading.systolic,
-            reading.diastolic
-          );
-
-
-        row.innerHTML = `
-
-          <div class="flex items-center gap-3">
-
-            <div class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
-              <i class="fas fa-heart-pulse text-purple-700"></i>
-            </div>
-
-            <div>
-
-              <div class="font-bold text-gray-900">
-                ${reading.systolic}/${reading.diastolic}
-                <span class="text-xs font-normal text-gray-400">
-                  mmHg
-                </span>
-              </div>
-
-              <div class="text-xs text-gray-500 mt-1">
-                ${reading.displayTime}
-              </div>
-
-            </div>
+            <span class="text-xs font-normal text-gray-400">
+              mmHg
+            </span>
 
           </div>
 
-          <span class="${status.classes} px-2.5 py-1 rounded-full text-xs font-semibold">
-            ${status.label}
-          </span>
+          <div class="text-xs text-gray-500 mt-1">
+            ${reading.displayTime}
+          </div>
 
-        `;
+        </div>
+
+      </div>
 
 
-        list.appendChild(row);
+      <span class="${status.classes}
+                   px-2.5 py-1
+                   rounded-full
+                   text-xs
+                   font-semibold">
+
+        ${status.label}
+
+      </span>
+
+    `;
+
+
+    list.appendChild(row);
+
+  });
+
+}
+
+
+/* ================================
+   MOCK SCAN
+================================ */
+
+function startScan() {
+
+  const scanCard =
+    document.getElementById("scanningCard");
+
+  scanCard.classList.remove("hidden");
+
+
+  document.getElementById("scanMessage")
+    .textContent =
+    "Presibo BP Monitor found. Connecting...";
+
+
+  document.getElementById("scanBtn")
+    .disabled = true;
+
+
+  let seconds = 30;
+
+
+  document.getElementById("timerText")
+    .textContent = "30s";
+
+
+  document.getElementById("progressBar")
+    .style.width = "0%";
+
+
+  const timer =
+    setInterval(() => {
+
+      seconds--;
+
+
+      document.getElementById("timerText")
+        .textContent =
+        `${seconds}s`;
+
+
+      const progress =
+        ((30 - seconds) / 30) * 100;
+
+
+      document.getElementById("progressBar")
+        .style.width =
+        `${progress}%`;
+
+
+      if (seconds <= 0) {
+
+        clearInterval(timer);
+
+        document.getElementById("scanMessage")
+          .textContent =
+          "Reading received successfully.";
+
+
+        setTimeout(() => {
+
+          scanCard.classList.add("hidden");
+
+          document.getElementById("scanBtn")
+            .disabled = false;
+
+          loadMockLatestReading();
+
+        }, 700);
 
       }
-    );
+
+    }, 1000);
+
+}
+
+
+/* ================================
+   INITIALIZE MOCK PAGE
+================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    loadMockDevice();
+
+    loadMockLatestReading();
+
+    loadMockHistory();
 
   }
-
-
-  function getBPStatus(
-    systolic,
-    diastolic
-  ) {
-
-    if (
-      systolic >= 140 ||
-      diastolic >= 90
-    ) {
-
-      return {
-        label: 'High',
-        classes: 'bg-red-100 text-red-700'
-      };
-
-    }
-
-
-    if (
-      systolic >= 120 ||
-      diastolic >= 80
-    ) {
-
-      return {
-        label: 'Elevated',
-        classes: 'bg-yellow-100 text-yellow-700'
-      };
-
-    }
-
-
-    return {
-      label: 'Normal',
-      classes: 'bg-green-100 text-green-700'
-    };
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * UPDATE EXISTING PRESIBO TRACK DATA
-   * ------------------------------------------------------------
-   */
-
-  function updatePresiboTrackData(reading) {
-
-    try {
-
-      const date =
-        new Date();
-
-
-      const dateString =
-        `${date.getFullYear()}-` +
-        `${String(date.getMonth() + 1).padStart(2, '0')}-` +
-        `${String(date.getDate()).padStart(2, '0')}`;
-
-
-      const key =
-        `track_data_${dateString}_${userEmail}`;
-
-
-      let data =
-        JSON.parse(
-          localStorage.getItem(key) || '{}'
-        );
-
-
-      data.bloodPressure =
-        reading.value;
-
-
-      localStorage.setItem(
-        key,
-        JSON.stringify(data)
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        'Unable to update Presibo track data:',
-        error
-      );
-
-    }
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * CONNECTION UI
-   * ------------------------------------------------------------
-   */
-
-  function setConnectionStatus(
-    text,
-    dotClass
-  ) {
-
-    document.getElementById(
-      'connectionStatus'
-    ).textContent = text;
-
-
-    const dot =
-      document.getElementById(
-        'connectionDot'
-      );
-
-
-    dot.className =
-      `w-2 h-2 rounded-full ${dotClass}`;
-
-  }
-
-
-  function showScanning(show) {
-
-    const card =
-      document.getElementById(
-        'scanningCard'
-      );
-
-
-    if (show) {
-
-      card.classList.remove('hidden');
-
-    } else {
-
-      card.classList.add('hidden');
-
-    }
-
-  }
-
-
-  function handleDisconnect() {
-
-    setConnectionStatus(
-      'Disconnected',
-      'bg-gray-400'
-    );
-
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * LOAD HISTORY
-   * ------------------------------------------------------------
-   */
-
-  document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-
-      renderHistory();
-
-    }
-  );
-
+);
 </script>
-
-</body>
-</html>
