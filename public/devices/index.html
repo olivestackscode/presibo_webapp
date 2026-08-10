@@ -151,18 +151,29 @@
           </h2>
 
           <p class="text-sm text-gray-600 mt-1 leading-relaxed">
-            Order your Presibo device and start tracking your blood pressure
-            directly in the Presibo app.
+            Get started with Presibo and receive your connected device
+            with the patient plan.
           </p>
 
-          <button
-            type="button"
-            onclick="openMarket()"
-            class="mt-4 inline-flex items-center justify-center gap-2 bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-xl font-semibold transition"
-          >
-            Order Your Device
-            <i class="fas fa-arrow-right text-sm"></i>
-          </button>
+          <div class="mt-4 flex items-center gap-3">
+            <div>
+              <p class="text-xl font-extrabold text-gray-900">₦5,000</p>
+              <p class="text-xs text-gray-500">per month</p>
+            </div>
+
+            <button
+              type="button"
+              onclick="openPayment()"
+              class="inline-flex items-center justify-center gap-2 bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-xl font-semibold transition"
+            >
+              Pay & Get Device
+              <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+          </div>
+
+          <p class="text-xs text-gray-500 mt-3">
+            Secure payment powered by Paystack.
+          </p>
         </div>
       </div>
     </section>
@@ -375,29 +386,80 @@
 
 
 
+<script src="https://js.paystack.co/v2/inline.js"></script>
+
 <script>
 /*
- * PRESIBO MY DEVICE — NO DEVICE VERSION
+ * PRESIBO MY DEVICE — NO DEVICE + PAYSTACK CHECKOUT
  *
- * Intended state:
- * - No BP device connected
- * - No BP readings
- * - No mock history
- * - User can order a Presibo BP Monitor from the marketplace
- * - Scan button can be used when the user gets a device
+ * No fake readings are generated.
+ * Payment uses the supplied LIVE Paystack public key.
+ *
+ * IMPORTANT:
+ * The public key is safe to expose in frontend code.
+ * Never put a Paystack SECRET key in this file.
  */
 
-const MARKET_URL = "https://presibo.com/bp-device-order";
+const PAYSTACK_PUBLIC_KEY =
+  "pk_live_e4512c48de3fef4f92b4b278715d5decfa436d88";
+
+const PLAN_AMOUNT_NAIRA = 5000;
+const PLAN_AMOUNT_KOBO = PLAN_AMOUNT_NAIRA * 100;
+
+const MARKET_URL = "https://presibo.com/market";
+
+let paymentReference = null;
+
+
+function getUserDetails() {
+  let email = "";
+  let name = "";
+
+  try {
+    const session =
+      JSON.parse(localStorage.getItem("user_session") || "{}");
+
+    email =
+      session.email ||
+      localStorage.getItem("email") ||
+      sessionStorage.getItem("email") ||
+      "";
+
+    name =
+      session.name ||
+      session.fullName ||
+      localStorage.getItem("name") ||
+      "";
+
+  } catch (error) {
+    console.warn("Unable to read user session.", error);
+  }
+
+  return { email, name };
+}
+
 
 function setNoDeviceState() {
-  const deviceName = document.getElementById("deviceName");
-  const connectionStatus = document.getElementById("connectionStatus");
-  const connectionDot = document.getElementById("connectionDot");
-  const resultCard = document.getElementById("resultCard");
-  const historyList = document.getElementById("historyList");
-  const emptyHistory = document.getElementById("emptyHistory");
-  const scanMessage = document.getElementById("scanMessage");
-  const scanCard = document.getElementById("scanningCard");
+  const deviceName =
+    document.getElementById("deviceName");
+
+  const connectionStatus =
+    document.getElementById("connectionStatus");
+
+  const connectionDot =
+    document.getElementById("connectionDot");
+
+  const resultCard =
+    document.getElementById("resultCard");
+
+  const historyList =
+    document.getElementById("historyList");
+
+  const emptyHistory =
+    document.getElementById("emptyHistory");
+
+  const scanCard =
+    document.getElementById("scanningCard");
 
   if (deviceName) {
     deviceName.textContent = "No device connected";
@@ -408,28 +470,30 @@ function setNoDeviceState() {
   }
 
   if (connectionDot) {
-    connectionDot.className = "w-2 h-2 rounded-full bg-gray-400";
+    connectionDot.className =
+      "w-2 h-2 rounded-full bg-gray-400";
   }
 
-  // No reading should be displayed until a real device is connected.
   if (resultCard) {
     resultCard.classList.add("hidden");
   }
 
-  // No history for users without a device.
   if (historyList) {
     historyList.innerHTML = "";
   }
 
   if (emptyHistory) {
     emptyHistory.classList.remove("hidden");
+
     emptyHistory.innerHTML = `
       <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
         <i class="fas fa-heart-pulse text-gray-400 text-lg"></i>
       </div>
+
       <p class="text-sm font-semibold text-gray-700 mt-3">
         No BP readings yet
       </p>
+
       <p class="text-xs text-gray-400 mt-1 max-w-xs mx-auto">
         Connect a Presibo BP Monitor to start recording your blood pressure readings.
       </p>
@@ -439,38 +503,262 @@ function setNoDeviceState() {
   if (scanCard) {
     scanCard.classList.add("hidden");
   }
+}
 
-  if (scanMessage) {
-    scanMessage.textContent =
-      "Make sure your Presibo BP Monitor is switched on and nearby.";
+
+/*
+ * ==========================================
+ * PAYSTACK PAYMENT
+ * ==========================================
+ */
+
+function openPayment() {
+  const { email, name } = getUserDetails();
+
+  if (!email) {
+    showPaymentMessage(
+      "Please sign in to Presibo first so we know where to send your payment confirmation.",
+      "error"
+    );
+    return;
   }
+
+  if (!window.PaystackPop) {
+    showPaymentMessage(
+      "Payment service is still loading. Please try again.",
+      "error"
+    );
+    return;
+  }
+
+  const reference =
+    "PRESIBO-" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  paymentReference = reference;
+
+  const paystack = new PaystackPop();
+
+  paystack.newTransaction({
+    key: PAYSTACK_PUBLIC_KEY,
+    email: email,
+    amount: PLAN_AMOUNT_KOBO,
+    currency: "NGN",
+    ref: reference,
+
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Product",
+          variable_name: "product",
+          value: "Presibo Patient Plan + Connected Device"
+        },
+        {
+          display_name: "Plan",
+          variable_name: "plan",
+          value: "₦5,000/month"
+        },
+        {
+          display_name: "Customer Name",
+          variable_name: "customer_name",
+          value: name || "Presibo User"
+        }
+      ]
+    },
+
+    onSuccess: function(transaction) {
+      handlePaymentSuccess(transaction);
+    },
+
+    onCancel: function() {
+      showPaymentMessage(
+        "Payment was cancelled. No charge was completed through this checkout.",
+        "cancel"
+      );
+    }
+  });
 }
 
-function openMarket() {
-  window.location.href = MARKET_URL;
+
+function handlePaymentSuccess(transaction) {
+  const reference =
+    transaction.reference || paymentReference;
+
+  /*
+   * Store the successful client-side transaction locally so
+   * the UI can show confirmation immediately.
+   *
+   * Your backend should still verify this reference with
+   * Paystack before fulfilling an order.
+   */
+  localStorage.setItem(
+    "presibo_last_payment",
+    JSON.stringify({
+      reference: reference,
+      amount: PLAN_AMOUNT_NAIRA,
+      currency: "NGN",
+      product: "Presibo Patient Plan + Connected Device",
+      paidAt: new Date().toISOString()
+    })
+  );
+
+  showPaymentSuccess(reference);
 }
+
+
+function showPaymentSuccess(reference) {
+  const resultCard =
+    document.getElementById("resultCard");
+
+  if (resultCard) {
+    resultCard.classList.add("hidden");
+  }
+
+  const emptyHistory =
+    document.getElementById("emptyHistory");
+
+  if (emptyHistory) {
+    emptyHistory.classList.remove("hidden");
+  }
+
+  const message =
+    document.createElement("div");
+
+  message.id = "paymentSuccess";
+
+  message.className =
+    "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-5";
+
+  message.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+        <i class="fas fa-check text-green-600 text-2xl"></i>
+      </div>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-5">
+        Payment Successful
+      </h2>
+
+      <p class="text-sm text-gray-600 mt-2">
+        Your Presibo plan payment was received successfully.
+      </p>
+
+      <div class="bg-gray-50 rounded-xl p-4 mt-4 text-left">
+        <p class="text-xs text-gray-500">Amount</p>
+        <p class="font-bold text-gray-900">₦${PLAN_AMOUNT_NAIRA.toLocaleString()}</p>
+
+        <p class="text-xs text-gray-500 mt-3">Reference</p>
+        <p class="text-xs font-mono text-gray-700 break-all">${escapeHtml(reference)}</p>
+      </div>
+
+      <p class="text-xs text-gray-500 mt-4">
+        Your device/order confirmation will be handled after payment verification.
+      </p>
+
+      <button
+        type="button"
+        onclick="closePaymentSuccess()"
+        class="w-full mt-5 bg-purple-700 hover:bg-purple-800 text-white py-3 rounded-xl font-semibold"
+      >
+        Done
+      </button>
+
+    </div>
+  `;
+
+  document.body.appendChild(message);
+}
+
+
+function closePaymentSuccess() {
+  document.getElementById("paymentSuccess")?.remove();
+}
+
+
+function showPaymentMessage(message, type) {
+  const existing =
+    document.getElementById("paymentMessage");
+
+  if (existing) existing.remove();
+
+  const box =
+    document.createElement("div");
+
+  box.id = "paymentMessage";
+
+  const bg =
+    type === "error"
+      ? "bg-red-50 border-red-200 text-red-800"
+      : "bg-gray-50 border-gray-200 text-gray-700";
+
+  box.className =
+    `fixed bottom-5 left-1/2 -translate-x-1/2 z-50
+     max-w-md w-[calc(100%-2rem)]
+     border rounded-xl px-4 py-3 shadow-lg text-sm ${bg}`;
+
+  box.textContent = message;
+
+  document.body.appendChild(box);
+
+  setTimeout(() => box.remove(), 5000);
+}
+
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+/*
+ * ==========================================
+ * BLUETOOTH SCAN
+ * ==========================================
+ */
 
 function startScan() {
-  const scanCard = document.getElementById("scanningCard");
-  const scanMessage = document.getElementById("scanMessage");
-  const scanButton = document.getElementById("scanBtn");
-  const timerText = document.getElementById("timerText");
-  const progressBar = document.getElementById("progressBar");
+  const scanCard =
+    document.getElementById("scanningCard");
 
-  // This is a UI-only scan state for now.
-  // It does not create fake readings.
+  const scanMessage =
+    document.getElementById("scanMessage");
+
+  const scanButton =
+    document.getElementById("scanBtn");
+
+  const timerText =
+    document.getElementById("timerText");
+
+  const progressBar =
+    document.getElementById("progressBar");
+
   if (!navigator.bluetooth) {
     scanCard.classList.remove("hidden");
+
     scanMessage.textContent =
-      "Bluetooth is not available in this browser. Connect your Presibo BP Monitor using a supported device/browser.";
+      "Bluetooth is not available in this browser. Connect your Presibo BP Monitor using a supported browser.";
+
     timerText.textContent = "—";
     progressBar.style.width = "0%";
+
     return;
   }
 
   scanCard.classList.remove("hidden");
+
   scanButton.disabled = true;
-  scanButton.classList.add("opacity-50", "cursor-not-allowed");
+
+  scanButton.classList.add(
+    "opacity-50",
+    "cursor-not-allowed"
+  );
 
   scanMessage.textContent =
     "Searching for your Presibo BP Monitor...";
@@ -478,53 +766,65 @@ function startScan() {
   timerText.textContent = "30s";
   progressBar.style.width = "0%";
 
-  /*
-   * Real Bluetooth connection can be added here once the
-   * Presibo BP monitor's Bluetooth service/characteristic
-   * details are available.
-   *
-   * IMPORTANT:
-   * No fake reading is generated.
-   */
-
   let seconds = 30;
 
-  const timer = setInterval(() => {
-    seconds--;
+  const timer =
+    setInterval(() => {
+      seconds--;
 
-    timerText.textContent = `${seconds}s`;
+      timerText.textContent =
+        `${seconds}s`;
 
-    const progress = ((30 - seconds) / 30) * 100;
-    progressBar.style.width = `${progress}%`;
+      const progress =
+        ((30 - seconds) / 30) * 100;
 
-    if (seconds <= 0) {
-      clearInterval(timer);
+      progressBar.style.width =
+        `${progress}%`;
 
-      scanMessage.textContent =
-        "No compatible Presibo BP Monitor was connected.";
+      if (seconds <= 0) {
+        clearInterval(timer);
 
-      scanButton.disabled = false;
-      scanButton.classList.remove("opacity-50", "cursor-not-allowed");
+        scanMessage.textContent =
+          "No compatible Presibo BP Monitor was connected.";
 
-      setTimeout(() => {
-        scanCard.classList.add("hidden");
-        timerText.textContent = "30s";
-        progressBar.style.width = "0%";
-      }, 2500);
-    }
-  }, 1000);
-}
+        scanButton.disabled = false;
+
+        scanButton.classList.remove(
+          "opacity-50",
+          "cursor-not-allowed"
+        );
+
+        setTimeout(() => {
+          scanCard.classList.add("hidden");
+          timerText.textContent = "30s";
+          progressBar.style.width = "0%";
+        }, 2500);
+      }
+    }, 1000);
+  }
+
 
 function stopScan() {
-  document.getElementById("scanningCard")?.classList.add("hidden");
+  document
+    .getElementById("scanningCard")
+    ?.classList.add("hidden");
 
-  const scanButton = document.getElementById("scanBtn");
+  const scanButton =
+    document.getElementById("scanBtn");
 
   if (scanButton) {
     scanButton.disabled = false;
-    scanButton.classList.remove("opacity-50", "cursor-not-allowed");
+
+    scanButton.classList.remove(
+      "opacity-50",
+      "cursor-not-allowed"
+    );
   }
 }
 
-document.addEventListener("DOMContentLoaded", setNoDeviceState);
+
+document.addEventListener(
+  "DOMContentLoaded",
+  setNoDeviceState
+);
 </script>
