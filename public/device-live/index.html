@@ -209,6 +209,7 @@
             line-height: 1.5;
         }
 
+        /* Doctor Pairing Box */
         .doctor-box {
             background: var(--doctor-bg);
             border: 1px solid var(--doctor-border);
@@ -271,6 +272,7 @@
             font-weight: 500;
             margin-bottom: 16px;
             text-align: center;
+            line-height: 1.4;
         }
 
         .booking-status.success {
@@ -513,48 +515,77 @@
         docAvatar.innerText = initials || '🩺';
     }
 
-    // Direct JSON Dispatch to Email API
-    function sendEvaluationEmail(record, doctor) {
-        if (!record.email) return;
+    // Consolidated email: Vitals + Clinical Evaluation + Confirmed Appointment Date & Time
+    async function sendCombinedReportEmail(record, doctor, apptDate, apptTime) {
+        const recipientEmail = record.email || '';
+        if (!recipientEmail || recipientEmail.trim() === '') return;
 
         const patientName = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
-        const docNameStr  = docName.innerText;
-        const sugarText   = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
+        const docFullName = [doctor.firstname, doctor.midname, doctor.lastname].filter(Boolean).join(' ');
+        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
+        const sugarText = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
 
         const emailMessageHtml = `
             <p>Dear <strong>${patientName}</strong>,</p>
-            <p>Here is the clinical evaluation of your recent vital signs reading:</p>
+            <p>Your vital signs have been evaluated and your consultation appointment is confirmed.</p>
             
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 15px 0;">
-                <p style="margin: 0 0 8px 0;"><strong>Blood Pressure:</strong> ${record.bp_sys}/${record.bp_dia} mmHg</p>
-                <p style="margin: 0 0 8px 0;"><strong>Blood Sugar:</strong> ${sugarText}</p>
-                <p style="margin: 0;"><strong>Recorded At:</strong> ${record.datetime || 'Recently'}</p>
+            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">1. Vital Signs Reading</h3>
+            <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Pressure:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${record.bp_sys}/${record.bp_dia} mmHg</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Sugar:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${sugarText}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px;"><strong>Reading Recorded:</strong></td>
+                    <td style="padding: 10px 14px;">${record.datetime || 'Just now'}</td>
+                </tr>
+            </table>
+
+            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">2. Clinical Analysis &amp; Advice</h3>
+            <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #1e3a8a; line-height: 1.5;">${record.evaluation || 'No clinical observations logged.'}</p>
             </div>
 
-            <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 15px 0;">
-                <h4 style="margin: 0 0 8px 0; color: #1e40af;">Clinical Analysis &amp; Advice</h4>
-                <p style="margin: 0; color: #1e3a8a;">${record.evaluation || 'No clinical remarks recorded.'}</p>
-            </div>
+            <h3 style="color: #16a34a; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment Details</h3>
+            <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 20px;">
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Assigned Doctor:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold; color: #14532d;">${formattedDocName}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Specialty:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.specialization || doctor.specialty || 'General Practitioner'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Location:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.location || 'Virtual Clinic'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Appointment Date:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold;">${apptDate}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px;"><strong>Appointment Time:</strong></td>
+                    <td style="padding: 10px 14px; font-weight: bold;">${apptTime}</td>
+                </tr>
+            </table>
 
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin: 15px 0;">
-                <p style="margin: 0 0 4px 0; font-size: 13px; color: #166534; font-weight: bold; text-transform: uppercase;">Assigned Physician</p>
-                <p style="margin: 0; font-size: 16px; font-weight: bold; color: #14532d;">${docNameStr}</p>
-                <p style="margin: 0; font-size: 14px; color: #15803d;">${doctor.specialization || doctor.specialty || 'General Practitioner'} (${doctor.location || 'Presibo Telehealth'})</p>
-            </div>
-
-            <p>Thank you for using Presibo Health.</p>
+            <p style="margin-top: 15px;">Please be ready 10 minutes before your scheduled appointment time. If you need any assistance, reach us at support@presibo.com.</p>
         `;
 
         const emailPayload = {
             action: "send",
             type: "custom",
-            email: record.email,
+            email: recipientEmail,
             name: patientName,
-            title: "Your Presibo Health Vital Signs Evaluation",
+            title: `Presibo Health - Vitals Evaluation & Appointment Confirmation`,
             message: emailMessageHtml
         };
 
-        // Fire POST payload directly to email API
         fetch(EMAIL_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -588,7 +619,6 @@
         resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully.';
 
         pairDoctor();
-        sendEvaluationEmail(record, currentMatchedDoctor);
 
         bookingStatus.className = 'booking-status';
         bookingStatus.innerText = '';
@@ -615,17 +645,18 @@
 
         const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
         const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
+        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
         
         const reasonText = `Device Reading: BP ${currentPatientRecord.bp_sys}/${currentPatientRecord.bp_dia} mmHg, Sugar: ${currentPatientRecord.sugar || 'N/A'} mg/dL. Evaluation: ${currentPatientRecord.evaluation || 'None'}`;
 
-        const payload = {
+        const appointmentPayload = {
             name: patientFullName,
             email: currentPatientRecord.email || 'patient@presibo.com',
             phone: currentPatientRecord.phone || '',
             date: apptDate,
             time: apptTime,
             doctor_id: String(currentMatchedDoctor.id || ''),
-            doctor: docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`,
+            doctor: formattedDocName,
             specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
             location: currentMatchedDoctor.location || 'Virtual Clinic',
             description: reasonText
@@ -638,14 +669,17 @@
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(appointmentPayload)
             });
 
             const resData = await response.json();
 
             if (response.ok && (resData.status === 'success' || resData.success)) {
+                // Dispatch complete results + appointment date & time email
+                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, apptDate, apptTime);
+
                 bookingStatus.className = 'booking-status success';
-                bookingStatus.innerText = '✓ Appointment booked successfully!';
+                bookingStatus.innerHTML = `✓ Appointment Confirmed for <strong>${apptDate} at ${apptTime}</strong>.<br>Full report & confirmation sent to your email.`;
                 bookBtnText.innerText = 'Booking Confirmed';
             } else {
                 throw new Error(resData.message || 'Failed to complete appointment booking.');
