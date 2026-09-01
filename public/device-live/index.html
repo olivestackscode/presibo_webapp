@@ -264,7 +264,16 @@
             align-items: center;
         }
 
-        /* Booking Notification Banner */
+        /* Notification Badges */
+        .email-status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .booking-status {
             display: none;
             padding: 12px 16px;
@@ -401,6 +410,7 @@
             </div>
         </div>
 
+        <div class="email-status" id="emailStatus"></div>
         <div class="booking-status" id="bookingStatus"></div>
 
         <div class="btn-group">
@@ -417,6 +427,7 @@
     const DEVICES_API_URL      = "https://api.presibo.com/devices/index.php";
     const DOCTORS_API_URL      = "https://app.presibo.com/doctors.json";
     const APPOINTMENTS_API_URL = "https://api.presibo.com/appointments/new.php";
+    const EMAIL_API_URL        = "https://api.presibo.com/email/index.php";
     const POLL_INTERVAL        = 3000;
 
     const fallbackData = {"doctors": [
@@ -465,6 +476,7 @@
     const bookSpinner        = document.getElementById('bookSpinner');
     const bookBtnText        = document.getElementById('bookBtnText');
     const bookingStatus      = document.getElementById('bookingStatus');
+    const emailStatus        = document.getElementById('emailStatus');
 
     const resPatientName     = document.getElementById('resPatientName');
     const resTimestamp       = document.getElementById('resTimestamp');
@@ -495,7 +507,7 @@
         }
     }
 
-    // Pure Random Doctor Selection
+    // Random doctor selection
     function pairDoctor() {
         if (!doctorsList || doctorsList.length === 0) return;
 
@@ -513,6 +525,68 @@
 
         const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
         docAvatar.innerText = initials || '🩺';
+    }
+
+    // Email Dispatch Function
+    async function sendEvaluationEmail(record, doctor) {
+        if (!record.email) {
+            emailStatus.innerHTML = `<span>⚠️ No patient email on record — evaluation not emailed.</span>`;
+            return;
+        }
+
+        const patientName = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+        const docNameStr  = docName.innerText;
+        const sugarText   = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
+
+        const emailMessageHtml = `
+            <p>Dear <strong>${patientName}</strong>,</p>
+            <p>Here is the clinical evaluation of your recent vital signs reading:</p>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                <p style="margin: 0 0 8px 0;"><strong>Blood Pressure:</strong> ${record.bp_sys}/${record.bp_dia} mmHg</p>
+                <p style="margin: 0 0 8px 0;"><strong>Blood Sugar:</strong> ${sugarText}</p>
+                <p style="margin: 0;"><strong>Recorded At:</strong> ${record.datetime || 'Recently'}</p>
+            </div>
+
+            <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 15px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #1e40af;">Clinical Analysis &amp; Advice</h4>
+                <p style="margin: 0; color: #1e3a8a;">${record.evaluation || 'No clinical remarks recorded.'}</p>
+            </div>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                <p style="margin: 0 0 4px 0; font-size: 13px; color: #166534; font-weight: bold; text-transform: uppercase;">Assigned Physician</p>
+                <p style="margin: 0; font-size: 16px; font-weight: bold; color: #14532d;">${docNameStr}</p>
+                <p style="margin: 0; font-size: 14px; color: #15803d;">${doctor.specialization || doctor.specialty || 'General Practitioner'} (${doctor.location || 'Presibo Telehealth'})</p>
+            </div>
+
+            <p>If you have any questions or would like to discuss this reading further, please log in to your Presibo portal or consult your assigned physician.</p>
+        `;
+
+        const emailPayload = {
+            action: "send",
+            type: "custom",
+            email: record.email,
+            name: patientName,
+            title: "Your Presibo Health Vital Signs Evaluation",
+            message: emailMessageHtml
+        };
+
+        try {
+            const res = await fetch(EMAIL_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(emailPayload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                emailStatus.innerHTML = `<span>✉️ Evaluation report sent to <strong>${record.email}</strong></span>`;
+            } else {
+                emailStatus.innerHTML = `<span>⚠️ Email delivery notice: ${data.error || 'Could not send email'}</span>`;
+            }
+        } catch (err) {
+            console.warn("Email API error:", err);
+            emailStatus.innerHTML = `<span>⚠️ Could not connect to email server.</span>`;
+        }
     }
 
     async function fetchLatestRecord() {
@@ -540,10 +614,13 @@
         resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
         resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully.';
 
-        // Pick a fresh random doctor for every reading
+        // Pick random doctor
         pairDoctor();
 
-        // Reset booking button state
+        // Send Evaluation Email Automatically
+        sendEvaluationEmail(record, currentMatchedDoctor);
+
+        // Reset booking state
         bookingStatus.className = 'booking-status';
         bookingStatus.innerText = '';
         btnBookAppointment.disabled = false;
