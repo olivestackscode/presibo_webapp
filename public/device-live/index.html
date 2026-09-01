@@ -527,23 +527,27 @@
         docAvatar.innerText = initials || '🩺';
     }
 
-    // Fetches the latest appointment ID from index.php and computes ID + 1
+    // Arithmetic Addition: Reads the highest numeric ID and adds 1
     async function getNextAppointmentId() {
         try {
             const res = await fetch(APPOINTMENTS_GET_URL, { cache: "no-store" });
             if (res.ok) {
                 const result = await res.json();
                 if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-                    const latestId = parseInt(result.data[0].id, 10);
-                    if (!isNaN(latestId)) {
-                        return latestId + 1;
+                    const allNumericIds = result.data
+                        .map(item => Number(item.id))
+                        .filter(id => !isNaN(id) && id > 0);
+                    
+                    if (allNumericIds.length > 0) {
+                        const maxId = Math.max(...allNumericIds);
+                        return maxId + 1; // Pure mathematical integer sum
                     }
                 }
             }
         } catch (err) {
-            console.warn("Could not fetch last appointment ID:", err);
+            console.warn("Could not calculate next appointment ID:", err);
         }
-        return Math.floor(1000 + Math.random() * 9000); // Safe numeric fallback
+        return 1;
     }
 
     async function sendCombinedReportEmail(record, doctor, apptDate, apptTime, meetingUrl) {
@@ -674,7 +678,7 @@
         bookBtnText.innerText = 'Processing Booking...';
         bookingStatus.className = 'booking-status';
 
-        // 1. Get the next appointment ID (last ID + 1) purely in JS
+        // Perform integer addition (e.g. 45 + 1 = 46)
         const nextId = await getNextAppointmentId();
         const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
 
@@ -714,7 +718,6 @@
             const resData = await response.json();
 
             if (response.ok && (resData.status === 'success' || resData.success)) {
-                // Send email with vitals, evaluation, date, time, and calculated meeting link
                 sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, apptDate, apptTime, meetingUrl);
 
                 bookingStatus.className = 'booking-status success';
