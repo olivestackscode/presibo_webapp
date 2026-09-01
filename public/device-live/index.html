@@ -176,7 +176,7 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- Hero Header Banner (Matching /devices Layout) -->
+    <!-- Hero Header Banner -->
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-800/40">
       <!-- Background Ambient Glow -->
       <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -236,7 +236,7 @@
       </div>
     </div>
 
-    <!-- Overview Metrics Cards Row (Matching /devices Grid) -->
+    <!-- Overview Metrics Cards Row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
         <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
@@ -327,7 +327,7 @@
         </div>
       </div>
 
-      <!-- Vitals Values Grid (Matching /devices Result Style) -->
+      <!-- Vitals Values Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         <!-- Blood Pressure Card -->
@@ -393,7 +393,45 @@
 
     </div>
 
-    <!-- Presibo Hardware Store / Paystack Order Promo Card (Matching /devices) -->
+    <!-- History Renderer Section: Older Results History from API -->
+    <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-xl font-extrabold text-gray-900 dark:text-white">Older Ingestion Telemetry History</h2>
+            <span class="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-extrabold border border-purple-200 dark:border-purple-800" id="historyCountBadge">0 Records</span>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+            Historical results from <code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-purple-600 dark:text-purple-400">api.presibo.com/devices</code>. For patient privacy, owner names are hidden by default—click on any entry to reveal.
+          </p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="fetchHistoryLog()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+            <i class="fas fa-rotate text-xs"></i> Refresh History
+          </button>
+          <button onclick="exportHistoryCSV()" class="bg-royal-purple hover:bg-purple-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+            <i class="fas fa-file-csv text-xs"></i> Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- History List Items -->
+      <div id="historyListContainer" class="divide-y divide-gray-100 dark:divide-gray-800">
+        <!-- Dynamically rendered via JS -->
+      </div>
+
+      <!-- Empty History State -->
+      <div id="historyEmptyState" class="hidden text-center py-10">
+        <div class="w-14 h-14 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+          <i class="fas fa-clock-rotate-left"></i>
+        </div>
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-300 mt-3">No Older Records Found</p>
+        <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">No previous vital signs telemetry records found in the API database.</p>
+      </div>
+    </div>
+
+    <!-- Presibo Hardware Store / Paystack Order Promo Card -->
     <div class="bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-purple-700/50">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         
@@ -437,7 +475,7 @@
 
   </main>
 
-  <!-- Script Logic (100% Original Logic & Endpoints Retained) -->
+  <!-- Script Logic (Original Polling + Doctor Pairing + History Renderer with Owner Masking) -->
   <script>
     const DEVICES_API_URL         = "https://api.presibo.com/devices/index.php";
     const DOCTORS_API_URL         = "https://app.presibo.com/doctors.json";
@@ -482,6 +520,7 @@
 
     let currentPatientRecord = null;
     let currentMatchedDoctor = null;
+    let fetchedApiRecords = [];
 
     const scanView           = document.getElementById('scanView');
     const resultsView        = document.getElementById('resultsView');
@@ -513,6 +552,52 @@
       if (statusText) statusText.innerText = text;
       const heroStat = document.getElementById("heroStatusText");
       if (heroStat) heroStat.innerText = text;
+    }
+
+    // Evaluate health classification & return appropriate colors (Red for Emergency, Yellow/Amber for Warning, Green for Normal)
+    function evaluateHealthStatus(bpSys, bpDia, sugar) {
+      const sys = parseInt(bpSys, 10) || 0;
+      const dia = parseInt(bpDia, 10) || 0;
+      const sug = parseFloat(sugar) || 0;
+
+      // Emergency / Danger: Red (#ef4444)
+      if (sys >= 140 || dia >= 90 || (sys > 0 && sys <= 90) || sug >= 200 || (sug > 0 && sug < 60)) {
+        let label = "Emergency";
+        if (sys >= 180 || dia >= 120) label = "Hypertensive Crisis";
+        else if (sys >= 140 || dia >= 90) label = "Stage 2 High";
+        else if (sug >= 200) label = "Severe Hyperglycemia";
+        else if (sug > 0 && sug < 60) label = "Severe Hypoglycemia";
+
+        return {
+          label: label,
+          colorClass: "bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800",
+          iconClass: "fa-triangle-exclamation text-red-600 dark:text-red-400",
+          badgeColor: "red"
+        };
+      }
+
+      // Warning / Elevated: Yellow / Amber (#f59e0b)
+      if (sys >= 120 || dia >= 80 || (sug >= 140 && sug < 200)) {
+        let label = "Elevated";
+        if (sys >= 130 || dia >= 80) label = "Stage 1 High";
+        else if (sys >= 120) label = "Elevated BP";
+        else if (sug >= 140) label = "Elevated Glucose";
+
+        return {
+          label: label,
+          colorClass: "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+          iconClass: "fa-circle-exclamation text-amber-600 dark:text-amber-400",
+          badgeColor: "amber"
+        };
+      }
+
+      // Normal / Optimal: Green (#10b981)
+      return {
+        label: "Normal",
+        colorClass: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+        iconClass: "fa-check-circle text-emerald-600 dark:text-emerald-400",
+        badgeColor: "emerald"
+      };
     }
 
     async function loadDoctors() {
@@ -669,6 +754,8 @@
         if (!response.ok) throw new Error("Network response was not OK");
         const result = await response.json();
         if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+          fetchedApiRecords = result.data;
+          renderHistoryLog(); // Refresh history log whenever API is called
           return result.data[0];
         }
         return null;
@@ -676,6 +763,125 @@
         console.error("API Read Error:", err);
         return null;
       }
+    }
+
+    // Toggle Privacy for Owner Name in History Log
+    function togglePatientPrivacy(element, realName) {
+      if (!element) return;
+      const isRevealed = element.getAttribute("data-revealed") === "true";
+      if (isRevealed) {
+        element.setAttribute("data-revealed", "false");
+        element.innerHTML = `<i class="fas fa-eye-slash text-xs mr-1.5 text-gray-400"></i><span class="font-mono text-gray-400 font-bold">• • • • • • • •</span> <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1 font-sans">(Click to reveal owner)</span>`;
+      } else {
+        element.setAttribute("data-revealed", "true");
+        element.innerHTML = `<i class="fas fa-eye text-xs mr-1.5 text-emerald-600 dark:text-emerald-400"></i><strong class="text-gray-900 dark:text-white font-extrabold">${realName}</strong> <span class="text-[10px] text-gray-400 font-normal underline ml-1 font-sans">(Click to hide)</span>`;
+      }
+    }
+
+    // Render History Log of Older Results from API with Classification & Owner Masking
+    async function fetchHistoryLog() {
+      try {
+        const res = await fetch(DEVICES_API_URL, { cache: "no-store" });
+        if (res.ok) {
+          const result = await res.json();
+          if (result.success && Array.isArray(result.data)) {
+            fetchedApiRecords = result.data;
+            renderHistoryLog();
+          }
+        }
+      } catch (e) {
+        console.warn("Error fetching history records:", e);
+      }
+    }
+
+    function renderHistoryLog() {
+      const container = document.getElementById("historyListContainer");
+      const emptyState = document.getElementById("historyEmptyState");
+      const badge = document.getElementById("historyCountBadge");
+      if (!container) return;
+
+      if (!fetchedApiRecords || fetchedApiRecords.length === 0) {
+        container.innerHTML = "";
+        if (emptyState) emptyState.classList.remove("hidden");
+        if (badge) badge.textContent = "0 Records";
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add("hidden");
+      if (badge) badge.textContent = `${fetchedApiRecords.length} Records`;
+
+      container.innerHTML = fetchedApiRecords.map((rec, index) => {
+        const evalStatus = evaluateHealthStatus(rec.bp_sys, rec.bp_dia, rec.sugar);
+        const ownerFullName = `${rec.first_name || 'Patient'} ${rec.last_name || ''}`.trim();
+        const bpText = (rec.bp_sys && rec.bp_dia) ? `${rec.bp_sys}/${rec.bp_dia}` : '--/--';
+        const sugarText = rec.sugar ? `${rec.sugar} mg/dL` : 'N/A';
+        const timeText = rec.datetime || 'N/A';
+
+        return `
+          <div class="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group transition hover:bg-gray-50/80 dark:hover:bg-gray-800/40 px-2 rounded-2xl">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-2xl ${evalStatus.colorClass} flex items-center justify-center text-lg shrink-0 mt-0.5 shadow-sm">
+                <i class="fas ${evalStatus.iconClass}"></i>
+              </div>
+
+              <div class="space-y-1">
+                <!-- Patient Owner Name (Masked by default) -->
+                <div class="text-sm">
+                  <span class="patient-name-mask inline-flex items-center cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-transparent hover:border-purple-200 transition" 
+                        data-revealed="false" 
+                        onclick="togglePatientPrivacy(this, '${ownerFullName.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-eye-slash text-xs mr-1.5 text-gray-400"></i>
+                    <span class="font-mono text-gray-400 font-bold">• • • • • • • •</span> 
+                    <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1.5 font-sans">(Click to reveal owner)</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 text-xs">
+                  <span class="font-black text-gray-900 dark:text-white">
+                    BP: <span class="text-purple-700 dark:text-purple-300">${bpText}</span> mmHg
+                  </span>
+                  <span>•</span>
+                  <span class="font-semibold text-gray-700 dark:text-gray-300">
+                    Sugar: <span class="text-amber-600 dark:text-amber-400">${sugarText}</span>
+                  </span>
+                  <span>•</span>
+                  <span class="text-gray-400 font-medium">${timeText}</span>
+                </div>
+
+                ${rec.evaluation ? `<p class="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-1 italic max-w-xl">"${rec.evaluation}"</p>` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-center">
+              <span class="px-3 py-1 rounded-full text-xs font-bold border ${evalStatus.colorClass} flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full ${evalStatus.badgeColor === 'red' ? 'bg-red-500' : (evalStatus.badgeColor === 'amber' ? 'bg-amber-500' : 'bg-emerald-500')}"></span>
+                ${evalStatus.label}
+              </span>
+              <button onclick="renderRecord(fetchedApiRecords[${index}])" class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 px-2.5 py-1 rounded-lg transition" title="Inspect Full Record">
+                Inspect <i class="fas fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function exportHistoryCSV() {
+      if (!fetchedApiRecords || fetchedApiRecords.length === 0) return alert("No telemetry records to export.");
+      let csv = "ID,First Name,Last Name,Blood Pressure (Systolic/Diastolic),Blood Sugar (mg/dL),Recorded Timestamp,Health Status,Clinical Evaluation\n";
+      fetchedApiRecords.forEach(r => {
+        const evalStatus = evaluateHealthStatus(r.bp_sys, r.bp_dia, r.sugar);
+        const nameFirst = (r.first_name || 'Patient').replace(/"/g, '""');
+        const nameLast = (r.last_name || '').replace(/"/g, '""');
+        const notes = (r.evaluation || '').replace(/"/g, '""');
+        csv += `"${r.id || ''}","${nameFirst}","${nameLast}","${r.bp_sys || ''}/${r.bp_dia || ''}","${r.sugar || ''}","${r.datetime || ''}","${evalStatus.label}","${notes}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'presibo_older_telemetry_results.csv';
+      a.click();
     }
 
     function renderRecord(record) {
@@ -697,6 +903,7 @@
 
       scanView.classList.add("hidden");
       resultsView.classList.remove("hidden");
+      resultsView.scrollIntoView({ behavior: 'smooth' });
       setStatus("Reading Complete", true);
     }
 
@@ -796,6 +1003,7 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       await loadDoctors();
+      await fetchHistoryLog();
       startScan();
     });
   </script>
