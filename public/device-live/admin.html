@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Device Entry | Presibo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --input-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .admin-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 650px;
+            padding: 32px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: var(--input-bg);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Result Callout */
+        .response-box {
+            display: none;
+            margin-top: 24px;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid transparent;
+        }
+
+        .response-box.success {
+            display: block;
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .response-box.error {
+            display: block;
+            background-color: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .response-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .response-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-card">
+    <div class="header">
+        <h1>Device Reading Intake</h1>
+        <p>Record clinical vitals and trigger instant AI analysis</p>
+    </div>
+
+    <form id="vitalsForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" required placeholder="e.g. John">
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name *</label>
+                <input type="text" id="last_name" required placeholder="e.g. Doe">
+            </div>
+
+            <div class="form-group">
+                <label for="bp_sys">Systolic BP (mmHg) *</label>
+                <input type="number" id="bp_sys" required min="50" max="300" placeholder="120">
+            </div>
+
+            <div class="form-group">
+                <label for="bp_dia">Diastolic BP (mmHg) *</label>
+                <input type="number" id="bp_dia" required min="30" max="200" placeholder="80">
+            </div>
+
+            <div class="form-group">
+                <label for="sugar">Blood Sugar (mg/dL) *</label>
+                <input type="number" step="0.1" id="sugar" required min="10" max="1000" placeholder="95.5">
+            </div>
+
+            <div class="form-group">
+                <label for="datetime">Reading Timestamp</label>
+                <input type="datetime-local" id="datetime">
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="spinner" id="btnSpinner"></span>
+                <span id="btnText">Save & Trigger Analysis</span>
+            </button>
+        </div>
+    </form>
+
+    <div class="response-box" id="responseBox">
+        <div class="response-title" id="responseTitle">Result</div>
+        <div class="response-content" id="responseContent"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://api.presibo.com/devices/index.php";
+
+    const form = document.getElementById('vitalsForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnText = document.getElementById('btnText');
+    const responseBox = document.getElementById('responseBox');
+    const responseTitle = document.getElementById('responseTitle');
+    const responseContent = document.getElementById('responseContent');
+    const datetimeInput = document.getElementById('datetime');
+
+    // Pre-fill datetime with current local time
+    function setCurrentDateTime() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        datetimeInput.value = now.toISOString().slice(0, 16);
+    }
+    setCurrentDateTime();
+
+    function setLoading(isLoading) {
+        submitBtn.disabled = isLoading;
+        btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+        btnText.innerText = isLoading ? 'Processing AI Evaluation...' : 'Save & Trigger Analysis';
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        responseBox.className = 'response-box';
+
+        // Format datetime to YYYY-MM-DD HH:MM:SS for MySQL
+        let rawDate = datetimeInput.value ? new Date(datetimeInput.value) : new Date();
+        const formattedDate = rawDate.toISOString().slice(0, 19).replace('T', ' ');
+
+        const payload = {
+            first_name: document.getElementById('first_name').value.trim(),
+            last_name: document.getElementById('last_name').value.trim(),
+            bp_sys: parseInt(document.getElementById('bp_sys').value, 10),
+            bp_dia: parseInt(document.getElementById('bp_dia').value, 10),
+            sugar: parseFloat(document.getElementById('sugar').value),
+            datetime: formattedDate
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                responseBox.className = 'response-box success';
+                responseTitle.innerText = `Record Saved (ID: #${result.id})`;
+                responseContent.innerHTML = `
+                    <strong>Generated Analysis:</strong><br>
+                    ${result.evaluation || 'No evaluation returned.'}
+                `;
+                form.reset();
+                setCurrentDateTime();
+            } else {
+                throw new Error(result.message || 'Failed to save record.');
+            }
+        } catch (err) {
+            responseBox.className = 'response-box error';
+            responseTitle.innerText = 'Submission Failed';
+            responseContent.innerText = err.message || 'An error occurred while connecting to the server.';
+        } finally {
+            setLoading(false);
+        }
+    });
+</script>
+
+</body>
+</html>

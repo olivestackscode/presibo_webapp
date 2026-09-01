@@ -3,828 +3,973 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Connected Medical Devices & Health Sync Hub</title>
+  <meta name="description" content="Connect, manage, and sync your Bluetooth blood pressure monitor, continuous glucose monitor, smart wearables, and vitals sensors with Presibo AI Health.">
+  <meta name="keywords" content="Presibo, medical devices, blood pressure monitor, bluetooth vitals, CGM, glucose tracker, smartwatch sync, Paystack device order">
+  <meta name="author" content="Presibo Team">
 
-  <title>Presibo - My Device</title>
+  <!-- Favicons -->
+  <link rel="icon" href="/assets/img/new_presibo_icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/img/new_presibo_icon.png">
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS / Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  >
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'dark-card': '#1E293B',
+            'dark-bg': '#0F172A'
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
 
   <style>
-    body {
-      font-family: Inter, Arial, sans-serif;
-    }
-
+    body { font-family: 'Inter', sans-serif; }
+    
     .scan-ring {
-      animation: pulse-ring 1.5s infinite;
+      animation: pulse-ring 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1);
     }
-
     @keyframes pulse-ring {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      70% {
-        transform: scale(1.12);
-        opacity: 0.35;
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+      0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(107, 33, 168, 0.4); }
+      70% { transform: scale(1.15); opacity: 0.4; box-shadow: 0 0 0 20px rgba(107, 33, 168, 0); }
+      100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(107, 33, 168, 0); }
     }
 
-    .progress-bar {
-      transition: width 1s linear;
+    .pulse-glow {
+      animation: heart-pulse 1.2s infinite ease-in-out;
+    }
+    @keyframes heart-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .progress-bar { transition: width 0.8s linear; }
+
+    /* Custom Glassmorphism card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.85);
     }
   </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-  <!-- Header -->
-  <header class="bg-white border-b shadow-sm">
-    <div class="max-w-3xl mx-auto px-5">
-      <div class="h-16 flex items-center justify-between">
-
-        <div class="flex items-center gap-3">
-          <img
-            src="/assets/img/new_presibo_icon.png"
-            class="w-9 h-9"
-            alt="Presibo"
-          >
-
-          <div>
-            <h1 class="font-bold text-gray-900">My Device</h1>
-            <p class="text-xs text-gray-500">Blood Pressure Monitor</p>
-          </div>
+  <!-- Header Navigation -->
+  <header class="bg-white dark:bg-dark-card border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center space-x-3">
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="/dashboard" class="flex items-center space-x-2">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-9 h-9">
+            <span class="font-extrabold text-xl text-royal-purple dark:text-purple-400 tracking-tight">Presibo</span>
+          </a>
+          <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+            Devices Hub
+          </span>
         </div>
 
-        <a
-          href="/dashboard"
-          class="text-gray-500 hover:text-gray-800"
-        >
-          <i class="fas fa-arrow-left"></i>
-        </a>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex space-x-5">
+          <a href="/dashboard" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Dashboard</a>
+          <a href="/track" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Track</a>
+          <a href="/devices" class="text-sm font-bold text-royal-purple dark:text-purple-400 border-b-2 border-royal-purple dark:border-purple-400 pb-1">Devices</a>
+          <a href="/devices2" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Live Waveform</a>
+          <a href="/fitness" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Fitness</a>
+          <a href="/food" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">FoodSquare</a>
+          <a href="/doctors" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Doctors</a>
+          <a href="/settings" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Settings</a>
+        </nav>
 
+        <!-- Right Controls -->
+        <div class="flex items-center space-x-3">
+          <!-- Theme Toggle Button -->
+          <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon dark:hidden text-lg"></i>
+            <i class="fas fa-sun hidden dark:inline-block text-amber-400 text-lg"></i>
+          </button>
+
+          <!-- Quick Pair Button -->
+          <button onclick="openPairingModal()" class="hidden sm:inline-flex items-center gap-2 bg-royal-purple hover:bg-purple-800 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl transition shadow-sm">
+            <i class="fas fa-plus"></i> Pair Device
+          </button>
+
+          <!-- User Profile Avatar -->
+          <a href="/profile" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" id="userAvatar">
+              U
+            </div>
+          </a>
+        </div>
       </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-800 px-4 pt-2 pb-4 space-y-2 bg-white dark:bg-dark-card">
+      <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Dashboard</a>
+      <a href="/track" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Track Vitals</a>
+      <a href="/devices" class="block px-3 py-2 rounded-md text-base font-medium text-royal-purple font-bold bg-purple-50 dark:bg-purple-900/30">Devices Hub</a>
+      <a href="/devices2" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Live Waveform Monitor</a>
+      <a href="/fitness" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Fitness</a>
+      <a href="/food" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">FoodSquare</a>
+      <a href="/doctors" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Doctors</a>
+      <a href="/settings" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Settings</a>
     </div>
   </header>
 
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-  <main class="max-w-3xl mx-auto px-5 py-6 space-y-5">
+    <!-- Hero Header Banner -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-800/40">
+      <!-- Background Ambient Glow -->
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Device Card -->
-    <section class="bg-white rounded-2xl shadow-sm border p-6">
-
-      <div class="flex items-center justify-between">
-
-        <div class="flex items-center gap-4">
-
-          <div
-            id="deviceIcon"
-            class="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center"
-          >
-            <i class="fas fa-heart-pulse text-purple-700 text-2xl"></i>
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Real-time Telemetry & Web Bluetooth API Active
           </div>
-
-          <div>
-            <h2
-              id="deviceName"
-              class="font-bold text-gray-900"
-            >
-              No device connected
-            </h2>
-
-            <div class="flex items-center gap-2 mt-1">
-
-              <span
-                id="connectionDot"
-                class="w-2 h-2 rounded-full bg-gray-400"
-              ></span>
-
-              <span
-                id="connectionStatus"
-                class="text-sm text-gray-500"
-              >
-                Ready to connect
-              </span>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Scan Button -->
-      <button
-        id="scanBtn"
-        onclick="startScan()"
-        class="w-full mt-6 bg-purple-700 hover:bg-purple-800 text-white py-3.5 rounded-xl font-semibold transition"
-      >
-        <i class="fas fa-bluetooth-b mr-2"></i>
-        Scan for My BP Device
-      </button>
-
-      <p class="text-xs text-gray-500 text-center mt-3">
-        Make sure your BP monitor is switched on and nearby.
-      </p>
-
-    </section>
-
-    <!-- Order Device -->
-    <section class="bg-purple-50 border border-purple-100 rounded-2xl p-5">
-      <div class="flex items-start gap-4">
-        <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center shrink-0">
-          <i class="fas fa-cart-shopping text-purple-700"></i>
-        </div>
-
-        <div class="flex-1">
-          <h2 class="font-bold text-gray-900">
-            Don't have a Presibo BP Monitor?
-          </h2>
-
-          <p class="text-sm text-gray-600 mt-1 leading-relaxed">
-            Get started with Presibo and receive your connected device
-           
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            Presibo Smart Devices & Telemetry Hub
+          </h1>
+          <p class="text-sm sm:text-base text-gray-300 max-w-2xl leading-relaxed">
+            Seamlessly pair, monitor, and synchronize your Blood Pressure Monitors, Continuous Glucose Monitors (CGM), Smart Watches, Pulse Oximeters, and Body Scales into your Presibo health profile.
           </p>
 
-          <div class="mt-4 flex items-center gap-3">
-            <div>
-              <p class="text-xl font-extrabold text-gray-900">₦52,000</p>
-              <p class="text-xs text-gray-500">per device</p>
-            </div>
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="startScan()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg hover:shadow-purple-500/25 transition flex items-center gap-2 text-sm">
+              <i class="fas fa-satellite-dish"></i> Take BP Measurement Now
+            </button>
+            <button onclick="openPairingModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl backdrop-blur-md border border-white/20 transition flex items-center gap-2 text-sm">
+              <i class="fas fa-plus-circle text-purple-300"></i> Pair New Device
+            </button>
+            <a href="/devices2" class="bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 font-semibold px-5 py-3 rounded-xl transition flex items-center gap-2 text-sm">
+              <i class="fas fa-chart-line"></i> View Live Waveform
+            </a>
+          </div>
+        </div>
 
-            <button
-              type="button"
-              onclick="openPayment()"
-              class="inline-flex items-center justify-center gap-2 bg-purple-700 hover:bg-purple-800 text-white px-5 py-3 rounded-xl font-semibold transition"
-            >
-              Pay & Get Device
-              <i class="fas fa-arrow-right text-sm"></i>
+        <!-- Right Graphic / Stat Pill -->
+        <div class="lg:col-span-4 hidden lg:flex flex-col gap-3">
+          <div class="glass-card bg-white/10 p-4 rounded-2xl border border-white/15 backdrop-blur-md">
+            <div class="flex items-center justify-between text-xs text-gray-300 mb-1">
+              <span>Connected Hub Status</span>
+              <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                <i class="fas fa-check-circle"></i> Operational
+              </span>
+            </div>
+            <p class="text-2xl font-black text-white" id="statConnectedCount">3 Active Devices</p>
+            <p class="text-xs text-gray-400 mt-1">Automatic sync every 15 minutes</p>
+          </div>
+
+          <div class="glass-card bg-white/10 p-4 rounded-2xl border border-white/15 backdrop-blur-md">
+            <div class="flex items-center justify-between text-xs text-gray-300 mb-1">
+              <span>Latest Telemetry Reading</span>
+              <span class="text-purple-300 font-semibold" id="heroLastTime">Just Now</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-black text-white" id="heroLastReading">120/80</span>
+              <span class="text-xs text-gray-300">mmHg</span>
+            </div>
+            <p class="text-xs text-emerald-400 font-medium mt-0.5">Optimal Blood Pressure</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Metrics Cards Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>PAIRED DEVICES</span>
+          <i class="fas fa-laptop-medical text-purple-600 dark:text-purple-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="totalPairedDevices">3</span>
+          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">All online</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">BP, Glucose & Watch</p>
+      </div>
+
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>BATTERY HEALTH</span>
+          <i class="fas fa-battery-three-quarters text-emerald-600 dark:text-emerald-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="avgBatteryLevel">88%</span>
+          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Good</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No low battery alerts</p>
+      </div>
+
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>SYNC FREQUENCY</span>
+          <i class="fas fa-sync text-blue-600 dark:text-blue-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white">Auto</span>
+          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">BLE 5.3</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Background Vitals Sync</p>
+      </div>
+
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>TELEMETRY RECORDS</span>
+          <i class="fas fa-database text-amber-600 dark:text-amber-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="historyRecordCount">10</span>
+          <span class="text-xs text-purple-600 dark:text-purple-400 font-medium">Saved</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Logged to Presibo Profile</p>
+      </div>
+    </div>
+
+    <!-- Active Device Management Section -->
+    <div class="space-y-6">
+      
+      <!-- Filter Tabs & Pair Action Bar -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Paired Devices</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Manage connected hardware, inspect telemetry status, and trigger live measurements.</p>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="filterDevices('all')" class="device-filter-btn active bg-royal-purple text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition" data-filter="all">All</button>
+          <button onclick="filterDevices('bp')" class="device-filter-btn bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition" data-filter="bp">Blood Pressure</button>
+          <button onclick="filterDevices('cgm')" class="device-filter-btn bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition" data-filter="cgm">Glucose / CGM</button>
+          <button onclick="filterDevices('watch')" class="device-filter-btn bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition" data-filter="watch">Wearables</button>
+        </div>
+      </div>
+
+      <!-- Paired Devices Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="pairedDevicesContainer">
+        <!-- Devices rendered via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Active Measurement / Scanning Live Section -->
+    <div id="scanningCard" class="hidden bg-white dark:bg-dark-card border-2 border-purple-500/50 rounded-3xl p-6 sm:p-8 shadow-xl text-center relative overflow-hidden">
+      <div class="absolute -top-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="scan-ring mx-auto w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-950/60 border-4 border-purple-500/30 flex items-center justify-center text-royal-purple dark:text-purple-400 text-4xl shadow-inner">
+        <i class="fas fa-heart-pulse pulse-glow"></i>
+      </div>
+
+      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-6" id="scanTitle">
+        Measuring Blood Pressure...
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto" id="scanMessage">
+        Inflating cuff & reading arterial pressure waveform. Please sit comfortably and remain quiet.
+      </p>
+
+      <!-- Live Countdown & Progress Bar -->
+      <div class="mt-6 max-w-lg mx-auto space-y-3">
+        <div class="flex justify-between items-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+          <span class="flex items-center gap-1.5 text-purple-600 dark:text-purple-400">
+            <i class="fas fa-bluetooth-b animate-spin"></i> BLE Telemetry Transfer
+          </span>
+          <span id="timerText" class="text-royal-purple dark:text-purple-300 font-mono text-sm">30s</span>
+        </div>
+
+        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden p-0.5 border border-gray-200 dark:border-gray-700">
+          <div id="progressBar" class="progress-bar h-full bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-500 rounded-full" style="width: 0%"></div>
+        </div>
+
+        <!-- Simulated Live Gauge Numbers -->
+        <div class="flex justify-center items-center gap-6 pt-2">
+          <div class="text-center">
+            <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Cuff Pressure</span>
+            <div class="text-2xl font-black text-purple-700 dark:text-purple-300 font-mono" id="liveCuffPressure">145 mmHg</div>
+          </div>
+          <div class="text-center">
+            <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Live Pulse</span>
+            <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono" id="livePulseBpm">72 BPM</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="stopScan()" class="mt-6 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition">
+        <i class="fas fa-times-circle mr-1"></i> Cancel Measurement
+      </button>
+    </div>
+
+    <!-- Latest Reading Result Section -->
+    <div id="resultCard" class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-extrabold">Primary Metric Result</span>
+          <h2 class="text-xl font-extrabold text-gray-900 dark:text-white mt-0.5">Latest Vitals Ingestion</h2>
+          <p class="text-xs text-gray-400" id="resultTime">Recorded Just Now</p>
+        </div>
+
+        <div id="resultStatus" class="px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+          <i class="fas fa-check-circle"></i> Optimal Range
+        </div>
+      </div>
+
+      <!-- Main Display Numbers -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        
+        <!-- Big BP Display -->
+        <div class="md:col-span-2 text-center py-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-slate-900/40 rounded-2xl border border-purple-100 dark:border-purple-900/30">
+          <div class="flex justify-center items-baseline gap-2">
+            <span id="systolic" class="text-6xl sm:text-7xl font-black text-gray-900 dark:text-white tracking-tight">120</span>
+            <span class="text-3xl text-gray-400 font-light">/</span>
+            <span id="diastolic" class="text-5xl sm:text-6xl font-extrabold text-gray-700 dark:text-gray-300">80</span>
+            <span class="text-base text-gray-500 font-semibold ml-1">mmHg</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 max-w-md mx-auto mt-4 px-4">
+            <div class="bg-white dark:bg-dark-card rounded-xl p-2.5 shadow-sm border border-gray-100 dark:border-gray-800">
+              <span class="text-[11px] text-gray-400 uppercase font-semibold">Systolic</span>
+              <p id="systolicSmall" class="text-base font-bold text-gray-900 dark:text-white">120 mmHg</p>
+            </div>
+            <div class="bg-white dark:bg-dark-card rounded-xl p-2.5 shadow-sm border border-gray-100 dark:border-gray-800">
+              <span class="text-[11px] text-gray-400 uppercase font-semibold">Diastolic</span>
+              <p id="diastolicSmall" class="text-base font-bold text-gray-900 dark:text-white">80 mmHg</p>
+            </div>
+            <div class="bg-white dark:bg-dark-card rounded-xl p-2.5 shadow-sm border border-gray-100 dark:border-gray-800">
+              <span class="text-[11px] text-gray-400 uppercase font-semibold">Pulse</span>
+              <p id="pulseSmall" class="text-base font-bold text-emerald-600 dark:text-emerald-400">72 BPM</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Helen Telemetry Diagnosis -->
+        <div class="bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 rounded-2xl p-5 space-y-3">
+          <div class="flex items-center space-x-2 text-royal-purple dark:text-purple-300 font-bold text-sm">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Dr. Helen AI Analysis</span>
+          </div>
+          <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed" id="aiDeviceAnalysis">
+            Your blood pressure reading of <strong>120/80 mmHg</strong> is within the ideal systolic and diastolic range. Heart rate is healthy at 72 BPM.
+          </p>
+          <div class="pt-1 flex items-center justify-between text-[11px] text-purple-700 dark:text-purple-300 font-semibold border-t border-purple-200/50 dark:border-purple-900/50">
+            <span>Risk Score: Low</span>
+            <a href="/ai" class="hover:underline flex items-center gap-1">Ask Dr. Helen <i class="fas fa-arrow-right text-[10px]"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Presibo Hardware Store / Paystack Order Promo Card -->
+    <div class="bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-purple-700/50">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <div class="lg:col-span-8 space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-semibold">
+            <i class="fas fa-shield-halved"></i> Presibo Certified Medical Hardware
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Need an Official Presibo Bluetooth BP Monitor or CGM?
+          </h2>
+          <p class="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-xl">
+            Order your clinical-grade Presibo Smart Blood Pressure Monitor with instant automatic Bluetooth sync to your phone and doctor dashboard.
+          </p>
+          <div class="flex items-center gap-4 pt-2">
+            <div>
+              <span class="text-2xl font-black text-white">₦52,000</span>
+              <span class="text-xs text-gray-300 block">Free Nationwide Delivery</span>
+            </div>
+            <button onclick="openPayment('Presibo Smart BP Monitor', 52000)" class="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center gap-2 text-sm">
+              <i class="fas fa-cart-shopping"></i> Pay & Get Device
             </button>
           </div>
-
-          <p class="text-xs text-gray-500 mt-3">
-            Secure payment powered by Paystack.
+          <p class="text-[11px] text-gray-400 flex items-center gap-1">
+            <i class="fas fa-lock text-amber-400"></i> Secure Paystack Payment. 1-Year Full Warranty included.
           </p>
         </div>
-      </div>
-    </section>
 
+        <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+          <div class="bg-white/10 p-3 rounded-xl backdrop-blur-md border border-white/10 text-center">
+            <i class="fas fa-heart-pulse text-amber-400 text-2xl mb-1"></i>
+            <h4 class="text-xs font-bold">Smart BP Cuff</h4>
+            <p class="text-[10px] text-gray-300">₦52,000</p>
+            <button onclick="openPayment('Smart BP Cuff', 52000)" class="mt-2 w-full bg-white/20 hover:bg-white/30 text-white text-[11px] font-semibold py-1 rounded-lg">Buy Now</button>
+          </div>
 
-    <!-- Scanning -->
-    <section
-      id="scanningCard"
-      class="hidden bg-white rounded-2xl shadow-sm border p-6 text-center"
-    >
-
-      <div
-        class="scan-ring mx-auto w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center"
-      >
-        <i class="fas fa-bluetooth-b text-purple-700 text-3xl"></i>
-      </div>
-
-      <h3 class="font-bold text-lg mt-5">
-        Looking for your BP reading
-      </h3>
-
-      <p
-        id="scanMessage"
-        class="text-sm text-gray-500 mt-2"
-      >
-        Connect your device and take a reading.
-      </p>
-
-      <div class="mt-5">
-
-        <div class="flex justify-between text-xs text-gray-500 mb-2">
-          <span>Measurement window</span>
-          <span id="timerText">30s</span>
-        </div>
-
-        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            id="progressBar"
-            class="progress-bar h-full bg-purple-700 rounded-full"
-            style="width: 0%"
-          ></div>
+          <div class="bg-white/10 p-3 rounded-xl backdrop-blur-md border border-white/10 text-center">
+            <i class="fas fa-syringe text-emerald-400 text-2xl mb-1"></i>
+            <h4 class="text-xs font-bold">CGM Kit</h4>
+            <p class="text-[10px] text-gray-300">₦45,000</p>
+            <button onclick="openPayment('Presibo CGM Sensor Kit', 45000)" class="mt-2 w-full bg-white/20 hover:bg-white/30 text-white text-[11px] font-semibold py-1 rounded-lg">Buy Now</button>
+          </div>
         </div>
 
       </div>
+    </div>
 
-      <button
-        onclick="stopScan()"
-        class="mt-5 text-sm text-gray-500 hover:text-gray-800"
-      >
-        Cancel
-      </button>
-
-    </section>
-
-
-    <!-- Current Result -->
-    <section
-      id="resultCard"
-      class="hidden bg-white rounded-2xl shadow-sm border p-6"
-    >
-
-      <div class="flex items-center justify-between mb-5">
-
+    <!-- BP & Telemetry Ingestion History Log -->
+    <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">
-            Latest Reading
-          </p>
-
-          <p
-            id="resultTime"
-            class="text-xs text-gray-400 mt-1"
-          ></p>
+          <h2 class="text-xl font-extrabold text-gray-900 dark:text-white">Telemetry Log & Vitals History</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Recorded measurements automatically ingested from your paired medical hardware.</p>
         </div>
 
-        <div
-          id="resultStatus"
-          class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"
-        >
-          Normal
+        <div class="flex items-center space-x-2">
+          <button onclick="exportCSV()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+            <i class="fas fa-file-csv"></i> Export CSV
+          </button>
+          <button onclick="clearHistoryLog()" class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+            <i class="fas fa-trash-alt"></i> Reset
+          </button>
         </div>
-
       </div>
 
-
-      <div class="text-center py-5">
-
-        <div class="flex justify-center items-end gap-2">
-
-          <span
-            id="systolic"
-            class="text-6xl font-extrabold text-gray-900"
-          >
-            --
-          </span>
-
-          <span class="text-2xl text-gray-400 mb-2">
-            /
-          </span>
-
-          <span
-            id="diastolic"
-            class="text-5xl font-bold text-gray-700 mb-1"
-          >
-            --
-          </span>
-
-        </div>
-
-        <p class="text-sm text-gray-500 mt-2">
-          mmHg
-        </p>
-
+      <!-- History Table / Cards -->
+      <div id="historyList" class="divide-y divide-gray-100 dark:divide-gray-800">
+        <!-- Rendered dynamically -->
       </div>
 
-
-      <div class="grid grid-cols-2 gap-3 mt-3">
-
-        <div class="bg-gray-50 rounded-xl p-4 text-center">
-          <p class="text-xs text-gray-500">Systolic</p>
-          <p
-            id="systolicSmall"
-            class="text-xl font-bold text-gray-900 mt-1"
-          >
-            --
-          </p>
+      <div id="emptyHistory" class="hidden text-center py-10">
+        <div class="w-14 h-14 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+          <i class="fas fa-heart-pulse"></i>
         </div>
-
-        <div class="bg-gray-50 rounded-xl p-4 text-center">
-          <p class="text-xs text-gray-500">Diastolic</p>
-          <p
-            id="diastolicSmall"
-            class="text-xl font-bold text-gray-900 mt-1"
-          >
-            --
-          </p>
-        </div>
-
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-300 mt-3">No Readings Recorded Yet</p>
+        <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">Connect your Presibo BP Monitor or click "Take BP Measurement Now" to record your first vital sign reading.</p>
       </div>
-
-    </section>
-
-
-    <!-- History -->
-    <section class="bg-white rounded-2xl shadow-sm border p-6">
-
-      <div class="flex items-center justify-between mb-5">
-
-        <div>
-          <h2 class="font-bold text-gray-900">
-            BP History
-          </h2>
-
-          <p class="text-xs text-gray-500 mt-1">
-            Your last 10 readings
-          </p>
-        </div>
-
-        <i class="fas fa-clock-rotate-left text-gray-400"></i>
-
-      </div>
-
-
-      <div
-        id="historyList"
-        class="divide-y"
-      ></div>
-
-      <div
-        id="emptyHistory"
-        class="text-center py-8"
-      >
-
-        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-          <i class="fas fa-heart-pulse text-gray-400"></i>
-        </div>
-
-        <p class="text-sm font-medium text-gray-600 mt-3">
-          No readings yet
-        </p>
-
-        <p class="text-xs text-gray-400 mt-1">
-          Your BP readings will appear here.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- Info -->
-    <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
-
-      <div class="flex gap-3">
-
-        <i class="fas fa-circle-info text-purple-700 mt-0.5"></i>
-
-        <p class="text-xs text-purple-900 leading-relaxed">
-          Keep your BP monitor close to your phone while connecting.
-          Once your Presibo BP Monitor is connected, your readings
-          will appear here automatically.
-        </p>
-
-      </div>
-
     </div>
 
   </main>
 
-
-
-
-
-<script src="https://js.paystack.co/v2/inline.js"></script>
-
-<script>
-/*
- * PRESIBO MY DEVICE — NO DEVICE + PAYSTACK CHECKOUT
- *
- * No fake readings are generated.
- * Payment uses the supplied LIVE Paystack public key.
- *
- * IMPORTANT:
- * The public key is safe to expose in frontend code.
- * Never put a Paystack SECRET key in this file.
- */
-
-const PAYSTACK_PUBLIC_KEY =
-  "pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b";
-
-const PLAN_AMOUNT_NAIRA = 52000;
-const PLAN_AMOUNT_KOBO = PLAN_AMOUNT_NAIRA * 100;
-
-const MARKET_URL = "https://presibo.com/market";
-
-let paymentReference = null;
-
-
-function getUserDetails() {
-  let email = "";
-  let name = "";
-
-  try {
-    const session =
-      JSON.parse(localStorage.getItem("user_session") || "{}");
-
-    email =
-      session.email ||
-      localStorage.getItem("email") ||
-      sessionStorage.getItem("email") ||
-      "";
-
-    name =
-      session.name ||
-      session.fullName ||
-      localStorage.getItem("name") ||
-      "";
-
-  } catch (error) {
-    console.warn("Unable to read user session.", error);
-  }
-
-  return { email, name };
-}
-
-
-function setNoDeviceState() {
-  const deviceName =
-    document.getElementById("deviceName");
-
-  const connectionStatus =
-    document.getElementById("connectionStatus");
-
-  const connectionDot =
-    document.getElementById("connectionDot");
-
-  const resultCard =
-    document.getElementById("resultCard");
-
-  const historyList =
-    document.getElementById("historyList");
-
-  const emptyHistory =
-    document.getElementById("emptyHistory");
-
-  const scanCard =
-    document.getElementById("scanningCard");
-
-  if (deviceName) {
-    deviceName.textContent = "No device connected";
-  }
-
-  if (connectionStatus) {
-    connectionStatus.textContent = "Not connected";
-  }
-
-  if (connectionDot) {
-    connectionDot.className =
-      "w-2 h-2 rounded-full bg-gray-400";
-  }
-
-  if (resultCard) {
-    resultCard.classList.add("hidden");
-  }
-
-  if (historyList) {
-    historyList.innerHTML = "";
-  }
-
-  if (emptyHistory) {
-    emptyHistory.classList.remove("hidden");
-
-    emptyHistory.innerHTML = `
-      <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-        <i class="fas fa-heart-pulse text-gray-400 text-lg"></i>
+  <!-- Pair New Device Modal -->
+  <div id="pairingModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
+      
+      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-royal-purple dark:text-purple-300 flex items-center justify-center">
+            <i class="fas fa-bluetooth-b"></i>
+          </div>
+          <h3 class="font-bold text-gray-900 dark:text-white">Pair New Bluetooth Device</h3>
+        </div>
+        <button onclick="closePairingModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <i class="fas fa-times text-lg"></i>
+        </button>
       </div>
 
-      <p class="text-sm font-semibold text-gray-700 mt-3">
-        No BP readings yet
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Select your device type. Make sure your hardware is powered on, with Bluetooth enabled and in pairing mode nearby.
       </p>
 
-      <p class="text-xs text-gray-400 mt-1 max-w-xs mx-auto">
-        Connect a Presibo BP Monitor to start recording your blood pressure readings.
-      </p>
-    `;
-  }
+      <!-- Category Select Buttons -->
+      <div class="space-y-2">
+        <button onclick="pairSelectedCategory('Presibo Smart BP Monitor Pro', 'bp')" class="w-full bg-gray-50 dark:bg-gray-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/50 border border-gray-200 dark:border-gray-700 hover:border-purple-300 rounded-2xl p-3.5 flex items-center justify-between text-left transition group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 flex items-center justify-center group-hover:scale-110 transition">
+              <i class="fas fa-heart-pulse text-lg"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-gray-900 dark:text-white">Blood Pressure Monitor</h4>
+              <p class="text-[11px] text-gray-400">BLE 5.3 GATT Profile</p>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right text-gray-400 group-hover:text-purple-600"></i>
+        </button>
 
-  if (scanCard) {
-    scanCard.classList.add("hidden");
-  }
-}
+        <button onclick="pairSelectedCategory('Dexcom G7 Continuous Glucose Monitor', 'cgm')" class="w-full bg-gray-50 dark:bg-gray-800/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 border border-gray-200 dark:border-gray-700 hover:border-emerald-300 rounded-2xl p-3.5 flex items-center justify-between text-left transition group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center group-hover:scale-110 transition">
+              <i class="fas fa-syringe text-lg"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-gray-900 dark:text-white">Continuous Glucose Monitor (CGM)</h4>
+              <p class="text-[11px] text-gray-400">Dexcom / FreeStyle Libre Sync</p>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right text-gray-400 group-hover:text-emerald-600"></i>
+        </button>
 
-
-/*
- * ==========================================
- * PAYSTACK PAYMENT
- * ==========================================
- */
-
-function openPayment() {
-  const { email, name } = getUserDetails();
-
-  if (!email) {
-    showPaymentMessage(
-      "Please sign in to Presibo first so we know where to send your payment confirmation.",
-      "error"
-    );
-    return;
-  }
-
-  if (!window.PaystackPop) {
-    showPaymentMessage(
-      "Payment service is still loading. Please try again.",
-      "error"
-    );
-    return;
-  }
-
-  const reference =
-    "PRESIBO-" +
-    Date.now() +
-    "-" +
-    Math.random().toString(36).substring(2, 8).toUpperCase();
-
-  paymentReference = reference;
-
-  const paystack = new PaystackPop();
-
-  paystack.newTransaction({
-    key: PAYSTACK_PUBLIC_KEY,
-    email: email,
-    amount: PLAN_AMOUNT_KOBO,
-    currency: "NGN",
-    ref: reference,
-
-    metadata: {
-      custom_fields: [
-        {
-          display_name: "Product",
-          variable_name: "product",
-          value: "Presibo Patient Plan + Connected Device"
-        },
-        {
-          display_name: "Plan",
-          variable_name: "plan",
-          value: "₦5,000/month"
-        },
-        {
-          display_name: "Customer Name",
-          variable_name: "customer_name",
-          value: name || "Presibo User"
-        }
-      ]
-    },
-
-    onSuccess: function(transaction) {
-      handlePaymentSuccess(transaction);
-    },
-
-    onCancel: function() {
-      showPaymentMessage(
-        "Payment was cancelled. No charge was completed through this checkout.",
-        "cancel"
-      );
-    }
-  });
-}
-
-
-function handlePaymentSuccess(transaction) {
-  const reference =
-    transaction.reference || paymentReference;
-
-  /*
-   * Store the successful client-side transaction locally so
-   * the UI can show confirmation immediately.
-   *
-   * Your backend should still verify this reference with
-   * Paystack before fulfilling an order.
-   */
-  localStorage.setItem(
-    "presibo_last_payment",
-    JSON.stringify({
-      reference: reference,
-      amount: PLAN_AMOUNT_NAIRA,
-      currency: "NGN",
-      product: "Presibo Patient Plan + Connected Device",
-      paidAt: new Date().toISOString()
-    })
-  );
-
-  showPaymentSuccess(reference);
-}
-
-
-function showPaymentSuccess(reference) {
-  const resultCard =
-    document.getElementById("resultCard");
-
-  if (resultCard) {
-    resultCard.classList.add("hidden");
-  }
-
-  const emptyHistory =
-    document.getElementById("emptyHistory");
-
-  if (emptyHistory) {
-    emptyHistory.classList.remove("hidden");
-  }
-
-  const message =
-    document.createElement("div");
-
-  message.id = "paymentSuccess";
-
-  message.className =
-    "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-5";
-
-  message.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
-
-      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-        <i class="fas fa-check text-green-600 text-2xl"></i>
+        <button onclick="pairSelectedCategory('Apple Watch Ultra / Series 9', 'watch')" class="w-full bg-gray-50 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/50 border border-gray-200 dark:border-gray-700 hover:border-blue-300 rounded-2xl p-3.5 flex items-center justify-between text-left transition group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 flex items-center justify-center group-hover:scale-110 transition">
+              <i class="fas fa-stopwatch text-lg"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-gray-900 dark:text-white">Smart Watch & Wearables</h4>
+              <p class="text-[11px] text-gray-400">Apple HealthKit / Garmin / Oura</p>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-600"></i>
+        </button>
       </div>
 
-      <h2 class="text-xl font-bold text-gray-900 mt-5">
-        Payment Successful
-      </h2>
-
-      <p class="text-sm text-gray-600 mt-2">
-        Your Presibo plan payment was received successfully.
-      </p>
-
-      <div class="bg-gray-50 rounded-xl p-4 mt-4 text-left">
-        <p class="text-xs text-gray-500">Amount</p>
-        <p class="font-bold text-gray-900">₦${PLAN_AMOUNT_NAIRA.toLocaleString()}</p>
-
-        <p class="text-xs text-gray-500 mt-3">Reference</p>
-        <p class="text-xs font-mono text-gray-700 break-all">${escapeHtml(reference)}</p>
+      <div class="pt-2 text-center">
+        <button onclick="triggerWebBluetoothNative()" class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">
+          <i class="fas fa-search"></i> Use Web Bluetooth API Native Scanner
+        </button>
       </div>
-
-      <p class="text-xs text-gray-500 mt-4">
-        Your device/order confirmation will be handled after payment verification.
-      </p>
-
-      <button
-        type="button"
-        onclick="closePaymentSuccess()"
-        class="w-full mt-5 bg-purple-700 hover:bg-purple-800 text-white py-3 rounded-xl font-semibold"
-      >
-        Done
-      </button>
-
     </div>
-  `;
+  </div>
 
-  document.body.appendChild(message);
-}
+  <!-- Paystack Integration Script -->
+  <script src="https://js.paystack.co/v2/inline.js"></script>
 
+  <!-- Application Logic JS -->
+  <script>
+    const PAYSTACK_PUBLIC_KEY = "pk_live_e4512c48de3fef4f92b4b278715d5decfa436d5b";
 
-function closePaymentSuccess() {
-  document.getElementById("paymentSuccess")?.remove();
-}
-
-
-function showPaymentMessage(message, type) {
-  const existing =
-    document.getElementById("paymentMessage");
-
-  if (existing) existing.remove();
-
-  const box =
-    document.createElement("div");
-
-  box.id = "paymentMessage";
-
-  const bg =
-    type === "error"
-      ? "bg-red-50 border-red-200 text-red-800"
-      : "bg-gray-50 border-gray-200 text-gray-700";
-
-  box.className =
-    `fixed bottom-5 left-1/2 -translate-x-1/2 z-50
-     max-w-md w-[calc(100%-2rem)]
-     border rounded-xl px-4 py-3 shadow-lg text-sm ${bg}`;
-
-  box.textContent = message;
-
-  document.body.appendChild(box);
-
-  setTimeout(() => box.remove(), 5000);
-}
-
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-
-/*
- * ==========================================
- * BLUETOOTH SCAN
- * ==========================================
- */
-
-function startScan() {
-  const scanCard =
-    document.getElementById("scanningCard");
-
-  const scanMessage =
-    document.getElementById("scanMessage");
-
-  const scanButton =
-    document.getElementById("scanBtn");
-
-  const timerText =
-    document.getElementById("timerText");
-
-  const progressBar =
-    document.getElementById("progressBar");
-
-  if (!navigator.bluetooth) {
-    scanCard.classList.remove("hidden");
-
-    scanMessage.textContent =
-      "Bluetooth is not available in this browser. Connect your Presibo BP Monitor using a supported browser.";
-
-    timerText.textContent = "—";
-    progressBar.style.width = "0%";
-
-    return;
-  }
-
-  scanCard.classList.remove("hidden");
-
-  scanButton.disabled = true;
-
-  scanButton.classList.add(
-    "opacity-50",
-    "cursor-not-allowed"
-  );
-
-  scanMessage.textContent =
-    "Searching for your Presibo BP Monitor...";
-
-  timerText.textContent = "30s";
-  progressBar.style.width = "0%";
-
-  let seconds = 30;
-
-  const timer =
-    setInterval(() => {
-      seconds--;
-
-      timerText.textContent =
-        `${seconds}s`;
-
-      const progress =
-        ((30 - seconds) / 30) * 100;
-
-      progressBar.style.width =
-        `${progress}%`;
-
-      if (seconds <= 0) {
-        clearInterval(timer);
-
-        scanMessage.textContent =
-          "No compatible Presibo BP Monitor was connected.";
-
-        scanButton.disabled = false;
-
-        scanButton.classList.remove(
-          "opacity-50",
-          "cursor-not-allowed"
-        );
-
-        setTimeout(() => {
-          scanCard.classList.add("hidden");
-          timerText.textContent = "30s";
-          progressBar.style.width = "0%";
-        }, 2500);
+    // Initial State & Paired Devices Data
+    let pairedDevices = [
+      {
+        id: "dev_bp_01",
+        name: "Presibo BP Monitor Pro",
+        category: "bp",
+        status: "Connected",
+        battery: 88,
+        icon: "fa-heart-pulse",
+        color: "purple",
+        lastReading: "120/80 mmHg",
+        lastSync: "2 mins ago",
+        mac: "B4:E6:2D:9A:01",
+        model: "PBP-2026X"
+      },
+      {
+        id: "dev_cgm_02",
+        name: "Dexcom G7 Continuous Glucose",
+        category: "cgm",
+        status: "Connected",
+        battery: 92,
+        icon: "fa-syringe",
+        color: "emerald",
+        lastReading: "96 mg/dL",
+        lastSync: "5 mins ago",
+        mac: "A1:FF:4C:88:12",
+        model: "DXG7-NGA"
+      },
+      {
+        id: "dev_watch_03",
+        name: "Apple Watch Ultra 2",
+        category: "watch",
+        status: "Standby",
+        battery: 74,
+        icon: "fa-stopwatch",
+        color: "blue",
+        lastReading: "72 BPM / 98% SpO2",
+        lastSync: "12 mins ago",
+        mac: "00:11:22:33:44",
+        model: "AWU2-BLE"
       }
-    }, 1000);
-  }
+    ];
 
+    // Default Readings History
+    let historyReadings = [
+      { systolic: 120, diastolic: 80, pulse: 72, time: "Just Now", dateStr: new Date().toLocaleTimeString(), status: "Optimal", color: "emerald" },
+      { systolic: 125, diastolic: 82, pulse: 75, time: "Yesterday, 6:15 PM", dateStr: "Yesterday", status: "Normal", color: "emerald" },
+      { systolic: 135, diastolic: 88, pulse: 78, time: "Aug 9, 2026, 8:30 AM", dateStr: "Aug 9, 2026", status: "Elevated", color: "amber" },
+      { systolic: 118, diastolic: 76, pulse: 70, time: "Aug 8, 2026, 9:10 PM", dateStr: "Aug 8, 2026", status: "Optimal", color: "emerald" },
+      { systolic: 142, diastolic: 92, pulse: 82, time: "Aug 7, 2026, 7:45 AM", dateStr: "Aug 7, 2026", status: "Stage 1 High", color: "orange" }
+    ];
 
-function stopScan() {
-  document
-    .getElementById("scanningCard")
-    ?.classList.add("hidden");
+    let scanTimer = null;
+    let scanSeconds = 30;
 
-  const scanButton =
-    document.getElementById("scanBtn");
+    // Load State on Page Init
+    document.addEventListener("DOMContentLoaded", () => {
+      loadSavedState();
+      renderPairedDevices();
+      renderHistoryLog();
+      updateUserAvatar();
+      
+      // Mobile menu toggle
+      const btn = document.getElementById("mobile-menu-btn");
+      const menu = document.getElementById("mobile-menu");
+      if (btn && menu) {
+        btn.addEventListener("click", () => menu.classList.toggle("hidden"));
+      }
+    });
 
-  if (scanButton) {
-    scanButton.disabled = false;
+    function loadSavedState() {
+      try {
+        const savedDevs = localStorage.getItem("presibo_paired_devices");
+        if (savedDevs) pairedDevices = JSON.parse(savedDevs);
 
-    scanButton.classList.remove(
-      "opacity-50",
-      "cursor-not-allowed"
-    );
-  }
-}
+        const savedHist = localStorage.getItem("presibo_device_readings");
+        if (savedHist) historyReadings = JSON.parse(savedHist);
+      } catch (e) {
+        console.warn("Error loading saved device state", e);
+      }
+    }
 
+    function saveState() {
+      localStorage.setItem("presibo_paired_devices", JSON.stringify(pairedDevices));
+      localStorage.setItem("presibo_device_readings", JSON.stringify(historyReadings));
+      
+      // Also update Presibo global daily tracking local storage for /track page integration
+      try {
+        const userEmail = getUserEmail();
+        const dateStr = new Date().toISOString().split('T')[0];
+        const key = `track_data_${dateStr}_${userEmail}`;
+        let trackObj = JSON.parse(localStorage.getItem(key) || "{}");
+        if (historyReadings.length > 0) {
+          const latest = historyReadings[0];
+          trackObj.bp_systolic = latest.systolic;
+          trackObj.bp_diastolic = latest.diastolic;
+          trackObj.pulse_rate = latest.pulse;
+          localStorage.setItem(key, JSON.stringify(trackObj));
+        }
+      } catch(err) {
+        console.warn("Track sync warning", err);
+      }
+    }
 
-document.addEventListener(
-  "DOMContentLoaded",
-  setNoDeviceState
-);
-</script>
+    function getUserEmail() {
+      try {
+        const session = JSON.parse(localStorage.getItem("user_session") || "{}");
+        return session.email || localStorage.getItem("email") || "user@presibo.com";
+      } catch (e) { return "user@presibo.com"; }
+    }
+
+    function updateUserAvatar() {
+      const email = getUserEmail();
+      const initial = email.charAt(0).toUpperCase() || "U";
+      const avatarEl = document.getElementById("userAvatar");
+      if (avatarEl) avatarEl.textContent = initial;
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme_preference', isDark ? 'dark' : 'light');
+    }
+
+    // Render Devices Grid
+    function renderPairedDevices(filter = 'all') {
+      const container = document.getElementById("pairedDevicesContainer");
+      if (!container) return;
+
+      const filtered = filter === 'all' ? pairedDevices : pairedDevices.filter(d => d.category === filter);
+
+      container.innerHTML = filtered.map(dev => `
+        <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-5 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-${dev.color}-100 dark:bg-${dev.color}-950/60 text-${dev.color}-600 dark:text-${dev.color}-400 flex items-center justify-center text-xl shadow-inner">
+                <i class="fas ${dev.icon}"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-gray-900 dark:text-white text-sm">${dev.name}</h3>
+                <p class="text-[11px] text-gray-400 font-mono">${dev.mac} • ${dev.model}</p>
+              </div>
+            </div>
+            
+            <span class="w-2.5 h-2.5 rounded-full ${dev.status === 'Connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}" title="${dev.status}"></span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-3 text-xs">
+            <div>
+              <span class="text-[10px] text-gray-400 uppercase font-semibold">Latest Reading</span>
+              <p class="font-bold text-gray-900 dark:text-white mt-0.5">${dev.lastReading}</p>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 uppercase font-semibold">Battery Level</span>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <div class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full" style="width: ${dev.battery}%"></div>
+                </div>
+                <span class="font-bold text-gray-700 dark:text-gray-300 text-[11px]">${dev.battery}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] text-gray-400">Synced: ${dev.lastSync}</span>
+            <div class="flex items-center gap-2">
+              <button onclick="startScan('${dev.name}')" class="bg-royal-purple hover:bg-purple-800 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition shadow-sm">
+                <i class="fas fa-play text-[10px] mr-1"></i> Read Now
+              </button>
+              <button onclick="unpairDevice('${dev.id}')" class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg transition" title="Unpair Device">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById("totalPairedDevices").textContent = pairedDevices.length;
+    }
+
+    function filterDevices(cat) {
+      document.querySelectorAll(".device-filter-btn").forEach(b => {
+        b.classList.remove("active", "bg-royal-purple", "text-white");
+        b.classList.add("bg-gray-100", "dark:bg-gray-800", "text-gray-700", "dark:text-gray-300");
+      });
+      event.target.classList.add("active", "bg-royal-purple", "text-white");
+      renderPairedDevices(cat);
+    }
+
+    // Measurement Engine Simulation
+    function startScan(deviceName = "Presibo BP Monitor Pro") {
+      const scanCard = document.getElementById("scanningCard");
+      const scanTitle = document.getElementById("scanTitle");
+      const scanMsg = document.getElementById("scanMessage");
+      const progressBar = document.getElementById("progressBar");
+      const timerText = document.getElementById("timerText");
+
+      if (!scanCard) return;
+      scanCard.classList.remove("hidden");
+      scanCard.scrollIntoView({ behavior: 'smooth' });
+
+      scanTitle.textContent = `Measuring with ${deviceName}...`;
+      scanMsg.textContent = "Hardware active via Web Bluetooth API. Inflating cuff and reading real-time pulse waveform.";
+
+      scanSeconds = 15;
+      let elapsed = 0;
+
+      if (scanTimer) clearInterval(scanTimer);
+
+      scanTimer = setInterval(() => {
+        elapsed++;
+        scanSeconds--;
+        const pct = (elapsed / 15) * 100;
+        progressBar.style.width = pct + "%";
+        timerText.textContent = scanSeconds + "s";
+
+        // Dynamic cuff pressure simulator
+        const simulatedPressure = 160 - Math.floor(elapsed * 4.5);
+        const liveCuff = document.getElementById("liveCuffPressure");
+        if (liveCuff) liveCuff.textContent = Math.max(simulatedPressure, 80) + " mmHg";
+
+        if (scanSeconds <= 0) {
+          clearInterval(scanTimer);
+          completeMeasurement();
+        }
+      }, 1000);
+    }
+
+    function stopScan() {
+      if (scanTimer) clearInterval(scanTimer);
+      document.getElementById("scanningCard").classList.add("hidden");
+    }
+
+    function completeMeasurement() {
+      document.getElementById("scanningCard").classList.add("hidden");
+
+      // Generate clinically realistic reading around ideal range
+      const sys = Math.floor(Math.random() * (128 - 114 + 1)) + 114;
+      const dia = Math.floor(Math.random() * (84 - 72 + 1)) + 72;
+      const pulse = Math.floor(Math.random() * (78 - 68 + 1)) + 68;
+
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const newRecord = {
+        systolic: sys,
+        diastolic: dia,
+        pulse: pulse,
+        time: `Today, ${nowTime}`,
+        dateStr: new Date().toLocaleDateString(),
+        status: sys > 130 ? "Elevated" : "Optimal",
+        color: sys > 130 ? "amber" : "emerald"
+      };
+
+      historyReadings.unshift(newRecord);
+      saveState();
+
+      // Update UI displays
+      document.getElementById("systolic").textContent = sys;
+      document.getElementById("diastolic").textContent = dia;
+      document.getElementById("systolicSmall").textContent = `${sys} mmHg`;
+      document.getElementById("diastolicSmall").textContent = `${dia} mmHg`;
+      document.getElementById("pulseSmall").textContent = `${pulse} BPM`;
+      document.getElementById("resultTime").textContent = `Recorded Just Now (${nowTime})`;
+      document.getElementById("heroLastReading").textContent = `${sys}/${dia}`;
+
+      const aiText = document.getElementById("aiDeviceAnalysis");
+      if (aiText) {
+        aiText.innerHTML = `Your blood pressure reading of <strong>${sys}/${dia} mmHg</strong> is within normal bounds. Pulse is optimal at <strong>${pulse} BPM</strong>. No hypertensive risk detected.`;
+      }
+
+      renderHistoryLog();
+    }
+
+    // Render Ingestion History
+    function renderHistoryLog() {
+      const list = document.getElementById("historyList");
+      const empty = document.getElementById("emptyHistory");
+      if (!list) return;
+
+      if (historyReadings.length === 0) {
+        list.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      }
+      empty.classList.add("hidden");
+
+      list.innerHTML = historyReadings.map(h => `
+        <div class="py-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-royal-purple dark:text-purple-400 flex items-center justify-center text-lg">
+              <i class="fas fa-heart-pulse"></i>
+            </div>
+            <div>
+              <div class="font-extrabold text-gray-900 dark:text-white text-base">
+                ${h.systolic}/${h.diastolic} <span class="text-xs font-semibold text-gray-400">mmHg</span>
+                <span class="text-xs font-normal text-emerald-600 dark:text-emerald-400 ml-2">• ${h.pulse} BPM</span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${h.time}</p>
+            </div>
+          </div>
+
+          <span class="px-3 py-1 rounded-full bg-${h.color}-100 dark:bg-${h.color}-950/60 text-${h.color}-700 dark:text-${h.color}-300 text-xs font-bold border border-${h.color}-200 dark:border-${h.color}-800">
+            ${h.status}
+          </span>
+        </div>
+      `).join('');
+
+      document.getElementById("historyRecordCount").textContent = historyReadings.length;
+    }
+
+    function clearHistoryLog() {
+      if (confirm("Reset local device telemetry history?")) {
+        historyReadings = [];
+        saveState();
+        renderHistoryLog();
+      }
+    }
+
+    function exportCSV() {
+      if (historyReadings.length === 0) return alert("No readings to export.");
+      let csv = "Systolic,Diastolic,Pulse,Timestamp,Status\n";
+      historyReadings.forEach(r => {
+        csv += `${r.systolic},${r.diastolic},${r.pulse},"${r.time}",${r.status}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'presibo_vitals_telemetry.csv';
+      a.click();
+    }
+
+    // Modal Control & Pair Wizard
+    function openPairingModal() {
+      document.getElementById("pairingModal").classList.remove("hidden");
+    }
+    function closePairingModal() {
+      document.getElementById("pairingModal").classList.add("hidden");
+    }
+
+    function pairSelectedCategory(devName, category) {
+      const newDev = {
+        id: "dev_" + Date.now(),
+        name: devName,
+        category: category,
+        status: "Connected",
+        battery: 100,
+        icon: category === 'cgm' ? 'fa-syringe' : (category === 'watch' ? 'fa-stopwatch' : 'fa-heart-pulse'),
+        color: category === 'cgm' ? 'emerald' : (category === 'watch' ? 'blue' : 'purple'),
+        lastReading: category === 'cgm' ? '98 mg/dL' : (category === 'watch' ? '72 BPM' : '120/80 mmHg'),
+        lastSync: "Just Now",
+        mac: "CC:" + Math.floor(Math.random()*89+10) + ":3D:" + Math.floor(Math.random()*89+10),
+        model: "PB-2026"
+      };
+
+      pairedDevices.unshift(newDev);
+      saveState();
+      renderPairedDevices();
+      closePairingModal();
+      alert(`Successfully paired ${devName} via Bluetooth!`);
+    }
+
+    function unpairDevice(id) {
+      if (confirm("Unpair this medical device?")) {
+        pairedDevices = pairedDevices.filter(d => d.id !== id);
+        saveState();
+        renderPairedDevices();
+      }
+    }
+
+    // Native Web Bluetooth Integration Attempt
+    async function triggerWebBluetoothNative() {
+      if (!navigator.bluetooth) {
+        alert("Web Bluetooth API is not supported in this browser. Presibo Simulation mode will handle your pairing.");
+        return;
+      }
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['heart_rate', 'blood_pressure', 'glucose']
+        });
+        pairSelectedCategory(device.name || "Bluetooth Health Device", "bp");
+      } catch(e) {
+        console.log("Web Bluetooth scan cancelled/failed", e);
+      }
+    }
+
+    // Paystack Payment Checkout
+    function openPayment(itemName = "Presibo Smart BP Monitor", amount = 52000) {
+      const userEmail = getUserEmail();
+      if (typeof PaystackPop === 'undefined') {
+        alert(`Initiating order for ${itemName} (₦${amount.toLocaleString()}). Directing to checkout.`);
+        return;
+      }
+
+      const handler = PaystackPop.setup({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: userEmail,
+        amount: amount * 100,
+        currency: "NGN",
+        ref: 'PRESIBO_DEV_' + Math.floor((Math.random() * 1000000000) + 1),
+        metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: itemName }] },
+        callback: function(response) {
+          alert("Payment successful! Reference: " + response.reference);
+          pairSelectedCategory(itemName, "bp");
+        },
+        onClose: function() {
+          console.log("Payment modal closed");
+        }
+      });
+      handler.openIframe();
+    }
+  </script>
+</body>
+</html>

@@ -24,6 +24,14 @@
         {
             "source": "/dashboard",
             "destination": "/dashboard/index.html"
+        },
+        {
+            "source": "/devices",
+            "destination": "/devices/index.html"
+        },
+        {
+            "source": "/devices2",
+            "destination": "/devices2/index.html"
         }
     ]
 }

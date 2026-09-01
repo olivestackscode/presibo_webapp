@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Vital Signs Monitor | Presibo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --pulse-color: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 520px;
+            padding: 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #94a3b8;
+        }
+
+        .status-dot.scanning {
+            background-color: var(--pulse-color);
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.ready {
+            background-color: #10b981;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        /* Scanning State Placeholder */
+        .scan-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 0;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Result View */
+        .results-view {
+            display: none;
+        }
+
+        .patient-info {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .patient-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .patient-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .vital-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .vital-box-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .vital-box-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .vital-box-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .analysis-section {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e40af;
+            margin-bottom: 6px;
+        }
+
+        .analysis-text {
+            font-size: 0.95rem;
+            color: #1e3a8a;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <h1 class="title">Device Sync</h1>
+        <div class="status-badge">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Idle</span>
+        </div>
+    </div>
+
+    <!-- 1. SCANNING / WAITING STATE -->
+    <div class="scan-view" id="scanView">
+        <div class="spinner"></div>
+        <h3 style="margin-bottom: 8px;">Waiting for device...</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Please connect sensor or perform reading</p>
+    </div>
+
+    <!-- 2. RESULT DISPLAY -->
+    <div class="results-view" id="resultsView">
+        <div class="patient-info">
+            <div class="patient-label">Patient Record</div>
+            <div class="patient-name" id="resPatientName">--</div>
+            <div class="timestamp" id="resTimestamp">--</div>
+        </div>
+
+        <div class="vitals-grid">
+            <div class="vital-box">
+                <div class="vital-box-label">Blood Pressure</div>
+                <div class="vital-box-value" id="resBp">--/--</div>
+                <span class="vital-box-unit">mmHg</span>
+            </div>
+            <div class="vital-box">
+                <div class="vital-box-label">Blood Sugar</div>
+                <div class="vital-box-value" id="resSugar">--</div>
+                <span class="vital-box-unit">mg/dL</span>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <div class="analysis-title">Clinical Analysis & Advice</div>
+            <p class="analysis-text" id="resEvaluation">--</p>
+        </div>
+
+        <button class="btn" id="btnNewReading">New Reading</button>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://api.presibo.com/devices/index.php";
+    const POLL_INTERVAL = 3000; // 3 seconds
+
+    let pollTimer = null;
+    let initialLastRecordId = null;
+
+    const scanView    = document.getElementById('scanView');
+    const resultsView = document.getElementById('resultsView');
+    const statusDot   = document.getElementById('statusDot');
+    const statusText  = document.getElementById('statusText');
+    const btnNewReading = document.getElementById('btnNewReading');
+
+    // UI Field References
+    const resPatientName = document.getElementById('resPatientName');
+    const resTimestamp   = document.getElementById('resTimestamp');
+    const resBp          = document.getElementById('resBp');
+    const resSugar       = document.getElementById('resSugar');
+    const resEvaluation  = document.getElementById('resEvaluation');
+
+    function setStatus(text, stateClass) {
+        statusText.innerText = text;
+        statusDot.className = 'status-dot ' + (stateClass || '');
+    }
+
+    async function fetchLatestRecord() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error("Network response was not OK");
+            
+            const result = await response.json();
+            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+                return result.data[0]; // First item (latest, based on ORDER BY datetime DESC)
+            }
+            return null;
+        } catch (err) {
+            console.error("API Read Error:", err);
+            return null;
+        }
+    }
+
+    function renderRecord(record) {
+        resPatientName.innerText = `${record.first_name} ${record.last_name}`;
+        resTimestamp.innerText = `Recorded: ${record.datetime || 'N/A'}`;
+        resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
+        resSugar.innerText = record.sugar || '--';
+        resEvaluation.innerText = record.evaluation || 'No evaluation notes provided.';
+
+        scanView.style.display = 'none';
+        resultsView.style.display = 'block';
+        setStatus("Reading Complete", "ready");
+    }
+
+    async function startScan() {
+        clearInterval(pollTimer);
+        
+        // Reset View
+        resultsView.style.display = 'none';
+        scanView.style.display = 'flex';
+        setStatus("Scanning...", "scanning");
+
+        // Step 1: Snapshot the latest ID to detect incoming new data
+        const currentRecord = await fetchLatestRecord();
+        initialLastRecordId = currentRecord ? currentRecord.id : null;
+
+        // Step 2: Poll until a newer ID appears
+        pollTimer = setInterval(async () => {
+            const latest = await fetchLatestRecord();
+            if (latest && (!initialLastRecordId || latest.id !== initialLastRecordId)) {
+                clearInterval(pollTimer);
+                renderRecord(latest);
+            }
+        }, POLL_INTERVAL);
+    }
+
+    btnNewReading.addEventListener('click', startScan);
+
+    // Run automatically on initial page load
+    window.addEventListener('DOMContentLoaded', startScan);
+</script>
+
+</body>
+</html>

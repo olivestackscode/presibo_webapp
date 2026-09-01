@@ -1,0 +1,316 @@
+{
+  "appName": "Presibo",
+  "version": "4.0.0",
+  "description": "Health tracking and consultation application with AI assistance, virtual doctor appointments, fitness/nutrition tracking, and peer video conferencing.",
+  "techStack": {
+    "mobile": {
+      "framework": "React Native (Expo)",
+      "uiLibrary": "React Native Paper",
+      "routing": "React Navigation (Stack)",
+      "network": "Axios & Fetch",
+      "storage": "AsyncStorage"
+    },
+    "webTarget": {
+      "framework": "HTML/Vanilla Javascript or Next.js/Vite",
+      "styling": "Vanilla CSS / custom utility styles",
+      "designSystem": {
+        "primaryColor": "#F97316 (Orange/coral primary)",
+        "accentColor": "#C62828 (Ox Red for dark mode notifications / custom highlights)",
+        "themes": ["Light Mode", "Dark Mode"]
+      }
+    }
+  },
+  "localStorageKeys": {
+    "authToken": "Authentication token for Authorization header Bearer token.",
+    "user_session": "JSON object with { email, firstName, userId, loginTime } representing active user session.",
+    "profile_{email}": "Cached user profile data with _cacheTime metadata to avoid redundant network calls.",
+    "cached_wallet_balance": "Cached wallet balance in local currency/credits.",
+    "ai_data_sharing_consent_granted": "Boolean ('true'/'false') indicating if the user consented to share health data with third-party AI service.",
+    "medical_disclaimer_accepted": "Boolean ('true') indicating if the user accepted the startup medical disclaimer.",
+    "notifications_history": "Backup list of notifications for offline reading or fallback retrieval.",
+    "blocked_users": "List of user profiles/IDs blocked by the user to moderate objectionable content.",
+    "user_reports": "User-generated reports flagging objectionable content for developer/admin review.",
+    "track_data_{dateStr}_{email}": "Aggregated daily tracking status containing steps, meals status, BP logs, sugar logs, exercises, and sleep.",
+    "fitness_score_{dateStr}_{email}": "Daily fitness score (up to 2.0 pts) calculated from goal achievements.",
+    "fitness_deck_swiped_{dateStr}_{email}": "Array of swiped goal IDs for the current calendar day to prevent repeat point awards.",
+    "food_score_{dateStr}_{email}": "Daily food score (up to 2.0 pts) calculated from meal selections.",
+    "food_deck_swiped_{dateStr}_{email}": "Array of swiped meal IDs for the current calendar day to prevent repeat point awards."
+  },
+  "billingRules": {
+    "threshold": 5000,
+    "warningText": "Low balance! Under ₦5,000.",
+    "costs": {
+      "AI_ANALYSIS": 250,
+      "BOOKING": 100,
+      "HEALTH_TIP": 100
+    },
+    "actions": {
+      "checkBalance": "Retrieved via profile response `wallet` field.",
+      "updateBalance": "POST to `/post/balance.php` with { email, amount } (negative for deduction, positive for top-up).",
+      "canProceed": "Validates if balance >= threshold."
+    }
+  },
+  "coreScreens": [
+    {
+      "name": "MainScreen",
+      "route": "Main",
+      "purpose": "App loader & session supervisor.",
+      "behavior": "Reads `user_session` local storage. If session exists, replaces route with Dashboard. Else, redirects to Login."
+    },
+    {
+      "name": "LoginScreen",
+      "route": "Login",
+      "purpose": "User authentication interface.",
+      "fields": ["email", "password"],
+      "apiCall": {
+        "url": "https://api.presibo.com/db/index.php?action=verify_password",
+        "method": "POST",
+        "payload": {
+          "email": "user@email.com",
+          "password": "user_password"
+        }
+      },
+      "interactions": [
+        "Redirects to Signup Screen.",
+        "Social Login integration: Google Authentication.",
+        "Upon successful verification, stores auth token and user_session, then replaces route with Dashboard."
+      ]
+    },
+    {
+      "name": "SignupScreen",
+      "route": "Signup",
+      "purpose": "New user registration.",
+      "fields": ["firstname", "lastname", "email", "password", "tel", "age", "sex", "blood_group", "address"],
+      "apiCall": {
+        "url": "https://api.presibo.com/post/index.php?action=signup",
+        "method": "POST",
+        "payload": "Complete user registration metadata."
+      },
+      "postRegistrationHook": {
+        "url": "https://api.presibo.com/email/index.php",
+        "method": "POST",
+        "payload": {
+          "action": "send",
+          "type": "welcome",
+          "email": "user@email.com",
+          "name": "User Name"
+        }
+      }
+    },
+    {
+      "name": "DashboardScreen",
+      "route": "Dashboard",
+      "purpose": "Main health panel presenting summary stats, daily recommendations, and fast navigation to modules.",
+      "uiComponents": [
+        "Dynamic greetings ('Good Morning', 'Good Afternoon', 'Good Evening') based on local time.",
+        "Health score status dial displaying score (1.0 to 10.0) and label ('Excellent', 'Very Good', 'Normal', 'Needs Attention').",
+        "Summary metrics cards: steps, completed meals, sleep hours, water intake.",
+        "AI Health Tip component: displays contextual healthy tips. Reloads tip every 5 minutes.",
+        "Low balance notification banner linking to Paystack top-up modal if wallet balance < 5000.",
+        "Medical Disclaimer modal: must be accepted on first launch, stored as accepted in local storage.",
+        "AI Data Sharing Consent modal: prompts user to approve sharing data with OpenAI/OpenRouter proxy."
+      ],
+      "aiIntegration": {
+        "description": "Requests custom AI advice from /ai/global.php config, sending user context (vitals, goals, health score) to get actionable wellness tips.",
+        "intervalChecks": "Every 30 minutes, checks vitals and logged meals, generating notifications for health updates or missing meal logs (breakfast, lunch, dinner reminders)."
+      }
+    },
+    {
+      "name": "AIDocScreen",
+      "route": "AIDoc",
+      "purpose": "Interactive health support chat with AI assistant 'Dr. Helen'.",
+      "uiComponents": [
+        "Chat window with user and AI messages bubble differentiation.",
+        "Voice dictation microphone button (integrates Speech-to-Text).",
+        "Quick action chip navigation: Hospitals locator, MyFood logging, Doctors list, Vital signs tracker, Call a Doctor shortcut.",
+        "Language translation modal allowing translation of AI responses.",
+        "Paystack top-up button directly visible when balance is insufficient."
+      ],
+      "apiCall": {
+        "url": "https://api.presibo.com/ai/open.php",
+        "method": "POST",
+        "payload": {
+          "message": "User query",
+          "name": "User Name",
+          "email": "user@email.com",
+          "temperature": 0.7,
+          "max_tokens": 400
+        }
+      }
+    },
+    {
+      "name": "TrackScreen",
+      "route": "Track",
+      "purpose": "Logging vital stats and computing unified health score.",
+      "trackedVitals": {
+        "steps": "Step count target (default 10,000 steps).",
+        "water": "Glasses of water logged (goal: 8 glasses).",
+        "sleep": "Hours of sleep logged (goal: 8 hours).",
+        "bloodPressure": "Systolic, Diastolic, and Pulse rate values.",
+        "bloodSugar": "Blood glucose levels (Fasting, Post-prandial, Random)."
+      },
+      "healthScoreCalculation": {
+        "baseScore": 5.0,
+        "maxScore": 10.0,
+        "mealBonus": "0.5 per meal logged (max 1.5).",
+        "exerciseBonus": "0.5 for any logged physical activity.",
+        "waterBonus": "+0.5 for >= 8 glasses, +0.2 for >= 4 glasses.",
+        "stepsBonus": "+1.0 for >= 10,000 steps, +0.5 for >= 5,000 steps.",
+        "sleepBonus": "+0.5 for >= 7 hours.",
+        "bpAnalysis": "+1.0 bonus for normal BP (110-130 / 70-90), penalties up to -4.0 for critical high values.",
+        "sugarAnalysis": "+0.5 bonus for normal sugar (70-140 mg/dL), penalties up to -2.5 for highly abnormal values."
+      },
+      "sharing": "Supports generating health reports and sharing them via WhatsApp URL or Email custom templates."
+    },
+    {
+      "name": "FoodScreen",
+      "route": "Food",
+      "purpose": "Logging daily meals and analyzing calorie/nutritional components.",
+      "uiComponents": [
+        "Nigerian Healthy Meal Suggestions Swipe Deck: Tinder-like card system (Jollof Rice, Moi Moi, Efo Riro, etc.). Swiping right logs the meal, plays a coin drop sound effect, and awards health points.",
+        "Manual Food Log dialog (input name, description, meal category).",
+        "Photo Uploader / Camera Capture linking to image picker. Uploaded images are passed to AI for nutritional analysis.",
+        "Daily calorie/macronutrient tracking summary (Calories, Protein, Carbs, Fats)."
+      ],
+      "apiCall": {
+        "url": "https://api.presibo.com/food/logs.php",
+        "method": "POST",
+        "payload": {
+          "user_id": "userId",
+          "email": "user@email.com",
+          "meal_type": "BREAKFAST/LUNCH/DINNER/SNACK",
+          "food_name": "Meal name",
+          "details": { "calories": 0, "protein": 0, "carbs": 0, "fats": 0 }
+        }
+      }
+    },
+    {
+      "name": "FitnessScreen",
+      "route": "Fitness",
+      "purpose": "Activity logging, fitness tasks recommendation, and goal tracking.",
+      "uiComponents": [
+        "AI Daily Fitness Tasks: JSON array list generated by AI representing suggested workouts.",
+        "AI Lifestyle Guide component displaying warm, holistic wellness recommendations.",
+        "Fitness Goals Suggestions Swipe Deck: Swipe right on targets (Lose Weight, Cut Sugar, 30m Cardio, Strength Training) to earn points and play sound effects.",
+        "Logs editor for active steps, exercise minutes, and water intake."
+      ],
+      "apiCalls": {
+        "saveLog": {
+          "url": "https://api.presibo.com/tracking/index.php",
+          "method": "POST",
+          "payload": {
+            "user_id": "integer",
+            "email": "string",
+            "category": "FITNESS / WATER / HEALTH_LOG",
+            "type": "specific log type",
+            "primary_value": "float/numeric value",
+            "secondary_value": "float/numeric value",
+            "details": "object containing extra logs info",
+            "logged_at": "normalized local YYYY-MM-DD HH:mm:ss"
+          }
+        }
+      }
+    },
+    {
+      "name": "DoctorsScreen",
+      "route": "Doctors",
+      "purpose": "Consulting and scheduling doctor appointments.",
+      "interactions": [
+        "Retrieves doctor profiles directory from app backend (https://app.presibo.com/doctors.json).",
+        "Booking Modal: input phone, consult reasons, schedule date/time.",
+        "Applies a booking charge (100 credits) deducted from wallet balance.",
+        "Sends booking confirmation emails to both patient and doctor.",
+        "Saves appointment notification log in system backend."
+      ],
+      "emailConfirmation": {
+        "url": "https://api.presibo.com/email/index.php",
+        "method": "POST",
+        "payload": {
+          "action": "send",
+          "type": "custom",
+          "email": "recipient@email.com",
+          "name": "Recipient Name",
+          "subject": "Appointment Confirmed/Scheduled Details",
+          "body": "Formatted HTML text email containing date, time, and participant profiles."
+        }
+      }
+    },
+    {
+      "name": "TrainersScreen",
+      "route": "Trainers",
+      "purpose": "Browsing and booking personal fitness trainers.",
+      "behavior": "Fetches trainers list from https://presibo-wl.vercel.app/trainers.json, filters items where specialization is 'Fitness Trainer', and logs appointments at `/appointments/new.php`."
+    },
+    {
+      "name": "MeetingsScreen",
+      "route": "Meetings",
+      "purpose": "Virtual consultation center.",
+      "uiComponents": [
+        "Displays list of upcoming and past virtual consultations.",
+        "Join Consultation button: initiates LiveKit/Jitsi room name.",
+        "On joining, stores appointment status as 'ongoing' and launches WebRTC video room."
+      ],
+      "apiCall": {
+        "url": "https://api.presibo.com/meetings/index.php?action=get_call_history&email={email}",
+        "method": "GET"
+      }
+    },
+    {
+      "name": "VideoRoomScreen",
+      "route": "VideoRoom",
+      "purpose": "Full-screen video call consultation room.",
+      "webrtcEngine": "Jitsi Meet embedded inside standard browser frames / WebViews.",
+      "meetingSession": {
+        "url": "https://meet.jit.si/{roomName}#config.prejoinPageEnabled=false&userInfo.displayName={encodedParticipantName}",
+        "behavior": "Hooks unload / conferenced left events. On completion, calculates call duration in seconds and submits a POST request to update call status to 'ended'."
+      }
+    },
+    {
+      "name": "ProfileScreen",
+      "route": "Profile",
+      "purpose": "Comprehensive profile dashboard and financial wallet management.",
+      "features": [
+        "Displays user demographics, health statistics, and upcoming consultation details.",
+        "Paystack Checkout implementation: allows topping up wallet balance.",
+        "Wallet action: can send payment invoice/reminders via email.",
+        "Self-Assessment module: user reports symptoms, triggers AI analysis, saves result, and shares via WhatsApp/Email."
+      ]
+    },
+    {
+      "name": "SettingsScreen",
+      "route": "Settings",
+      "purpose": "Global app configurations panel.",
+      "sections": [
+        {
+          "title": "Account",
+          "items": [
+            { "name": "Account Information", "route": "AccountInformation", "purpose": "Form to edit firstname, lastname, tel, age, sex, blood_group, address." },
+            { "name": "Privacy & Security", "route": "PrivacySecurity", "purpose": "Contains password resets, Privacy Policy access, AI Data Sharing toggle (and gpt/grok disclosures), and Account Deletion workflow (requires typing 'delete' and entering password)." }
+          ]
+        },
+        {
+          "title": "Preferences",
+          "items": ["Notifications switch", "Dark Mode switch (ThemeContext handler)", "Location Services switch"]
+        },
+        {
+          "title": "Support",
+          "items": ["Help Center", "Medical Disclaimer text overlay"]
+        }
+      ]
+    },
+    {
+      "name": "NotificationsScreen",
+      "route": "Notifications",
+      "purpose": "Aggregated center for system messages.",
+      "notificationTypes": ["reminder", "tip", "fitness", "message", "medication", "confirmation"],
+      "apiCall": {
+        "url": "https://api.presibo.com/notifications/index.php?email={email}",
+        "method": "GET"
+      },
+      "interactions": [
+        "Mark as Read: PUT request to `/notifications/index.php?id={notificationId}` with { is_read: 1 }.",
+        "Clear all notifications: empties state and removes local history."
+      ]
+    }
+  ]
+}

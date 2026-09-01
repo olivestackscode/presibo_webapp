@@ -376,6 +376,15 @@ app.get('/broadcast', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'broadcast', 'index.html'));
 });
 
+// Explicit routes for devices pages
+app.get('/devices', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'devices', 'index.html'));
+});
+
+app.get('/devices2', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'devices2', 'index.html'));
+});
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
