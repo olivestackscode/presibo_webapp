@@ -4,16 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Vital Signs Monitor | Presibo</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/img/new_presibo_icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/img/new_presibo_icon.png">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --royal-purple: #6B21A8;
+            --naija-green: #008753;
+            --primary: #6B21A8;
+            --primary-hover: #581c87;
+            --success: #10b981;
+            --success-hover: #059669;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --pulse-color: #3b82f6;
+            --pulse-color: #6B21A8;
             --doctor-bg: #f0fdf4;
             --doctor-border: #bbf7d0;
         }
@@ -29,10 +41,78 @@
             background-color: var(--bg);
             color: var(--text-main);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+        }
+
+        /* Top Brand Header Bar */
+        .brand-header-bar {
+            width: 100%;
+            max-width: 520px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .brand-logo-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-logo-img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .brand-title-text {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--royal-purple);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-sub-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--naija-green);
+            background: #e6f4ea;
+            padding: 2px 8px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .brand-sub-badge i {
+            font-size: 0.6rem;
+            color: var(--naija-green);
+        }
+
+        .brand-nav-link {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .brand-nav-link:hover {
+            color: var(--royal-purple);
         }
 
         .card {
@@ -52,9 +132,42 @@
             margin-bottom: 24px;
         }
 
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-logo-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
         .title {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .card-footer-branding {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .status-badge {
@@ -83,7 +196,7 @@
         }
 
         .status-dot.ready {
-            background-color: #10b981;
+            background-color: var(--success);
         }
 
         @keyframes pulse {
@@ -207,13 +320,12 @@
             line-height: 1.5;
         }
 
-        /* Doctor Pairing Section */
         .doctor-box {
             background: var(--doctor-bg);
             border: 1px solid var(--doctor-border);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 14px;
@@ -227,8 +339,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             flex-shrink: 0;
+            border: 2px solid #86efac;
+            font-weight: 700;
+            color: #15803d;
         }
 
         .doctor-details {
@@ -250,49 +365,144 @@
             color: #14532d;
         }
 
-        .doctor-specialty {
+        .doctor-meta {
             font-size: 0.85rem;
             color: #166534;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .booking-status {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .booking-status.success {
+            display: block;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .booking-status.error {
+            display: block;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .meeting-link-banner {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .meeting-link-banner a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            background-color: var(--primary);
-            color: white;
             border: none;
             border-radius: 10px;
             padding: 14px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
+        .btn-primary {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
     </style>
 </head>
 <body>
 
+<!-- Top Presibo Brand Header Bar -->
+<div class="brand-header-bar">
+    <a href="/dashboard" class="brand-logo-group">
+        <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="brand-logo-img">
+        <span class="brand-title-text">Presibo</span>
+        <span class="brand-sub-badge"><i class="fas fa-circle font-xs"></i> Live Sync</span>
+    </a>
+    <a href="/devices" class="brand-nav-link">
+        <i class="fas fa-arrow-left"></i> Devices Hub
+    </a>
+</div>
+
 <div class="card">
     <div class="header">
-        <h1 class="title">Device Sync</h1>
+        <div class="title-group">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo" class="card-logo-icon">
+            <div>
+                <h1 class="title">Live Vital Signs Monitor</h1>
+                <p class="subtitle">Presibo Biometrics Telemetry</p>
+            </div>
+        </div>
         <div class="status-badge">
             <span class="status-dot" id="statusDot"></span>
             <span id="statusText">Idle</span>
         </div>
     </div>
 
-    <!-- 1. SCANNING / WAITING STATE -->
+    <!-- SCANNING VIEW -->
     <div class="scan-view" id="scanView">
         <div class="spinner"></div>
         <h3 style="margin-bottom: 8px;">Waiting for device...</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem;">Please connect sensor or perform reading</p>
     </div>
 
-    <!-- 2. RESULT & DOCTOR PAIRING DISPLAY -->
+    <!-- RESULTS & BOOKING DISPLAY -->
     <div class="results-view" id="resultsView">
         <div class="patient-info">
             <div class="patient-label">Patient Record</div>
@@ -318,103 +528,274 @@
             <p class="analysis-text" id="resEvaluation">--</p>
         </div>
 
-        <!-- Assigned Doctor Box -->
-        <div class="doctor-box" id="doctorBox">
-            <div class="doctor-avatar">🩺</div>
+        <!-- Matched Doctor Card -->
+        <div class="doctor-box">
+            <div class="doctor-avatar" id="docAvatar">🩺</div>
             <div class="doctor-details">
                 <div class="doctor-badge">Assigned Physician</div>
-                <div class="doctor-name" id="docName">Finding physician...</div>
-                <div class="doctor-specialty" id="docSpecialty">General Practice</div>
+                <div class="doctor-name" id="docName">Selecting doctor...</div>
+                <div class="doctor-meta">
+                    <span id="docSpecialty">General Practitioner</span>
+                    <span id="docLocation"></span>
+                </div>
             </div>
         </div>
 
-        <button class="btn" id="btnNewReading">New Reading</button>
+        <div class="booking-status" id="bookingStatus"></div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" id="btnBookAppointment">
+                <span class="btn-spinner" id="bookSpinner"></span>
+                <span id="bookBtnText">Confirm Doctor Booking</span>
+            </button>
+            <button class="btn btn-secondary" id="btnNewReading">New Reading</button>
+        </div>
+    </div>
+
+    <div class="card-footer-branding">
+        <img src="/assets/img/new_presibo_icon.png" alt="Presibo" style="width: 14px; height: 14px; opacity: 0.8;">
+        <span>Powered by Presibo AI Telemetry • Encrypted Medical Data</span>
     </div>
 </div>
 
 <script>
-    const DEVICES_API_URL = "https://api.presibo.com/devices/index.php";
-    const DOCTORS_API_URL = "https://app.presibo.com/doctors.json";
-    const POLL_INTERVAL   = 3000;
+    const DEVICES_API_URL         = "https://api.presibo.com/devices/index.php";
+    const DOCTORS_API_URL         = "https://app.presibo.com/doctors.json";
+    const APPOINTMENTS_NEW_URL    = "https://api.presibo.com/appointments/new.php";
+    const APPOINTMENTS_LATEST_ID  = "https://api.presibo.com/appointments/latest_id.php";
+    const EMAIL_API_URL           = "https://api.presibo.com/email/index.php";
+    const POLL_INTERVAL           = 3000;
 
+    const fallbackData = {"doctors": [
+      {"id": 1, "firstname": "Sopuru", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 34, "firstname": "Farida", "lastname": "Bello", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 2, "firstname": "Firdausi", "lastname": "Usman", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 3, "firstname": "Chinenye", "midname": "Ozioma", "lastname": "Nnabuife", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 4, "firstname": "Abu", "lastname": "Abdulrashid", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 5, "firstname": "Fatima", "midname": "Aderonke", "lastname": "Adebisi", "specialization": "General Practitioner", "location":"Lagos Island"},
+      {"id": 6, "firstname": "Titilope", "lastname": "Adedeji", "specialization": "Family Medicine", "location":"Abuja"},
+      {"id": 7, "firstname": "Enny", "lastname": "Aikodon", "specialization": "General Practitioner", "location":"Ontario"},
+      {"id": 8, "firstname": "Ojo", "lastname": "Damilola", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 9, "firstname": "Collins", "lastname": "Uche", "specialization": "General Practitioner", "location":"Gwagwalada"},
+      {"id": 10, "firstname": "Nneoma", "lastname": "Ike", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 11, "firstname": "Victoria Ene", "lastname": "Abah", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 12, "firstname": "Asuquo", "lastname": "Ekpenyong", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 13, "firstname": "James", "lastname": "Udom", "specialization": "General Practitioner", "location":"Lagos"},
+      {"id": 14, "firstname": "Ebere", "midname": "Gift", "lastname": "Okere", "specialization": "Nutritionist", "location":"Port Harcourt"},
+      {"id": 15, "firstname": "Maryam", "lastname": "", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 16, "firstname": "Nusaibah", "lastname": "Bashir", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 17, "firstname": "Ekomobong", "lastname": "Edeghe", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 18, "firstname": "Adline", "lastname": "Eze", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 19, "firstname": "Efe", "midname": "Iyi", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 20, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 21, "firstname": "Busayo", "midname": "Felicia", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 22, "firstname": "Henrietta", "midname": "Eseoghene", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 23, "firstname": "Ebai", "midname": "Romanus", "lastname": "Ashu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 24, "firstname": "Hajara", "midname": "Dalhatu", "lastname": "Musa", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 25, "firstname": "Hannatu", "lastname": "Yakasai", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 26, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "Medical Officer", "location":"Port Harcourt"}
+    ]};
+
+    let doctorsList = fallbackData.doctors;
     let pollTimer = null;
     let initialLastRecordId = null;
-    let doctorsList = [];
 
-    const scanView      = document.getElementById('scanView');
-    const resultsView   = document.getElementById('resultsView');
-    const statusDot     = document.getElementById('statusDot');
-    const statusText    = document.getElementById('statusText');
-    const btnNewReading = document.getElementById('btnNewReading');
+    let currentPatientRecord = null;
+    let currentMatchedDoctor = null;
 
-    // UI Element References
-    const resPatientName = document.getElementById('resPatientName');
-    const resTimestamp   = document.getElementById('resTimestamp');
-    const resBp          = document.getElementById('resBp');
-    const resSugar       = document.getElementById('resSugar');
-    const resEvaluation  = document.getElementById('resEvaluation');
+    const scanView           = document.getElementById('scanView');
+    const resultsView        = document.getElementById('resultsView');
+    const statusDot          = document.getElementById('statusDot');
+    const statusText         = document.getElementById('statusText');
+    const btnNewReading      = document.getElementById('btnNewReading');
+    const btnBookAppointment = document.getElementById('btnBookAppointment');
+    const bookSpinner        = document.getElementById('bookSpinner');
+    const bookBtnText        = document.getElementById('bookBtnText');
+    const bookingStatus      = document.getElementById('bookingStatus');
 
-    const docName        = document.getElementById('docName');
-    const docSpecialty   = document.getElementById('docSpecialty');
+    const resPatientName     = document.getElementById('resPatientName');
+    const resTimestamp       = document.getElementById('resTimestamp');
+    const resBp              = document.getElementById('resBp');
+    const resSugar           = document.getElementById('resSugar');
+    const resEvaluation      = document.getElementById('resEvaluation');
+
+    const docName            = document.getElementById('docName');
+    const docSpecialty       = document.getElementById('docSpecialty');
+    const docLocation        = document.getElementById('docLocation');
+    const docAvatar          = document.getElementById('docAvatar');
 
     function setStatus(text, stateClass) {
         statusText.innerText = text;
         statusDot.className = 'status-dot ' + (stateClass || '');
     }
 
-    // Pre-load doctors catalog
-    async function fetchDoctors() {
+    async function loadDoctors() {
         try {
-            const res = await fetch(DOCTORS_API_URL);
+            const res = await fetch(DOCTORS_API_URL, { cache: "no-store" });
             if (res.ok) {
                 const data = await res.json();
-                doctorsList = Array.isArray(data) ? data : (data.doctors || []);
+                const fetched = Array.isArray(data) ? data : (data.doctors || []);
+                if (fetched.length > 0) doctorsList = fetched;
             }
         } catch (err) {
-            console.warn("Doctors API unavailable, using fallback pairing:", err);
+            console.log("Using built-in doctors fallback roster.");
         }
     }
 
-    // Auto-Pairing Logic: Matches vitals severity to relevant specialist
-    function pairDoctor(record) {
-        if (!doctorsList || doctorsList.length === 0) {
-            docName.innerText = "Dr. On-Duty Specialist";
-            docSpecialty.innerText = "General Practice / Telehealth";
-            return;
+    function pairDoctor() {
+        if (!doctorsList || doctorsList.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * doctorsList.length);
+        const matched = doctorsList[randomIndex];
+
+        currentMatchedDoctor = matched;
+
+        const names = [matched.firstname, matched.midname, matched.lastname].filter(Boolean).join(' ');
+        const fullName = names.startsWith('Dr.') ? names : `Dr. ${names}`;
+
+        docName.innerText = fullName;
+        docSpecialty.innerText = matched.specialization || matched.specialty || 'General Practitioner';
+        docLocation.innerText = `• ${matched.location || 'Nigeria'}`;
+
+        const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
+        docAvatar.innerText = initials || '🩺';
+    }
+
+    // Schedule 12-24 hours ahead (next calendar day) during prime slots between 9 AM and 6 PM
+    function generatePrimeAppointmentDateTime() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // Format YYYY-MM-DD
+        const apptDate = tomorrow.toISOString().slice(0, 10);
+
+        // Standard Prime Slots (9:00 AM to 6:00 PM)
+        const primeSlots = [
+            { time24: '09:00:00', label: '09:00 AM' },
+            { time24: '09:30:00', label: '09:30 AM' },
+            { time24: '10:00:00', label: '10:00 AM' },
+            { time24: '10:30:00', label: '10:30 AM' },
+            { time24: '11:00:00', label: '11:00 AM' },
+            { time24: '11:30:00', label: '11:30 AM' },
+            { time24: '14:00:00', label: '02:00 PM' },
+            { time24: '14:30:00', label: '02:30 PM' },
+            { time24: '15:00:00', label: '03:00 PM' },
+            { time24: '15:30:00', label: '03:30 PM' },
+            { time24: '16:00:00', label: '04:00 PM' },
+            { time24: '16:30:00', label: '04:30 PM' },
+            { time24: '17:00:00', label: '05:00 PM' },
+            { time24: '17:30:00', label: '05:30 PM' }
+        ];
+
+        const selectedSlot = primeSlots[Math.floor(Math.random() * primeSlots.length)];
+
+        return {
+            date: apptDate,
+            time: selectedSlot.time24,
+            displayTime: selectedSlot.label
+        };
+    }
+
+    async function getNextAppointmentId() {
+        try {
+            const res = await fetch(APPOINTMENTS_LATEST_ID, { cache: "no-store" });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.next_id !== undefined) {
+                    return Number(data.next_id);
+                }
+            }
+        } catch (err) {
+            console.warn("Could not retrieve next ID from latest_id.php:", err);
         }
+        return 1;
+    }
 
-        const sys = parseInt(record.bp_sys, 10) || 0;
-        const sugar = parseFloat(record.sugar) || 0;
+    async function sendCombinedReportEmail(record, doctor, apptDate, apptDisplayTime, meetingUrl) {
+        const recipientEmail = record.email || '';
+        if (!recipientEmail || recipientEmail.trim() === '') return;
 
-        let targetKeywords = ['general', 'family', 'physician'];
+        const patientName = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+        const docFullName = [doctor.firstname, doctor.midname, doctor.lastname].filter(Boolean).join(' ');
+        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
+        const sugarText = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
 
-        if (sys >= 140 || sys <= 90) {
-            targetKeywords = ['cardio', 'heart', 'internal', 'general'];
-        } else if (sugar >= 180 || (sugar > 0 && sugar < 70)) {
-            targetKeywords = ['endocrin', 'internal', 'diabet', 'general'];
-        }
+        const emailMessageHtml = `
+            <p>Dear <strong>${patientName}</strong>,</p>
+            <p>Your vital signs have been evaluated and your consultation appointment is confirmed for tomorrow.</p>
+            
+            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">1. Vital Signs Reading</h3>
+            <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Pressure:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${record.bp_sys}/${record.bp_dia} mmHg</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Sugar:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${sugarText}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px;"><strong>Reading Recorded:</strong></td>
+                    <td style="padding: 10px 14px;">${record.datetime || 'Just now'}</td>
+                </tr>
+            </table>
 
-        // Search for best matching doctor
-        let matchedDoctor = doctorsList.find(doc => {
-            const spec = (doc.specialty || doc.specialization || '').toLowerCase();
-            return targetKeywords.some(kw => spec.includes(kw));
-        });
+            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">2. Clinical Analysis &amp; Advice</h3>
+            <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #1e3a8a; line-height: 1.5;">${record.evaluation || 'No clinical observations logged.'}</p>
+            </div>
 
-        // Fallback: pick any available doctor
-        if (!matchedDoctor) {
-            matchedDoctor = doctorsList[0];
-        }
+            <h3 style="color: #16a34a; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment &amp; Consultation Link</h3>
+            <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 15px;">
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Assigned Doctor:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold; color: #14532d;">${formattedDocName}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Specialty:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.specialization || doctor.specialty || 'General Practitioner'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Location:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.location || 'Virtual Clinic'}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Appointment Date:</strong></td>
+                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold;">${apptDate}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 14px;"><strong>Appointment Time:</strong></td>
+                    <td style="padding: 10px 14px; font-weight: bold;">${apptDisplayTime}</td>
+                </tr>
+            </table>
 
-        const name = matchedDoctor.name || matchedDoctor.doctor_name || `${matchedDoctor.first_name || ''} ${matchedDoctor.last_name || ''}`.trim() || 'Dr. Assigned';
-        const specialty = matchedDoctor.specialty || matchedDoctor.specialization || 'Clinical Specialist';
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="${meetingUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Join Video Consultation Room</a>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b;">Direct Link: <a href="${meetingUrl}" style="color: #2563eb;">${meetingUrl}</a></p>
+            </div>
 
-        docName.innerText = name.startsWith('Dr.') ? name : `Dr. ${name}`;
-        docSpecialty.innerText = specialty;
+            <p style="margin-top: 15px; font-size: 13px; color: #64748b;">Please click the button above at your scheduled time to connect directly with your doctor. If you need assistance, reach us at support@presibo.com.</p>
+        `;
+
+        const emailPayload = {
+            action: "send",
+            type: "custom",
+            email: recipientEmail,
+            name: patientName,
+            title: `Presibo Health - Vitals Evaluation & Consultation Link`,
+            message: emailMessageHtml
+        };
+
+        fetch(EMAIL_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailPayload)
+        }).catch(() => {});
     }
 
     async function fetchLatestRecord() {
         try {
-            const response = await fetch(DEVICES_API_URL);
+            const response = await fetch(DEVICES_API_URL, { cache: "no-store" });
             if (!response.ok) throw new Error("Network response was not OK");
             
             const result = await response.json();
@@ -429,17 +810,95 @@
     }
 
     function renderRecord(record) {
-        resPatientName.innerText = `${record.first_name} ${record.last_name}`;
-        resTimestamp.innerText = `Recorded: ${record.datetime || 'N/A'}`;
+        currentPatientRecord = record;
+
+        resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+        resTimestamp.innerText = `Recorded: ${record.datetime || 'Just now'}`;
         resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
         resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
-        resEvaluation.innerText = record.evaluation || 'No evaluation notes provided.';
+        resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully.';
 
-        pairDoctor(record);
+        pairDoctor();
+
+        bookingStatus.className = 'booking-status';
+        bookingStatus.innerText = '';
+        btnBookAppointment.disabled = false;
+        bookBtnText.innerText = 'Confirm Doctor Booking';
+        bookSpinner.style.display = 'none';
 
         scanView.style.display = 'none';
         resultsView.style.display = 'block';
         setStatus("Reading Complete", "ready");
+    }
+
+    async function bookAppointment() {
+        if (!currentPatientRecord || !currentMatchedDoctor) return;
+
+        btnBookAppointment.disabled = true;
+        bookSpinner.style.display = 'inline-block';
+        bookBtnText.innerText = 'Processing Booking...';
+        bookingStatus.className = 'booking-status';
+
+        // 1. Fetch next integer ID from latest_id.php
+        const nextId = await getNextAppointmentId();
+        const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
+
+        // 2. Generate Next Day + Prime Slot (9 AM - 6 PM)
+        const schedule = generatePrimeAppointmentDateTime();
+
+        const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
+        const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
+        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
+        
+        const reasonText = `Device Reading: BP ${currentPatientRecord.bp_sys}/${currentPatientRecord.bp_dia} mmHg, Sugar: ${currentPatientRecord.sugar || 'N/A'} mg/dL. Evaluation: ${currentPatientRecord.evaluation || 'None'}`;
+
+        const appointmentPayload = {
+            name: patientFullName,
+            email: currentPatientRecord.email || 'patient@presibo.com',
+            phone: currentPatientRecord.phone || '',
+            date: schedule.date,
+            time: schedule.time,
+            doctor_id: String(currentMatchedDoctor.id || ''),
+            doctor: formattedDocName,
+            specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
+            location: currentMatchedDoctor.location || 'Virtual Clinic',
+            description: reasonText
+        };
+
+        try {
+            const response = await fetch(APPOINTMENTS_NEW_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(appointmentPayload)
+            });
+
+            const resData = await response.json();
+
+            if (response.ok && (resData.status === 'success' || resData.success)) {
+                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, schedule.date, schedule.displayTime, meetingUrl);
+
+                bookingStatus.className = 'booking-status success';
+                bookingStatus.innerHTML = `
+                    ✓ Appointment Confirmed (#${nextId}) for <strong>${schedule.date} at ${schedule.displayTime}</strong>.<br>
+                    <div class="meeting-link-banner">
+                        Meeting Room: <a href="${meetingUrl}" target="_blank">${meetingUrl}</a>
+                    </div>
+                `;
+                bookBtnText.innerText = 'Booking Confirmed';
+            } else {
+                throw new Error(resData.message || 'Failed to complete appointment booking.');
+            }
+        } catch (err) {
+            bookingStatus.className = 'booking-status error';
+            bookingStatus.innerText = `Error: ${err.message || 'Booking failed. Try again.'}`;
+            btnBookAppointment.disabled = false;
+            bookBtnText.innerText = 'Retry Doctor Booking';
+        } finally {
+            bookSpinner.style.display = 'none';
+        }
     }
 
     async function startScan() {
@@ -461,10 +920,11 @@
         }, POLL_INTERVAL);
     }
 
+    btnBookAppointment.addEventListener('click', bookAppointment);
     btnNewReading.addEventListener('click', startScan);
 
     window.addEventListener('DOMContentLoaded', async () => {
-        await fetchDoctors();
+        await loadDoctors();
         startScan();
     });
 </script>
