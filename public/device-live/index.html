@@ -527,20 +527,23 @@
         docAvatar.innerText = initials || '🩺';
     }
 
-    // Arithmetic Addition: Reads the highest numeric ID and adds 1
+    // Sorts all entries by integer ID DESC to find the true latest ID and adds 1
     async function getNextAppointmentId() {
         try {
             const res = await fetch(APPOINTMENTS_GET_URL, { cache: "no-store" });
             if (res.ok) {
                 const result = await res.json();
                 if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-                    const allNumericIds = result.data
-                        .map(item => Number(item.id))
-                        .filter(id => !isNaN(id) && id > 0);
+                    // 1. Filter only valid positive numerical IDs
+                    const validRecords = result.data.filter(item => item.id && !isNaN(parseInt(item.id, 10)));
                     
-                    if (allNumericIds.length > 0) {
-                        const maxId = Math.max(...allNumericIds);
-                        return maxId + 1; // Pure mathematical integer sum
+                    if (validRecords.length > 0) {
+                        // 2. Explicitly sort by ID in descending order (highest ID first)
+                        validRecords.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
+                        
+                        const latestId = parseInt(validRecords[0].id, 10);
+                        const nextId = latestId + 1; // Pure addition
+                        return nextId;
                     }
                 }
             }
@@ -678,7 +681,7 @@
         bookBtnText.innerText = 'Processing Booking...';
         bookingStatus.className = 'booking-status';
 
-        // Perform integer addition (e.g. 45 + 1 = 46)
+        // 1. Fetch latest record sorted by ID DESC and add 1
         const nextId = await getNextAppointmentId();
         const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
 
@@ -722,7 +725,7 @@
 
                 bookingStatus.className = 'booking-status success';
                 bookingStatus.innerHTML = `
-                    ✓ Appointment Confirmed for <strong>${apptDate} at ${apptTime}</strong>.<br>
+                    ✓ Appointment Confirmed (#${nextId}) for <strong>${apptDate} at ${apptTime}</strong>.<br>
                     <div class="meeting-link-banner">
                         Meeting Room: <a href="${meetingUrl}" target="_blank">${meetingUrl}</a>
                     </div>
