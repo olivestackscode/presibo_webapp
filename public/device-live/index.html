@@ -1,564 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Vital Signs Monitor | Presibo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presibo - Live Vital Signs Telemetry & Doctor Pairing</title>
+  <meta name="description" content="Real-time Bluetooth device vital signs ingestion monitor, clinical evaluation, and instant doctor appointment pairing on Presibo AI Health.">
+  <meta name="keywords" content="Presibo, live devices, vital signs monitor, telemetry sync, blood pressure stream, blood sugar, telehealth doctor booking">
+  <meta name="author" content="Presibo Team">
 
-    <!-- Favicon -->
-    <link rel="icon" href="/assets/img/new_presibo_icon.png" type="image/png">
-    <link rel="apple-touch-icon" href="/assets/img/new_presibo_icon.png">
+  <!-- Favicons -->
+  <link rel="icon" href="/assets/img/new_presibo_icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/img/new_presibo_icon.png">
 
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --royal-purple: #6B21A8;
-            --naija-green: #008753;
-            --primary: #6B21A8;
-            --primary-hover: #581c87;
-            --success: #10b981;
-            --success-hover: #059669;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --pulse-color: #6B21A8;
-            --doctor-bg: #f0fdf4;
-            --doctor-border: #bbf7d0;
+  <!-- Vendor Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'naija-green': '#008753',
+            'golden-yellow': '#FFC107',
+            'warm-orange': '#F97316',
+            'royal-purple': '#6B21A8',
+            'health-pink': '#EC4899',
+            'trust-blue': '#3B82F6',
+            'dark-card': '#1E293B',
+            'dark-bg': '#0F172A'
+          }
         }
+      }
+    }
+  </script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme_preference');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    
+    .scan-ring {
+      animation: pulse-ring 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(107, 33, 168, 0.4); }
+      70% { transform: scale(1.15); opacity: 0.4; box-shadow: 0 0 0 20px rgba(107, 33, 168, 0); }
+      100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(107, 33, 168, 0); }
+    }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    .pulse-glow {
+      animation: heart-pulse 1.2s infinite ease-in-out;
+    }
+    @keyframes heart-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
 
-        /* Top Brand Header Bar */
-        .brand-header-bar {
-            width: 100%;
-            max-width: 520px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 18px;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
+    .progress-bar { transition: width 0.8s linear; }
 
-        .brand-logo-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+    /* Glassmorphism accent */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.85);
+    }
 
-        .brand-logo-img {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-        }
-
-        .brand-title-text {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--royal-purple);
-            letter-spacing: -0.02em;
-        }
-
-        .brand-sub-badge {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--naija-green);
-            background: #e6f4ea;
-            padding: 2px 8px;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .brand-sub-badge i {
-            font-size: 0.6rem;
-            color: var(--naija-green);
-        }
-
-        .brand-nav-link {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #475569;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-
-        .brand-nav-link:hover {
-            color: var(--royal-purple);
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 520px;
-            padding: 32px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-logo-icon {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-        }
-
-        .title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .card-footer-branding {
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 9999px;
-            background: #f1f5f9;
-            color: var(--text-muted);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #94a3b8;
-        }
-
-        .status-dot.scanning {
-            background-color: var(--pulse-color);
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-            animation: pulse 1.5s infinite;
-        }
-
-        .status-dot.ready {
-            background-color: var(--success);
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-            }
-        }
-
-        .scan-view {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 0;
-            text-align: center;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 16px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .results-view {
-            display: none;
-        }
-
-        .patient-info {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 16px;
-            margin-bottom: 20px;
-        }
-
-        .patient-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .patient-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .timestamp {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .vitals-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .vital-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .vital-box-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .vital-box-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .vital-box-unit {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .analysis-section {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .analysis-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #1e40af;
-            margin-bottom: 6px;
-        }
-
-        .analysis-text {
-            font-size: 0.95rem;
-            color: #1e3a8a;
-            line-height: 1.5;
-        }
-
-        .doctor-box {
-            background: var(--doctor-bg);
-            border: 1px solid var(--doctor-border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .doctor-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #dcfce7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-            border: 2px solid #86efac;
-            font-weight: 700;
-            color: #15803d;
-        }
-
-        .doctor-details {
-            flex-grow: 1;
-        }
-
-        .doctor-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #15803d;
-            margin-bottom: 2px;
-        }
-
-        .doctor-name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #14532d;
-        }
-
-        .doctor-meta {
-            font-size: 0.85rem;
-            color: #166534;
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .booking-status {
-            display: none;
-            padding: 14px 16px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 16px;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .booking-status.success {
-            display: block;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .booking-status.error {
-            display: block;
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .meeting-link-banner {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            word-break: break-all;
-        }
-
-        .meeting-link-banner a {
-            color: var(--primary);
-            font-weight: 700;
-            text-decoration: underline;
-        }
-
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--success-hover);
-        }
-
-        .btn-primary:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: var(--text-main);
-        }
-
-        .btn-secondary:hover {
-            background-color: #e2e8f0;
-        }
-
-        .btn-spinner {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #ffffff;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-    </style>
+    .spinner-btn {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
-<body>
 
-<!-- Top Presibo Brand Header Bar -->
-<div class="brand-header-bar">
-    <a href="/dashboard" class="brand-logo-group">
-        <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="brand-logo-img">
-        <span class="brand-title-text">Presibo</span>
-        <span class="brand-sub-badge"><i class="fas fa-circle font-xs"></i> Live Sync</span>
-    </a>
-    <a href="/devices" class="brand-nav-link">
-        <i class="fas fa-arrow-left"></i> Devices Hub
-    </a>
-</div>
+<body class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-<div class="card">
-    <div class="header">
-        <div class="title-group">
-            <img src="/assets/img/new_presibo_icon.png" alt="Presibo" class="card-logo-icon">
-            <div>
-                <h1 class="title">Live Vital Signs Monitor</h1>
-                <p class="subtitle">Presibo Biometrics Telemetry</p>
+  <!-- Header Navigation -->
+  <header class="bg-white dark:bg-dark-card border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Left: Logo & Brand Title -->
+        <div class="flex items-center space-x-3">
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+          <a href="/dashboard" class="flex items-center space-x-2">
+            <img src="/assets/img/new_presibo_icon.png" alt="Presibo Logo" class="w-9 h-9">
+            <span class="font-extrabold text-xl text-royal-purple dark:text-purple-400 tracking-tight">Presibo</span>
+          </a>
+          <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Stream
+          </span>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex space-x-5">
+          <a href="/dashboard" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Dashboard</a>
+          <a href="/track" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Track</a>
+          <a href="/devices" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Devices Hub</a>
+          <a href="/devices2" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Live Waveform</a>
+          <a href="/device-live/index.html" class="text-sm font-bold text-royal-purple dark:text-purple-400 border-b-2 border-royal-purple dark:border-purple-400 pb-1">Live Vital Sync</a>
+          <a href="/fitness" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Fitness</a>
+          <a href="/food" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">FoodSquare</a>
+          <a href="/doctors" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Doctors</a>
+          <a href="/settings" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-royal-purple dark:hover:text-purple-400">Settings</a>
+        </nav>
+
+        <!-- Right Controls -->
+        <div class="flex items-center space-x-3">
+          <!-- Theme Toggle Button -->
+          <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon dark:hidden text-lg"></i>
+            <i class="fas fa-sun hidden dark:inline-block text-amber-400 text-lg"></i>
+          </button>
+
+          <!-- Admin Portal Button -->
+          <a href="/device-live/admin.html" class="hidden sm:inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-semibold px-3 py-2 rounded-xl transition border border-gray-200 dark:border-gray-700">
+            <i class="fas fa-user-gear"></i> Admin Intake
+          </a>
+
+          <!-- User Profile Avatar -->
+          <a href="/profile" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" id="userAvatar">
+              P
             </div>
+          </a>
         </div>
-        <div class="status-badge">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">Idle</span>
-        </div>
+      </div>
     </div>
 
-    <!-- SCANNING VIEW -->
-    <div class="scan-view" id="scanView">
-        <div class="spinner"></div>
-        <h3 style="margin-bottom: 8px;">Waiting for device...</h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Please connect sensor or perform reading</p>
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-800 px-4 pt-2 pb-4 space-y-2 bg-white dark:bg-dark-card">
+      <a href="/dashboard" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Dashboard</a>
+      <a href="/track" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Track Vitals</a>
+      <a href="/devices" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Devices Hub</a>
+      <a href="/devices2" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Live Waveform Monitor</a>
+      <a href="/device-live/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-royal-purple font-bold bg-purple-50 dark:bg-purple-900/30">Live Vital Sync</a>
+      <a href="/device-live/admin.html" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Admin Intake</a>
+      <a href="/fitness" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Fitness</a>
+      <a href="/food" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">FoodSquare</a>
+      <a href="/doctors" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Doctors</a>
+      <a href="/settings" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">Settings</a>
     </div>
+  </header>
 
-    <!-- RESULTS & BOOKING DISPLAY -->
-    <div class="results-view" id="resultsView">
-        <div class="patient-info">
-            <div class="patient-label">Patient Record</div>
-            <div class="patient-name" id="resPatientName">--</div>
-            <div class="timestamp" id="resTimestamp">--</div>
-        </div>
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <div class="vitals-grid">
-            <div class="vital-box">
-                <div class="vital-box-label">Blood Pressure</div>
-                <div class="vital-box-value" id="resBp">--/--</div>
-                <span class="vital-box-unit">mmHg</span>
-            </div>
-            <div class="vital-box">
-                <div class="vital-box-label">Blood Sugar</div>
-                <div class="vital-box-value" id="resSugar">--</div>
-                <span class="vital-box-unit">mg/dL</span>
-            </div>
-        </div>
+    <!-- Hero Header Banner (Matching /devices Layout) -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-purple-800/40">
+      <!-- Background Ambient Glow -->
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="analysis-section">
-            <div class="analysis-title">Clinical Analysis & Advice</div>
-            <p class="analysis-text" id="resEvaluation">--</p>
-        </div>
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Continuous Telemetry Polling Active (3s)
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            Presibo Live Vital Signs Telemetry Stream
+          </h1>
+          <p class="text-sm sm:text-base text-gray-300 max-w-2xl leading-relaxed">
+            Real-time patient vital signs ingestion from connected medical sensors. Receive immediate AI clinical evaluation, automated doctor specialist pairing, and 1-click telehealth appointment booking.
+          </p>
 
-        <!-- Matched Doctor Card -->
-        <div class="doctor-box">
-            <div class="doctor-avatar" id="docAvatar">🩺</div>
-            <div class="doctor-details">
-                <div class="doctor-badge">Assigned Physician</div>
-                <div class="doctor-name" id="docName">Selecting doctor...</div>
-                <div class="doctor-meta">
-                    <span id="docSpecialty">General Practitioner</span>
-                    <span id="docLocation"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="booking-status" id="bookingStatus"></div>
-
-        <div class="btn-group">
-            <button class="btn btn-primary" id="btnBookAppointment">
-                <span class="btn-spinner" id="bookSpinner"></span>
-                <span id="bookBtnText">Confirm Doctor Booking</span>
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="startScan()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg hover:shadow-purple-500/25 transition flex items-center gap-2 text-sm">
+              <i class="fas fa-rotate"></i> Poll Incoming Reading Now
             </button>
-            <button class="btn btn-secondary" id="btnNewReading">New Reading</button>
+            <a href="/device-live/admin.html" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl backdrop-blur-md border border-white/20 transition flex items-center gap-2 text-sm">
+              <i class="fas fa-plus-circle text-purple-300"></i> Admin Reading Intake
+            </a>
+            <a href="/devices2" class="bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 font-semibold px-5 py-3 rounded-xl transition flex items-center gap-2 text-sm">
+              <i class="fas fa-chart-line"></i> View ECG Waveform
+            </a>
+          </div>
         </div>
+
+        <!-- Right Graphic / Telemetry Stat Card -->
+        <div class="lg:col-span-4 hidden lg:flex flex-col gap-3">
+          <div class="glass-card bg-white/10 p-4 rounded-2xl border border-white/15 backdrop-blur-md">
+            <div class="flex items-center justify-between text-xs text-gray-300 mb-1">
+              <span>Telemetry Receiver</span>
+              <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                <i class="fas fa-wifi"></i> Online
+              </span>
+            </div>
+            <p class="text-2xl font-black text-white" id="heroStatusText">Polling API...</p>
+            <p class="text-xs text-gray-400 mt-1">Polling api.presibo.com/devices every 3s</p>
+          </div>
+
+          <div class="glass-card bg-white/10 p-4 rounded-2xl border border-white/15 backdrop-blur-md">
+            <div class="flex items-center justify-between text-xs text-gray-300 mb-1">
+              <span>Matched Doctor Roster</span>
+              <span class="text-purple-300 font-semibold">Ready</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-2xl font-black text-white" id="heroDocCount">26+ Doctors</span>
+            </div>
+            <p class="text-xs text-emerald-400 font-medium mt-0.5">Instant Telehealth Booking Enabled</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card-footer-branding">
-        <img src="/assets/img/new_presibo_icon.png" alt="Presibo" style="width: 14px; height: 14px; opacity: 0.8;">
-        <span>Powered by Presibo AI Telemetry • Encrypted Medical Data</span>
-    </div>
-</div>
+    <!-- Overview Metrics Cards Row (Matching /devices Grid) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>RECEIVER STATUS</span>
+          <i class="fas fa-satellite-dish text-purple-600 dark:text-purple-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="statReceiverState">Active</span>
+          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">3s Loop</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">GATT & Cloud Receiver</p>
+      </div>
 
-<script>
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>AI CLINICAL ENGINE</span>
+          <i class="fas fa-brain text-emerald-600 dark:text-emerald-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white">Ready</span>
+          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Dr. Helen</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Instant Vitals Evaluation</p>
+      </div>
+
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>BOOKING ENGINE</span>
+          <i class="fas fa-calendar-check text-blue-600 dark:text-blue-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white">Auto</span>
+          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">Jitsi Room</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Prime Slot Reservation</p>
+      </div>
+
+      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
+          <span>EMAIL DISPATCH</span>
+          <i class="fas fa-paper-plane text-amber-600 dark:text-amber-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-extrabold text-gray-900 dark:text-white">Enabled</span>
+          <span class="text-xs text-purple-600 dark:text-purple-400 font-medium">HTML Mail</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sends Report to Patient</p>
+      </div>
+    </div>
+
+    <!-- Active Scanning Container (Poller View) -->
+    <div id="scanView" class="bg-white dark:bg-dark-card border-2 border-purple-500/50 rounded-3xl p-6 sm:p-8 shadow-xl text-center relative overflow-hidden space-y-4">
+      <div class="absolute -top-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="scan-ring mx-auto w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-950/60 border-4 border-purple-500/30 flex items-center justify-center text-royal-purple dark:text-purple-400 text-4xl shadow-inner">
+        <i class="fas fa-heart-pulse pulse-glow"></i>
+      </div>
+
+      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-4">
+        Waiting for incoming device reading...
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+        Please connect your sensor or complete a measurement on your hardware. Telemetry updates automatically every 3 seconds.
+      </p>
+
+      <!-- Polling Status Badge & Indicator -->
+      <div class="max-w-md mx-auto pt-2">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400 animate-ping" id="statusDot"></span>
+          <span id="statusText">Scanning for new record...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitals Result & Doctor Booking Display Container -->
+    <div id="resultsView" class="hidden bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      
+      <!-- Top Patient & Timestamp Banner -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-4">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-extrabold">Ingested Telemetry Record</span>
+          <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-0.5" id="resPatientName">--</h2>
+          <p class="text-xs text-gray-400 mt-0.5" id="resTimestamp">--</p>
+        </div>
+
+        <div class="px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+          <i class="fas fa-check-circle"></i> Ingestion Received
+        </div>
+      </div>
+
+      <!-- Vitals Values Grid (Matching /devices Result Style) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Blood Pressure Card -->
+        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-slate-900/40 rounded-2xl p-5 border border-purple-100 dark:border-purple-900/30 text-center">
+          <span class="text-xs uppercase tracking-wider text-gray-400 font-semibold">Blood Pressure</span>
+          <div class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mt-1" id="resBp">--/--</div>
+          <span class="text-xs font-semibold text-purple-700 dark:text-purple-300 block mt-1">mmHg</span>
+        </div>
+
+        <!-- Blood Sugar Card -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-slate-900/40 rounded-2xl p-5 border border-amber-100 dark:border-amber-900/30 text-center">
+          <span class="text-xs uppercase tracking-wider text-gray-400 font-semibold">Blood Glucose</span>
+          <div class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mt-1" id="resSugar">--</div>
+          <span class="text-xs font-semibold text-amber-700 dark:text-amber-300 block mt-1">mg/dL</span>
+        </div>
+      </div>
+
+      <!-- Clinical Analysis & AI Evaluation Box -->
+      <div class="bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 rounded-2xl p-5 space-y-2">
+        <div class="flex items-center space-x-2 text-royal-purple dark:text-purple-300 font-bold text-sm">
+          <i class="fas fa-user-md text-base"></i>
+          <span>Dr. Helen AI Clinical Analysis & Advice</span>
+        </div>
+        <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed" id="resEvaluation">
+          --
+        </p>
+      </div>
+
+      <!-- Matched Doctor Specialist Card -->
+      <div class="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl p-5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-base shadow-sm" id="docAvatar">
+            🩺
+          </div>
+          <div>
+            <span class="text-[10px] uppercase tracking-wider font-extrabold text-emerald-700 dark:text-emerald-400">Assigned Physician Specialist</span>
+            <h4 class="text-base font-extrabold text-gray-900 dark:text-white" id="docName">Selecting doctor...</h4>
+            <div class="text-xs text-emerald-800 dark:text-emerald-300 font-medium flex items-center gap-2 mt-0.5">
+              <span id="docSpecialty">General Practitioner</span>
+              <span id="docLocation"></span>
+            </div>
+          </div>
+        </div>
+
+        <span class="hidden sm:inline-block px-3 py-1 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-bold">
+          Verified Doctor
+        </span>
+      </div>
+
+      <!-- Booking Result Banner -->
+      <div id="bookingStatus" class="hidden p-4 rounded-2xl text-xs sm:text-sm font-semibold text-center border"></div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+        <button id="btnBookAppointment" class="w-full sm:flex-1 bg-royal-purple hover:bg-purple-800 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+          <span class="spinner-btn hidden" id="bookSpinner"></span>
+          <span id="bookBtnText"><i class="fas fa-calendar-check mr-1.5"></i> Confirm Doctor Booking</span>
+        </button>
+        <button id="btnNewReading" class="w-full sm:w-auto bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-800 dark:text-gray-200 font-semibold py-3.5 px-6 rounded-xl transition text-sm">
+          <i class="fas fa-rotate mr-1.5"></i> Scan New Reading
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Presibo Hardware Store / Paystack Order Promo Card (Matching /devices) -->
+    <div class="bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-purple-700/50">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <div class="lg:col-span-8 space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-semibold">
+            <i class="fas fa-shield-halved"></i> Presibo Certified Hardware Integration
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Connect Official Presibo Bluetooth Sensors
+          </h2>
+          <p class="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-xl">
+            Stream your vitals automatically into Presibo AI Telemetry with clinical-grade blood pressure monitors and continuous glucose sensor kits.
+          </p>
+          <div class="flex items-center gap-4 pt-2">
+            <div>
+              <span class="text-2xl font-black text-white">₦52,000</span>
+              <span class="text-xs text-gray-300 block">Free Nationwide Delivery</span>
+            </div>
+            <a href="/devices" class="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center gap-2 text-sm">
+              <i class="fas fa-cart-shopping"></i> Order Devices
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+          <div class="bg-white/10 p-3 rounded-xl backdrop-blur-md border border-white/10 text-center">
+            <i class="fas fa-heart-pulse text-amber-400 text-2xl mb-1"></i>
+            <h4 class="text-xs font-bold">Smart BP Cuff</h4>
+            <p class="text-[10px] text-gray-300">₦52,000</p>
+          </div>
+
+          <div class="bg-white/10 p-3 rounded-xl backdrop-blur-md border border-white/10 text-center">
+            <i class="fas fa-syringe text-emerald-400 text-2xl mb-1"></i>
+            <h4 class="text-xs font-bold">CGM Kit</h4>
+            <p class="text-[10px] text-gray-300">₦45,000</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script Logic (100% Original Logic & Endpoints Retained) -->
+  <script>
     const DEVICES_API_URL         = "https://api.presibo.com/devices/index.php";
     const DOCTORS_API_URL         = "https://app.presibo.com/doctors.json";
     const APPOINTMENTS_NEW_URL    = "https://api.presibo.com/appointments/new.php";
@@ -624,310 +504,300 @@
     const docLocation        = document.getElementById('docLocation');
     const docAvatar          = document.getElementById('docAvatar');
 
-    function setStatus(text, stateClass) {
-        statusText.innerText = text;
-        statusDot.className = 'status-dot ' + (stateClass || '');
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme_preference', isDark ? 'dark' : 'light');
+    }
+
+    function setStatus(text, isReady) {
+      if (statusText) statusText.innerText = text;
+      const heroStat = document.getElementById("heroStatusText");
+      if (heroStat) heroStat.innerText = text;
     }
 
     async function loadDoctors() {
-        try {
-            const res = await fetch(DOCTORS_API_URL, { cache: "no-store" });
-            if (res.ok) {
-                const data = await res.json();
-                const fetched = Array.isArray(data) ? data : (data.doctors || []);
-                if (fetched.length > 0) doctorsList = fetched;
-            }
-        } catch (err) {
-            console.log("Using built-in doctors fallback roster.");
+      try {
+        const res = await fetch(DOCTORS_API_URL, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          const fetched = Array.isArray(data) ? data : (data.doctors || []);
+          if (fetched.length > 0) doctorsList = fetched;
         }
+      } catch (err) {
+        console.log("Using built-in doctors fallback roster.");
+      }
     }
 
     function pairDoctor() {
-        if (!doctorsList || doctorsList.length === 0) return;
+      if (!doctorsList || doctorsList.length === 0) return;
 
-        const randomIndex = Math.floor(Math.random() * doctorsList.length);
-        const matched = doctorsList[randomIndex];
+      const randomIndex = Math.floor(Math.random() * doctorsList.length);
+      const matched = doctorsList[randomIndex];
+      currentMatchedDoctor = matched;
 
-        currentMatchedDoctor = matched;
+      const names = [matched.firstname, matched.midname, matched.lastname].filter(Boolean).join(' ');
+      const fullName = names.startsWith('Dr.') ? names : `Dr. ${names}`;
 
-        const names = [matched.firstname, matched.midname, matched.lastname].filter(Boolean).join(' ');
-        const fullName = names.startsWith('Dr.') ? names : `Dr. ${names}`;
+      docName.innerText = fullName;
+      docSpecialty.innerText = matched.specialization || matched.specialty || 'General Practitioner';
+      docLocation.innerText = `• ${matched.location || 'Nigeria'}`;
 
-        docName.innerText = fullName;
-        docSpecialty.innerText = matched.specialization || matched.specialty || 'General Practitioner';
-        docLocation.innerText = `• ${matched.location || 'Nigeria'}`;
-
-        const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
-        docAvatar.innerText = initials || '🩺';
+      const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
+      docAvatar.innerText = initials || '🩺';
     }
 
-    // Schedule 12-24 hours ahead (next calendar day) during prime slots between 9 AM and 6 PM
     function generatePrimeAppointmentDateTime() {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        // Format YYYY-MM-DD
-        const apptDate = tomorrow.toISOString().slice(0, 10);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const apptDate = tomorrow.toISOString().slice(0, 10);
 
-        // Standard Prime Slots (9:00 AM to 6:00 PM)
-        const primeSlots = [
-            { time24: '09:00:00', label: '09:00 AM' },
-            { time24: '09:30:00', label: '09:30 AM' },
-            { time24: '10:00:00', label: '10:00 AM' },
-            { time24: '10:30:00', label: '10:30 AM' },
-            { time24: '11:00:00', label: '11:00 AM' },
-            { time24: '11:30:00', label: '11:30 AM' },
-            { time24: '14:00:00', label: '02:00 PM' },
-            { time24: '14:30:00', label: '02:30 PM' },
-            { time24: '15:00:00', label: '03:00 PM' },
-            { time24: '15:30:00', label: '03:30 PM' },
-            { time24: '16:00:00', label: '04:00 PM' },
-            { time24: '16:30:00', label: '04:30 PM' },
-            { time24: '17:00:00', label: '05:00 PM' },
-            { time24: '17:30:00', label: '05:30 PM' }
-        ];
+      const primeSlots = [
+        { time24: '09:00:00', label: '09:00 AM' },
+        { time24: '09:30:00', label: '09:30 AM' },
+        { time24: '10:00:00', label: '10:00 AM' },
+        { time24: '10:30:00', label: '10:30 AM' },
+        { time24: '11:00:00', label: '11:00 AM' },
+        { time24: '11:30:00', label: '11:30 AM' },
+        { time24: '14:00:00', label: '02:00 PM' },
+        { time24: '14:30:00', label: '02:30 PM' },
+        { time24: '15:00:00', label: '03:00 PM' },
+        { time24: '15:30:00', label: '03:30 PM' },
+        { time24: '16:00:00', label: '04:00 PM' },
+        { time24: '16:30:00', label: '04:30 PM' },
+        { time24: '17:00:00', label: '05:00 PM' },
+        { time24: '17:30:00', label: '05:30 PM' }
+      ];
 
-        const selectedSlot = primeSlots[Math.floor(Math.random() * primeSlots.length)];
-
-        return {
-            date: apptDate,
-            time: selectedSlot.time24,
-            displayTime: selectedSlot.label
-        };
+      const selectedSlot = primeSlots[Math.floor(Math.random() * primeSlots.length)];
+      return { date: apptDate, time: selectedSlot.time24, displayTime: selectedSlot.label };
     }
 
     async function getNextAppointmentId() {
-        try {
-            const res = await fetch(APPOINTMENTS_LATEST_ID, { cache: "no-store" });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success && data.next_id !== undefined) {
-                    return Number(data.next_id);
-                }
-            }
-        } catch (err) {
-            console.warn("Could not retrieve next ID from latest_id.php:", err);
+      try {
+        const res = await fetch(APPOINTMENTS_LATEST_ID, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.next_id !== undefined) return Number(data.next_id);
         }
-        return 1;
+      } catch (err) {
+        console.warn("Could not retrieve next ID from latest_id.php:", err);
+      }
+      return 1;
     }
 
     async function sendCombinedReportEmail(record, doctor, apptDate, apptDisplayTime, meetingUrl) {
-        const recipientEmail = record.email || '';
-        if (!recipientEmail || recipientEmail.trim() === '') return;
+      const recipientEmail = record.email || '';
+      if (!recipientEmail || recipientEmail.trim() === '') return;
 
-        const patientName = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
-        const docFullName = [doctor.firstname, doctor.midname, doctor.lastname].filter(Boolean).join(' ');
-        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
-        const sugarText = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
+      const patientName = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+      const docFullName = [doctor.firstname, doctor.midname, doctor.lastname].filter(Boolean).join(' ');
+      const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
+      const sugarText = record.sugar ? `${record.sugar} mg/dL` : 'Not recorded';
 
-        const emailMessageHtml = `
-            <p>Dear <strong>${patientName}</strong>,</p>
-            <p>Your vital signs have been evaluated and your consultation appointment is confirmed for tomorrow.</p>
-            
-            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">1. Vital Signs Reading</h3>
-            <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Pressure:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${record.bp_sys}/${record.bp_dia} mmHg</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Sugar:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${sugarText}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px;"><strong>Reading Recorded:</strong></td>
-                    <td style="padding: 10px 14px;">${record.datetime || 'Just now'}</td>
-                </tr>
-            </table>
+      const emailMessageHtml = `
+        <p>Dear <strong>${patientName}</strong>,</p>
+        <p>Your vital signs have been evaluated and your consultation appointment is confirmed for tomorrow.</p>
+        
+        <h3 style="color: #6B21A8; margin: 20px 0 10px 0; font-size: 16px;">1. Vital Signs Reading</h3>
+        <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Pressure:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${record.bp_sys}/${record.bp_dia} mmHg</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;"><strong>Blood Sugar:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #e2e8f0;">${sugarText}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px;"><strong>Reading Recorded:</strong></td>
+                <td style="padding: 10px 14px;">${record.datetime || 'Just now'}</td>
+            </tr>
+        </table>
 
-            <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">2. Clinical Analysis &amp; Advice</h3>
-            <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px; margin-bottom: 20px; border-radius: 4px;">
-                <p style="margin: 0; color: #1e3a8a; line-height: 1.5;">${record.evaluation || 'No clinical observations logged.'}</p>
-            </div>
+        <h3 style="color: #6B21A8; margin: 20px 0 10px 0; font-size: 16px;">2. Clinical Analysis &amp; Advice</h3>
+        <div style="background: #f3e8ff; border-left: 4px solid #6B21A8; padding: 14px; margin-bottom: 20px; border-radius: 4px;">
+            <p style="margin: 0; color: #581c87; line-height: 1.5;">${record.evaluation || 'No clinical observations logged.'}</p>
+        </div>
 
-            <h3 style="color: #16a34a; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment &amp; Consultation Link</h3>
-            <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 15px;">
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Assigned Doctor:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold; color: #14532d;">${formattedDocName}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Specialty:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.specialization || doctor.specialty || 'General Practitioner'}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Location:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.location || 'Virtual Clinic'}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Appointment Date:</strong></td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold;">${apptDate}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 14px;"><strong>Appointment Time:</strong></td>
-                    <td style="padding: 10px 14px; font-weight: bold;">${apptDisplayTime}</td>
-                </tr>
-            </table>
+        <h3 style="color: #10b981; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment &amp; Consultation Link</h3>
+        <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 15px;">
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Assigned Doctor:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold; color: #14532d;">${formattedDocName}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Specialty:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.specialization || doctor.specialty || 'General Practitioner'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Location:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;">${doctor.location || 'Virtual Clinic'}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Appointment Date:</strong></td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold;">${apptDate}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 14px;"><strong>Appointment Time:</strong></td>
+                <td style="padding: 10px 14px; font-weight: bold;">${apptDisplayTime}</td>
+            </tr>
+        </table>
 
-            <div style="text-align: center; margin: 25px 0;">
-                <a href="${meetingUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Join Video Consultation Room</a>
-                <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b;">Direct Link: <a href="${meetingUrl}" style="color: #2563eb;">${meetingUrl}</a></p>
-            </div>
+        <div style="text-align: center; margin: 25px 0;">
+            <a href="${meetingUrl}" target="_blank" style="display: inline-block; background: #6B21A8; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">Join Video Consultation Room</a>
+            <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b;">Direct Link: <a href="${meetingUrl}" style="color: #6B21A8;">${meetingUrl}</a></p>
+        </div>
+      `;
 
-            <p style="margin-top: 15px; font-size: 13px; color: #64748b;">Please click the button above at your scheduled time to connect directly with your doctor. If you need assistance, reach us at support@presibo.com.</p>
-        `;
-
-        const emailPayload = {
-            action: "send",
-            type: "custom",
-            email: recipientEmail,
-            name: patientName,
-            title: `Presibo Health - Vitals Evaluation & Consultation Link`,
-            message: emailMessageHtml
-        };
-
-        fetch(EMAIL_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emailPayload)
-        }).catch(() => {});
+      fetch(EMAIL_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: "send",
+          type: "custom",
+          email: recipientEmail,
+          name: patientName,
+          title: `Presibo Health - Vitals Evaluation & Consultation Link`,
+          message: emailMessageHtml
+        })
+      }).catch(() => {});
     }
 
     async function fetchLatestRecord() {
-        try {
-            const response = await fetch(DEVICES_API_URL, { cache: "no-store" });
-            if (!response.ok) throw new Error("Network response was not OK");
-            
-            const result = await response.json();
-            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-                return result.data[0];
-            }
-            return null;
-        } catch (err) {
-            console.error("API Read Error:", err);
-            return null;
+      try {
+        const response = await fetch(DEVICES_API_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("Network response was not OK");
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+          return result.data[0];
         }
+        return null;
+      } catch (err) {
+        console.error("API Read Error:", err);
+        return null;
+      }
     }
 
     function renderRecord(record) {
-        currentPatientRecord = record;
+      currentPatientRecord = record;
 
-        resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
-        resTimestamp.innerText = `Recorded: ${record.datetime || 'Just now'}`;
-        resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
-        resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
-        resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully.';
+      resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+      resTimestamp.innerText = `Recorded: ${record.datetime || 'Just now'}`;
+      resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
+      resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
+      resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully into Presibo telemetry.';
 
-        pairDoctor();
+      pairDoctor();
 
-        bookingStatus.className = 'booking-status';
-        bookingStatus.innerText = '';
-        btnBookAppointment.disabled = false;
-        bookBtnText.innerText = 'Confirm Doctor Booking';
-        bookSpinner.style.display = 'none';
+      bookingStatus.classList.add("hidden");
+      bookingStatus.innerText = '';
+      btnBookAppointment.disabled = false;
+      bookBtnText.innerHTML = '<i class="fas fa-calendar-check mr-1.5"></i> Confirm Doctor Booking';
+      bookSpinner.classList.add("hidden");
 
-        scanView.style.display = 'none';
-        resultsView.style.display = 'block';
-        setStatus("Reading Complete", "ready");
+      scanView.classList.add("hidden");
+      resultsView.classList.remove("hidden");
+      setStatus("Reading Complete", true);
     }
 
     async function bookAppointment() {
-        if (!currentPatientRecord || !currentMatchedDoctor) return;
+      if (!currentPatientRecord || !currentMatchedDoctor) return;
 
-        btnBookAppointment.disabled = true;
-        bookSpinner.style.display = 'inline-block';
-        bookBtnText.innerText = 'Processing Booking...';
-        bookingStatus.className = 'booking-status';
+      btnBookAppointment.disabled = true;
+      bookSpinner.classList.remove("hidden");
+      bookBtnText.innerText = 'Processing Booking...';
+      bookingStatus.classList.add("hidden");
 
-        // 1. Fetch next integer ID from latest_id.php
-        const nextId = await getNextAppointmentId();
-        const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
+      const nextId = await getNextAppointmentId();
+      const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
+      const schedule = generatePrimeAppointmentDateTime();
 
-        // 2. Generate Next Day + Prime Slot (9 AM - 6 PM)
-        const schedule = generatePrimeAppointmentDateTime();
+      const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
+      const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
+      const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
+      const reasonText = `Device Reading: BP ${currentPatientRecord.bp_sys}/${currentPatientRecord.bp_dia} mmHg, Sugar: ${currentPatientRecord.sugar || 'N/A'} mg/dL. Evaluation: ${currentPatientRecord.evaluation || 'None'}`;
 
-        const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
-        const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
-        const formattedDocName = docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`;
-        
-        const reasonText = `Device Reading: BP ${currentPatientRecord.bp_sys}/${currentPatientRecord.bp_dia} mmHg, Sugar: ${currentPatientRecord.sugar || 'N/A'} mg/dL. Evaluation: ${currentPatientRecord.evaluation || 'None'}`;
+      const appointmentPayload = {
+        name: patientFullName,
+        email: currentPatientRecord.email || 'patient@presibo.com',
+        phone: currentPatientRecord.phone || '',
+        date: schedule.date,
+        time: schedule.time,
+        doctor_id: String(currentMatchedDoctor.id || ''),
+        doctor: formattedDocName,
+        specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
+        location: currentMatchedDoctor.location || 'Virtual Clinic',
+        description: reasonText
+      };
 
-        const appointmentPayload = {
-            name: patientFullName,
-            email: currentPatientRecord.email || 'patient@presibo.com',
-            phone: currentPatientRecord.phone || '',
-            date: schedule.date,
-            time: schedule.time,
-            doctor_id: String(currentMatchedDoctor.id || ''),
-            doctor: formattedDocName,
-            specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
-            location: currentMatchedDoctor.location || 'Virtual Clinic',
-            description: reasonText
-        };
+      try {
+        const response = await fetch(APPOINTMENTS_NEW_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(appointmentPayload)
+        });
 
-        try {
-            const response = await fetch(APPOINTMENTS_NEW_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(appointmentPayload)
-            });
+        const resData = await response.json();
 
-            const resData = await response.json();
+        if (response.ok && (resData.status === 'success' || resData.success)) {
+          sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, schedule.date, schedule.displayTime, meetingUrl);
 
-            if (response.ok && (resData.status === 'success' || resData.success)) {
-                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, schedule.date, schedule.displayTime, meetingUrl);
-
-                bookingStatus.className = 'booking-status success';
-                bookingStatus.innerHTML = `
-                    ✓ Appointment Confirmed (#${nextId}) for <strong>${schedule.date} at ${schedule.displayTime}</strong>.<br>
-                    <div class="meeting-link-banner">
-                        Meeting Room: <a href="${meetingUrl}" target="_blank">${meetingUrl}</a>
-                    </div>
-                `;
-                bookBtnText.innerText = 'Booking Confirmed';
-            } else {
-                throw new Error(resData.message || 'Failed to complete appointment booking.');
-            }
-        } catch (err) {
-            bookingStatus.className = 'booking-status error';
-            bookingStatus.innerText = `Error: ${err.message || 'Booking failed. Try again.'}`;
-            btnBookAppointment.disabled = false;
-            bookBtnText.innerText = 'Retry Doctor Booking';
-        } finally {
-            bookSpinner.style.display = 'none';
+          bookingStatus.className = 'p-4 rounded-2xl text-xs sm:text-sm font-semibold text-center border bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800';
+          bookingStatus.innerHTML = `
+            ✓ Appointment Confirmed (#${nextId}) for <strong>${schedule.date} at ${schedule.displayTime}</strong>.<br>
+            <div class="mt-2 font-mono text-xs">
+              Meeting Room: <a href="${meetingUrl}" target="_blank" class="text-purple-600 dark:text-purple-400 font-bold underline">${meetingUrl}</a>
+            </div>
+          `;
+          bookingStatus.classList.remove("hidden");
+          bookBtnText.innerText = 'Booking Confirmed';
+        } else {
+          throw new Error(resData.message || 'Failed to complete appointment booking.');
         }
+      } catch (err) {
+        bookingStatus.className = 'p-4 rounded-2xl text-xs sm:text-sm font-semibold text-center border bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800';
+        bookingStatus.innerText = `Error: ${err.message || 'Booking failed. Try again.'}`;
+        bookingStatus.classList.remove("hidden");
+        btnBookAppointment.disabled = false;
+        bookBtnText.innerText = 'Retry Doctor Booking';
+      } finally {
+        bookSpinner.classList.add("hidden");
+      }
     }
 
     async function startScan() {
-        clearInterval(pollTimer);
-        
-        resultsView.style.display = 'none';
-        scanView.style.display = 'flex';
-        setStatus("Scanning...", "scanning");
+      if (pollTimer) clearInterval(pollTimer);
 
-        const currentRecord = await fetchLatestRecord();
-        initialLastRecordId = currentRecord ? currentRecord.id : null;
+      resultsView.classList.add("hidden");
+      scanView.classList.remove("hidden");
+      setStatus("Scanning for incoming record...", false);
 
-        pollTimer = setInterval(async () => {
-            const latest = await fetchLatestRecord();
-            if (latest && (!initialLastRecordId || latest.id !== initialLastRecordId)) {
-                clearInterval(pollTimer);
-                renderRecord(latest);
-            }
-        }, POLL_INTERVAL);
+      const currentRecord = await fetchLatestRecord();
+      initialLastRecordId = currentRecord ? currentRecord.id : null;
+
+      pollTimer = setInterval(async () => {
+        const latest = await fetchLatestRecord();
+        if (latest && (!initialLastRecordId || latest.id !== initialLastRecordId)) {
+          clearInterval(pollTimer);
+          renderRecord(latest);
+        }
+      }, POLL_INTERVAL);
     }
 
     btnBookAppointment.addEventListener('click', bookAppointment);
     btnNewReading.addEventListener('click', startScan);
 
-    window.addEventListener('DOMContentLoaded', async () => {
-        await loadDoctors();
-        startScan();
-    });
-</script>
+    // Mobile Menu Toggle
+    const mobileBtn = document.getElementById("mobile-menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+    }
 
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadDoctors();
+      startScan();
+    });
+  </script>
 </body>
 </html>
