@@ -504,14 +504,14 @@
 
       <!-- Category Select Buttons -->
       <div class="space-y-2">
-        <button onclick="pairSelectedCategory('Presibo Smart BP Monitor Pro', 'bp')" class="w-full bg-gray-50 dark:bg-gray-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/50 border border-gray-200 dark:border-gray-700 hover:border-purple-300 rounded-2xl p-3.5 flex items-center justify-between text-left transition group">
+        <button onclick="window.location.href='/device-live/index.html'" class="w-full bg-gray-50 dark:bg-gray-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/50 border border-gray-200 dark:border-gray-700 hover:border-purple-300 rounded-2xl p-3.5 flex items-center justify-between text-left transition group">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 flex items-center justify-center group-hover:scale-110 transition">
               <i class="fas fa-heart-pulse text-lg"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-gray-900 dark:text-white">Blood Pressure Monitor</h4>
-              <p class="text-[11px] text-gray-400">BLE 5.3 GATT Profile</p>
+              <p class="text-[11px] text-gray-400">BLE 5.3 GATT Profile • Opens /device-live Stream</p>
             </div>
           </div>
           <i class="fas fa-chevron-right text-gray-400 group-hover:text-purple-600"></i>
@@ -899,6 +899,12 @@
     }
 
     function pairSelectedCategory(devName, category) {
+      if (category === 'bp') {
+        closePairingModal();
+        window.location.href = '/device-live/index.html';
+        return;
+      }
+
       const newDev = {
         id: "dev_" + Date.now(),
         name: devName,
