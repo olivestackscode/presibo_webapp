@@ -287,23 +287,52 @@
       </div>
     </div>
 
-    <!-- Active Scanning Container (Poller View) -->
-    <div id="scanView" class="bg-white dark:bg-dark-card border-2 border-purple-500/50 rounded-3xl p-6 sm:p-8 shadow-xl text-center relative overflow-hidden space-y-4">
+    <!-- Active Scanning Container (Poller View with Countdown & Live Cuff Pressure) -->
+    <div id="scanView" class="bg-white dark:bg-dark-card border-2 border-purple-500/50 rounded-3xl p-6 sm:p-8 shadow-xl text-center relative overflow-hidden space-y-6">
       <div class="absolute -top-16 -right-16 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
+      <!-- Scan Ring -->
       <div class="scan-ring mx-auto w-24 h-24 rounded-full bg-purple-100 dark:bg-purple-950/60 border-4 border-purple-500/30 flex items-center justify-center text-royal-purple dark:text-purple-400 text-4xl shadow-inner">
         <i class="fas fa-heart-pulse pulse-glow"></i>
       </div>
 
-      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-4">
-        Waiting for incoming device reading...
-      </h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-        Please connect your sensor or complete a measurement on your hardware. Results updates automatically every 3 seconds.
-      </p>
+      <div>
+        <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white" id="scanTitle">
+          Measuring Blood Pressure & Telemetry Vitals...
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-md mx-auto" id="scanMessage">
+          Inflating cuff & reading arterial pressure waveform. Please sit comfortably and remain quiet until result is received.
+        </p>
+      </div>
+
+      <!-- Live Countdown & Progress Bar (Matching /devices Page Layout) -->
+      <div class="max-w-lg mx-auto space-y-3 pt-1">
+        <div class="flex justify-between items-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+          <span class="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-bold">
+            <i class="fas fa-bluetooth-b animate-spin"></i> BLE Telemetry Ingestion Active
+          </span>
+          <span id="timerText" class="text-royal-purple dark:text-purple-300 font-mono text-sm font-bold">30s</span>
+        </div>
+
+        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden p-0.5 border border-gray-200 dark:border-gray-700">
+          <div id="progressBar" class="progress-bar h-full bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-500 rounded-full" style="width: 0%"></div>
+        </div>
+
+        <!-- Simulated Live Dynamic Gauge Numbers (Cuff Pressure & Live Pulse) -->
+        <div class="flex justify-center items-center gap-6 pt-3">
+          <div class="text-center bg-purple-50 dark:bg-purple-950/40 px-5 py-3 rounded-2xl border border-purple-100 dark:border-purple-900/40 min-w-[130px]">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-extrabold block">Cuff Pressure</span>
+            <div class="text-2xl font-black text-purple-700 dark:text-purple-300 font-mono mt-0.5" id="liveCuffPressure">160 mmHg</div>
+          </div>
+          <div class="text-center bg-emerald-50 dark:bg-emerald-950/40 px-5 py-3 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 min-w-[130px]">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-extrabold block">Live Pulse</span>
+            <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5" id="livePulseBpm">72 BPM</div>
+          </div>
+        </div>
+      </div>
 
       <!-- Polling Status Badge & Indicator -->
-      <div class="max-w-md mx-auto pt-2">
+      <div class="max-w-md mx-auto pt-1">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 text-xs font-semibold">
           <span class="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400 animate-ping" id="statusDot"></span>
           <span id="statusText">Scanning for new record...</span>
@@ -899,7 +928,11 @@
       a.click();
     }
 
+    let countdownTimer = null;
+
     function renderRecord(record) {
+      if (countdownTimer) clearInterval(countdownTimer);
+      if (pollTimer) clearInterval(pollTimer);
       currentPatientRecord = record;
 
       resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
@@ -989,10 +1022,46 @@
 
     async function startScan() {
       if (pollTimer) clearInterval(pollTimer);
+      if (countdownTimer) clearInterval(countdownTimer);
 
       resultsView.classList.add("hidden");
       scanView.classList.remove("hidden");
+      scanView.scrollIntoView({ behavior: 'smooth' });
       setStatus("Scanning for incoming record...", false);
+
+      const timerText = document.getElementById("timerText");
+      const progressBar = document.getElementById("progressBar");
+      const liveCuff = document.getElementById("liveCuffPressure");
+      const livePulse = document.getElementById("livePulseBpm");
+
+      let elapsed = 0;
+      let durationSeconds = 30;
+
+      if (progressBar) progressBar.style.width = "0%";
+      if (timerText) timerText.textContent = "30s";
+      if (liveCuff) liveCuff.textContent = "160 mmHg";
+      if (livePulse) livePulse.textContent = "72 BPM";
+
+      countdownTimer = setInterval(() => {
+        elapsed++;
+        const remaining = Math.max(0, durationSeconds - elapsed);
+        const pct = Math.min(100, (elapsed / durationSeconds) * 100);
+
+        if (progressBar) progressBar.style.width = pct + "%";
+        if (timerText) timerText.textContent = remaining + "s";
+
+        // Dynamic cuff pressure countdown simulation (160 mmHg down to 80 mmHg)
+        const cuffVal = Math.max(80, Math.round(160 - (elapsed * 2.67)));
+        if (liveCuff) liveCuff.textContent = cuffVal + " mmHg";
+
+        // Live pulse fluctuation simulation around 72 BPM
+        const pulseVal = 70 + Math.floor(Math.sin(elapsed * 1.4) * 4);
+        if (livePulse) livePulse.textContent = pulseVal + " BPM";
+
+        if (remaining <= 0) {
+          elapsed = 0;
+        }
+      }, 1000);
 
       const currentRecord = await fetchLatestRecord();
       initialLastRecordId = currentRecord ? currentRecord.id : null;
@@ -1001,6 +1070,7 @@
         const latest = await fetchLatestRecord();
         if (latest && (!initialLastRecordId || latest.id !== initialLastRecordId)) {
           clearInterval(pollTimer);
+          if (countdownTimer) clearInterval(countdownTimer);
           renderRecord(latest);
         }
       }, POLL_INTERVAL);
