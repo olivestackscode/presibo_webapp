@@ -527,7 +527,41 @@
         docAvatar.innerText = initials || '🩺';
     }
 
-    // Direct fetch from latest_id.php API endpoint
+    // Schedule 12-24 hours ahead (next calendar day) during prime slots between 9 AM and 6 PM
+    function generatePrimeAppointmentDateTime() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // Format YYYY-MM-DD
+        const apptDate = tomorrow.toISOString().slice(0, 10);
+
+        // Standard Prime Slots (9:00 AM to 6:00 PM)
+        const primeSlots = [
+            { time24: '09:00:00', label: '09:00 AM' },
+            { time24: '09:30:00', label: '09:30 AM' },
+            { time24: '10:00:00', label: '10:00 AM' },
+            { time24: '10:30:00', label: '10:30 AM' },
+            { time24: '11:00:00', label: '11:00 AM' },
+            { time24: '11:30:00', label: '11:30 AM' },
+            { time24: '14:00:00', label: '02:00 PM' },
+            { time24: '14:30:00', label: '02:30 PM' },
+            { time24: '15:00:00', label: '03:00 PM' },
+            { time24: '15:30:00', label: '03:30 PM' },
+            { time24: '16:00:00', label: '04:00 PM' },
+            { time24: '16:30:00', label: '04:30 PM' },
+            { time24: '17:00:00', label: '05:00 PM' },
+            { time24: '17:30:00', label: '05:30 PM' }
+        ];
+
+        const selectedSlot = primeSlots[Math.floor(Math.random() * primeSlots.length)];
+
+        return {
+            date: apptDate,
+            time: selectedSlot.time24,
+            displayTime: selectedSlot.label
+        };
+    }
+
     async function getNextAppointmentId() {
         try {
             const res = await fetch(APPOINTMENTS_LATEST_ID, { cache: "no-store" });
@@ -543,7 +577,7 @@
         return 1;
     }
 
-    async function sendCombinedReportEmail(record, doctor, apptDate, apptTime, meetingUrl) {
+    async function sendCombinedReportEmail(record, doctor, apptDate, apptDisplayTime, meetingUrl) {
         const recipientEmail = record.email || '';
         if (!recipientEmail || recipientEmail.trim() === '') return;
 
@@ -554,7 +588,7 @@
 
         const emailMessageHtml = `
             <p>Dear <strong>${patientName}</strong>,</p>
-            <p>Your vital signs have been evaluated and your consultation appointment is confirmed.</p>
+            <p>Your vital signs have been evaluated and your consultation appointment is confirmed for tomorrow.</p>
             
             <h3 style="color: #2563eb; margin: 20px 0 10px 0; font-size: 16px;">1. Vital Signs Reading</h3>
             <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
@@ -597,7 +631,7 @@
                 </tr>
                 <tr>
                     <td style="padding: 10px 14px;"><strong>Appointment Time:</strong></td>
-                    <td style="padding: 10px 14px; font-weight: bold;">${apptTime}</td>
+                    <td style="padding: 10px 14px; font-weight: bold;">${apptDisplayTime}</td>
                 </tr>
             </table>
 
@@ -671,13 +705,12 @@
         bookBtnText.innerText = 'Processing Booking...';
         bookingStatus.className = 'booking-status';
 
-        // Retrieve the true next ID from latest_id.php
+        // 1. Fetch next integer ID from latest_id.php
         const nextId = await getNextAppointmentId();
         const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
 
-        const now = new Date();
-        const apptDate = now.toISOString().slice(0, 10);
-        const apptTime = now.toTimeString().slice(0, 8);
+        // 2. Generate Next Day + Prime Slot (9 AM - 6 PM)
+        const schedule = generatePrimeAppointmentDateTime();
 
         const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
         const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
@@ -689,8 +722,8 @@
             name: patientFullName,
             email: currentPatientRecord.email || 'patient@presibo.com',
             phone: currentPatientRecord.phone || '',
-            date: apptDate,
-            time: apptTime,
+            date: schedule.date,
+            time: schedule.time,
             doctor_id: String(currentMatchedDoctor.id || ''),
             doctor: formattedDocName,
             specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
@@ -711,11 +744,11 @@
             const resData = await response.json();
 
             if (response.ok && (resData.status === 'success' || resData.success)) {
-                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, apptDate, apptTime, meetingUrl);
+                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, schedule.date, schedule.displayTime, meetingUrl);
 
                 bookingStatus.className = 'booking-status success';
                 bookingStatus.innerHTML = `
-                    ✓ Appointment Confirmed (#${nextId}) for <strong>${apptDate} at ${apptTime}</strong>.<br>
+                    ✓ Appointment Confirmed (#${nextId}) for <strong>${schedule.date} at ${schedule.displayTime}</strong>.<br>
                     <div class="meeting-link-banner">
                         Meeting Room: <a href="${meetingUrl}" target="_blank">${meetingUrl}</a>
                     </div>
