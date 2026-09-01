@@ -815,10 +815,10 @@
       const isRevealed = element.getAttribute("data-revealed") === "true";
       if (isRevealed) {
         element.setAttribute("data-revealed", "false");
-        element.innerHTML = `<i class="fas fa-eye-slash text-xs mr-1.5 text-gray-400"></i><span class="font-mono text-gray-400 font-bold">• • • • • • • •</span> <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1 font-sans">(Click to reveal owner)</span>`;
+        element.innerHTML = `<i class="fas fa-eye-slash text-xs mr-1.5 text-gray-400"></i><span class="font-mono text-gray-400 font-bold">• • • • • • • •</span> <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1 font-sans"> </span>`;
       } else {
         element.setAttribute("data-revealed", "true");
-        element.innerHTML = `<i class="fas fa-eye text-xs mr-1.5 text-emerald-600 dark:text-emerald-400"></i><strong class="text-gray-900 dark:text-white font-extrabold">${realName}</strong> <span class="text-[10px] text-gray-400 font-normal underline ml-1 font-sans">(Click to hide)</span>`;
+        element.innerHTML = `<i class="fas fa-eye text-xs mr-1.5 text-emerald-600 dark:text-emerald-400"></i><strong class="text-gray-900 dark:text-white font-extrabold">${realName}</strong> <span class="text-[10px] text-gray-400 font-normal underline ml-1 font-sans"> </span>`;
       }
     }
 
@@ -876,7 +876,7 @@
                         onclick="togglePatientPrivacy(this, '${ownerFullName.replace(/'/g, "\\'")}')">
                     <i class="fas fa-eye-slash text-xs mr-1.5 text-gray-400"></i>
                     <span class="font-mono text-gray-400 font-bold">• • • • • • • •</span> 
-                    <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1.5 font-sans">(Click to reveal owner)</span>
+                    <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold underline ml-1.5 font-sans"> </span>
                   </span>
                 </div>
 
