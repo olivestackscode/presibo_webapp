@@ -14,6 +14,8 @@
             --text-muted: #64748b;
             --border: #e2e8f0;
             --pulse-color: #3b82f6;
+            --doctor-bg: #f0fdf4;
+            --doctor-border: #bbf7d0;
         }
 
         * {
@@ -99,7 +101,6 @@
             }
         }
 
-        /* Scanning State Placeholder */
         .scan-view {
             display: flex;
             flex-direction: column;
@@ -124,7 +125,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Result View */
         .results-view {
             display: none;
         }
@@ -157,7 +157,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .vital-box {
@@ -191,7 +191,7 @@
             border: 1px solid #bfdbfe;
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .analysis-title {
@@ -205,6 +205,54 @@
             font-size: 0.95rem;
             color: #1e3a8a;
             line-height: 1.5;
+        }
+
+        /* Doctor Pairing Section */
+        .doctor-box {
+            background: var(--doctor-bg);
+            border: 1px solid var(--doctor-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .doctor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .doctor-details {
+            flex-grow: 1;
+        }
+
+        .doctor-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #15803d;
+            margin-bottom: 2px;
+        }
+
+        .doctor-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #14532d;
+        }
+
+        .doctor-specialty {
+            font-size: 0.85rem;
+            color: #166534;
         }
 
         .btn {
@@ -244,7 +292,7 @@
         <p style="color: var(--text-muted); font-size: 0.9rem;">Please connect sensor or perform reading</p>
     </div>
 
-    <!-- 2. RESULT DISPLAY -->
+    <!-- 2. RESULT & DOCTOR PAIRING DISPLAY -->
     <div class="results-view" id="resultsView">
         <div class="patient-info">
             <div class="patient-label">Patient Record</div>
@@ -270,43 +318,108 @@
             <p class="analysis-text" id="resEvaluation">--</p>
         </div>
 
+        <!-- Assigned Doctor Box -->
+        <div class="doctor-box" id="doctorBox">
+            <div class="doctor-avatar">🩺</div>
+            <div class="doctor-details">
+                <div class="doctor-badge">Assigned Physician</div>
+                <div class="doctor-name" id="docName">Finding physician...</div>
+                <div class="doctor-specialty" id="docSpecialty">General Practice</div>
+            </div>
+        </div>
+
         <button class="btn" id="btnNewReading">New Reading</button>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://api.presibo.com/devices/index.php";
-    const POLL_INTERVAL = 3000; // 3 seconds
+    const DEVICES_API_URL = "https://api.presibo.com/devices/index.php";
+    const DOCTORS_API_URL = "https://app.presibo.com/doctors.json";
+    const POLL_INTERVAL   = 3000;
 
     let pollTimer = null;
     let initialLastRecordId = null;
+    let doctorsList = [];
 
-    const scanView    = document.getElementById('scanView');
-    const resultsView = document.getElementById('resultsView');
-    const statusDot   = document.getElementById('statusDot');
-    const statusText  = document.getElementById('statusText');
+    const scanView      = document.getElementById('scanView');
+    const resultsView   = document.getElementById('resultsView');
+    const statusDot     = document.getElementById('statusDot');
+    const statusText    = document.getElementById('statusText');
     const btnNewReading = document.getElementById('btnNewReading');
 
-    // UI Field References
+    // UI Element References
     const resPatientName = document.getElementById('resPatientName');
     const resTimestamp   = document.getElementById('resTimestamp');
     const resBp          = document.getElementById('resBp');
     const resSugar       = document.getElementById('resSugar');
     const resEvaluation  = document.getElementById('resEvaluation');
 
+    const docName        = document.getElementById('docName');
+    const docSpecialty   = document.getElementById('docSpecialty');
+
     function setStatus(text, stateClass) {
         statusText.innerText = text;
         statusDot.className = 'status-dot ' + (stateClass || '');
     }
 
+    // Pre-load doctors catalog
+    async function fetchDoctors() {
+        try {
+            const res = await fetch(DOCTORS_API_URL);
+            if (res.ok) {
+                const data = await res.json();
+                doctorsList = Array.isArray(data) ? data : (data.doctors || []);
+            }
+        } catch (err) {
+            console.warn("Doctors API unavailable, using fallback pairing:", err);
+        }
+    }
+
+    // Auto-Pairing Logic: Matches vitals severity to relevant specialist
+    function pairDoctor(record) {
+        if (!doctorsList || doctorsList.length === 0) {
+            docName.innerText = "Dr. On-Duty Specialist";
+            docSpecialty.innerText = "General Practice / Telehealth";
+            return;
+        }
+
+        const sys = parseInt(record.bp_sys, 10) || 0;
+        const sugar = parseFloat(record.sugar) || 0;
+
+        let targetKeywords = ['general', 'family', 'physician'];
+
+        if (sys >= 140 || sys <= 90) {
+            targetKeywords = ['cardio', 'heart', 'internal', 'general'];
+        } else if (sugar >= 180 || (sugar > 0 && sugar < 70)) {
+            targetKeywords = ['endocrin', 'internal', 'diabet', 'general'];
+        }
+
+        // Search for best matching doctor
+        let matchedDoctor = doctorsList.find(doc => {
+            const spec = (doc.specialty || doc.specialization || '').toLowerCase();
+            return targetKeywords.some(kw => spec.includes(kw));
+        });
+
+        // Fallback: pick any available doctor
+        if (!matchedDoctor) {
+            matchedDoctor = doctorsList[0];
+        }
+
+        const name = matchedDoctor.name || matchedDoctor.doctor_name || `${matchedDoctor.first_name || ''} ${matchedDoctor.last_name || ''}`.trim() || 'Dr. Assigned';
+        const specialty = matchedDoctor.specialty || matchedDoctor.specialization || 'Clinical Specialist';
+
+        docName.innerText = name.startsWith('Dr.') ? name : `Dr. ${name}`;
+        docSpecialty.innerText = specialty;
+    }
+
     async function fetchLatestRecord() {
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(DEVICES_API_URL);
             if (!response.ok) throw new Error("Network response was not OK");
             
             const result = await response.json();
             if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-                return result.data[0]; // First item (latest, based on ORDER BY datetime DESC)
+                return result.data[0];
             }
             return null;
         } catch (err) {
@@ -319,8 +432,10 @@
         resPatientName.innerText = `${record.first_name} ${record.last_name}`;
         resTimestamp.innerText = `Recorded: ${record.datetime || 'N/A'}`;
         resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
-        resSugar.innerText = record.sugar || '--';
+        resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
         resEvaluation.innerText = record.evaluation || 'No evaluation notes provided.';
+
+        pairDoctor(record);
 
         scanView.style.display = 'none';
         resultsView.style.display = 'block';
@@ -330,16 +445,13 @@
     async function startScan() {
         clearInterval(pollTimer);
         
-        // Reset View
         resultsView.style.display = 'none';
         scanView.style.display = 'flex';
         setStatus("Scanning...", "scanning");
 
-        // Step 1: Snapshot the latest ID to detect incoming new data
         const currentRecord = await fetchLatestRecord();
         initialLastRecordId = currentRecord ? currentRecord.id : null;
 
-        // Step 2: Poll until a newer ID appears
         pollTimer = setInterval(async () => {
             const latest = await fetchLatestRecord();
             if (latest && (!initialLastRecordId || latest.id !== initialLastRecordId)) {
@@ -351,8 +463,10 @@
 
     btnNewReading.addEventListener('click', startScan);
 
-    // Run automatically on initial page load
-    window.addEventListener('DOMContentLoaded', startScan);
+    window.addEventListener('DOMContentLoaded', async () => {
+        await fetchDoctors();
+        startScan();
+    });
 </script>
 
 </body>
