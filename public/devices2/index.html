@@ -183,7 +183,7 @@
         </div>
 
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <button id="scanBtn" onclick="startScan()" class="flex-1 sm:flex-none bg-royal-purple hover:bg-purple-800 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+          <button id="scanBtn" onclick="window.location.href='/device-live/index.html'" class="flex-1 sm:flex-none bg-royal-purple hover:bg-purple-800 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
             <i class="fas fa-satellite-dish"></i> Measure BP Now
           </button>
           <a href="/devices" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-xl font-semibold text-sm transition">
@@ -596,37 +596,9 @@
       draw();
     }
 
-    // Measurement simulation
+    // Redirect to /device-live for real-time telemetry streaming
     function startScan() {
-      const card = document.getElementById("scanningCard");
-      const bar = document.getElementById("progressBar");
-      const timerText = document.getElementById("timerText");
-
-      card.classList.remove("hidden");
-      card.scrollIntoView({ behavior: 'smooth' });
-
-      let sec = 15;
-      bar.style.width = "0%";
-
-      if (scanTimer) clearInterval(scanTimer);
-      scanTimer = setInterval(() => {
-        sec--;
-        const pct = ((15 - sec) / 15) * 100;
-        bar.style.width = pct + "%";
-        timerText.textContent = sec + "s";
-
-        if (sec <= 0) {
-          clearInterval(scanTimer);
-          card.classList.add("hidden");
-          
-          const newSys = 118;
-          const newDia = 78;
-          const newPulse = 72;
-          MOCK_HISTORY.unshift({ systolic: newSys, diastolic: newDia, displayTime: "Just Now", pulse: newPulse });
-          loadMockHistory();
-          loadLatestReading();
-        }
-      }, 1000);
+      window.location.href = '/device-live/index.html';
     }
 
     function stopScan() {

@@ -180,7 +180,7 @@
 
           <!-- Action Buttons -->
           <div class="flex flex-wrap items-center gap-3 pt-2">
-            <button onclick="startScan()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg hover:shadow-purple-500/25 transition flex items-center gap-2 text-sm">
+            <button onclick="window.location.href='/device-live/index.html'" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg hover:shadow-purple-500/25 transition flex items-center gap-2 text-sm">
               <i class="fas fa-satellite-dish"></i> Take BP Measurement Now
             </button>
             <button onclick="openPairingModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl backdrop-blur-md border border-white/20 transition flex items-center gap-2 text-sm">
@@ -724,7 +724,7 @@
           <div class="flex items-center justify-between pt-1">
             <span class="text-[11px] text-gray-400">Synced: ${dev.lastSync}</span>
             <div class="flex items-center gap-2">
-              <button onclick="startScan('${dev.name}')" class="bg-royal-purple hover:bg-purple-800 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition shadow-sm">
+              <button onclick="window.location.href='/device-live/index.html'" class="bg-royal-purple hover:bg-purple-800 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition shadow-sm">
                 <i class="fas fa-play text-[10px] mr-1"></i> Read Now
               </button>
               <button onclick="unpairDevice('${dev.id}')" class="text-gray-400 hover:text-red-500 p-1.5 rounded-lg transition" title="Unpair Device">
@@ -747,43 +747,9 @@
       renderPairedDevices(cat);
     }
 
-    // Measurement Engine Simulation
+    // Redirect to /device-live for real-time telemetry streaming
     function startScan(deviceName = "Presibo BP Monitor Pro") {
-      const scanCard = document.getElementById("scanningCard");
-      const scanTitle = document.getElementById("scanTitle");
-      const scanMsg = document.getElementById("scanMessage");
-      const progressBar = document.getElementById("progressBar");
-      const timerText = document.getElementById("timerText");
-
-      if (!scanCard) return;
-      scanCard.classList.remove("hidden");
-      scanCard.scrollIntoView({ behavior: 'smooth' });
-
-      scanTitle.textContent = `Measuring with ${deviceName}...`;
-      scanMsg.textContent = "Hardware active via Web Bluetooth API. Inflating cuff and reading real-time pulse waveform.";
-
-      scanSeconds = 15;
-      let elapsed = 0;
-
-      if (scanTimer) clearInterval(scanTimer);
-
-      scanTimer = setInterval(() => {
-        elapsed++;
-        scanSeconds--;
-        const pct = (elapsed / 15) * 100;
-        progressBar.style.width = pct + "%";
-        timerText.textContent = scanSeconds + "s";
-
-        // Dynamic cuff pressure simulator
-        const simulatedPressure = 160 - Math.floor(elapsed * 4.5);
-        const liveCuff = document.getElementById("liveCuffPressure");
-        if (liveCuff) liveCuff.textContent = Math.max(simulatedPressure, 80) + " mmHg";
-
-        if (scanSeconds <= 0) {
-          clearInterval(scanTimer);
-          completeMeasurement();
-        }
-      }, 1000);
+      window.location.href = '/device-live/index.html';
     }
 
     function stopScan() {
