@@ -186,10 +186,10 @@
         <div class="lg:col-span-8 space-y-4">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Continuous Telemetry Polling Active (3s)
+            Continuous Polling Active (3s)
           </div>
           <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            Presibo Live Vital Signs Telemetry Stream
+            Presibo Live Vital Signs Tracking
           </h1>
           <p class="text-sm sm:text-base text-gray-300 max-w-2xl leading-relaxed">
             Real-time patient vital signs ingestion from connected medical sensors. Receive immediate AI clinical evaluation, automated doctor specialist pairing, and 1-click telehealth appointment booking.
@@ -213,7 +213,7 @@
         <div class="lg:col-span-4 hidden lg:flex flex-col gap-3">
           <div class="glass-card bg-white/10 p-4 rounded-2xl border border-white/15 backdrop-blur-md">
             <div class="flex items-center justify-between text-xs text-gray-300 mb-1">
-              <span>Telemetry Receiver</span>
+              <span>Receiver</span>
               <span class="text-emerald-400 font-semibold flex items-center gap-1">
                 <i class="fas fa-wifi"></i> Online
               </span>
@@ -299,7 +299,7 @@
         Waiting for incoming device reading...
       </h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-        Please connect your sensor or complete a measurement on your hardware. Telemetry updates automatically every 3 seconds.
+        Please connect your sensor or complete a measurement on your hardware. Results updates automatically every 3 seconds.
       </p>
 
       <!-- Polling Status Badge & Indicator -->
@@ -317,7 +317,7 @@
       <!-- Top Patient & Timestamp Banner -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-4">
         <div>
-          <span class="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-extrabold">Ingested Telemetry Record</span>
+          <span class="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-extrabold">Records</span>
           <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mt-0.5" id="resPatientName">--</h2>
           <p class="text-xs text-gray-400 mt-0.5" id="resTimestamp">--</p>
         </div>
@@ -359,7 +359,7 @@
       <!-- Matched Doctor Specialist Card -->
       <div class="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl p-5 flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-base shadow-sm" id="docAvatar">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-base shadow-md overflow-hidden shrink-0 border-2 border-emerald-500/30" id="docAvatar">
             🩺
           </div>
           <div>
@@ -398,11 +398,11 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
         <div>
           <div class="flex items-center gap-2.5">
-            <h2 class="text-xl font-extrabold text-gray-900 dark:text-white">Older Ingestion Telemetry History</h2>
+            <h2 class="text-xl font-extrabold text-gray-900 dark:text-white"> History</h2>
             <span class="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-extrabold border border-purple-200 dark:border-purple-800" id="historyCountBadge">0 Records</span>
           </div>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-            Historical results from <code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-purple-600 dark:text-purple-400">api.presibo.com/devices</code>. For patient privacy, owner names are hidden by default—click on any entry to reveal.
+            All results <code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-purple-600 dark:text-purple-400"></code>. For patient privacy, owner names are hidden by default—click on any entry to reveal.
           </p>
         </div>
 
@@ -427,7 +427,7 @@
           <i class="fas fa-clock-rotate-left"></i>
         </div>
         <p class="text-sm font-bold text-gray-700 dark:text-gray-300 mt-3">No Older Records Found</p>
-        <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">No previous vital signs telemetry records found in the API database.</p>
+        <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">No previous vital signs records found</p>
       </div>
     </div>
 
@@ -443,7 +443,7 @@
             Connect Official Presibo Bluetooth Sensors
           </h2>
           <p class="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-xl">
-            Stream your vitals automatically into Presibo AI Telemetry with clinical-grade blood pressure monitors and continuous glucose sensor kits.
+            Stream your vitals automatically into Presibo AI with clinical-grade blood pressure monitors and continuous glucose sensor kits.
           </p>
           <div class="flex items-center gap-4 pt-2">
             <div>
@@ -485,33 +485,33 @@
     const POLL_INTERVAL           = 3000;
 
     const fallbackData = {"doctors": [
-      {"id": 1, "firstname": "Sopuru", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 34, "firstname": "Farida", "lastname": "Bello", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 2, "firstname": "Firdausi", "lastname": "Usman", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 3, "firstname": "Chinenye", "midname": "Ozioma", "lastname": "Nnabuife", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 4, "firstname": "Abu", "lastname": "Abdulrashid", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 5, "firstname": "Fatima", "midname": "Aderonke", "lastname": "Adebisi", "specialization": "General Practitioner", "location":"Lagos Island"},
-      {"id": 6, "firstname": "Titilope", "lastname": "Adedeji", "specialization": "Family Medicine", "location":"Abuja"},
-      {"id": 7, "firstname": "Enny", "lastname": "Aikodon", "specialization": "General Practitioner", "location":"Ontario"},
-      {"id": 8, "firstname": "Ojo", "lastname": "Damilola", "specialization": "General Practitioner", "location":"Port Harcourt"},
-      {"id": 9, "firstname": "Collins", "lastname": "Uche", "specialization": "General Practitioner", "location":"Gwagwalada"},
-      {"id": 10, "firstname": "Nneoma", "lastname": "Ike", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 11, "firstname": "Victoria Ene", "lastname": "Abah", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 12, "firstname": "Asuquo", "lastname": "Ekpenyong", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 13, "firstname": "James", "lastname": "Udom", "specialization": "General Practitioner", "location":"Lagos"},
-      {"id": 14, "firstname": "Ebere", "midname": "Gift", "lastname": "Okere", "specialization": "Nutritionist", "location":"Port Harcourt"},
-      {"id": 15, "firstname": "Maryam", "lastname": "", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 16, "firstname": "Nusaibah", "lastname": "Bashir", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 17, "firstname": "Ekomobong", "lastname": "Edeghe", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 18, "firstname": "Adline", "lastname": "Eze", "specialization": "General Practitioner", "location":"Port Harcourt"},
-      {"id": 19, "firstname": "Efe", "midname": "Iyi", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 20, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "General Practitioner", "location":"Port Harcourt"},
-      {"id": 21, "firstname": "Busayo", "midname": "Felicia", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 22, "firstname": "Henrietta", "midname": "Eseoghene", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 23, "firstname": "Ebai", "midname": "Romanus", "lastname": "Ashu", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 24, "firstname": "Hajara", "midname": "Dalhatu", "lastname": "Musa", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 25, "firstname": "Hannatu", "lastname": "Yakasai", "specialization": "General Practitioner", "location":"Abuja"},
-      {"id": 26, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "Medical Officer", "location":"Port Harcourt"}
+      {"id": 1, "firstname": "Sopuru", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc1"},
+      {"id": 34, "firstname": "Farida", "lastname": "Bello", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc34"},
+      {"id": 2, "firstname": "Firdausi", "lastname": "Usman", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc2"},
+      {"id": 3, "firstname": "Chinenye", "midname": "Ozioma", "lastname": "Nnabuife", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc3"},
+      {"id": 4, "firstname": "Abu", "lastname": "Abdulrashid", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc4"},
+      {"id": 5, "firstname": "Fatima", "midname": "Aderonke", "lastname": "Adebisi", "specialization": "General Practitioner", "location":"Lagos Island", "thumbnail": "doc5"},
+      {"id": 6, "firstname": "Titilope", "lastname": "Adedeji", "specialization": "Family Medicine", "location":"Abuja", "thumbnail": "doc6"},
+      {"id": 7, "firstname": "Enny", "lastname": "Aikodon", "specialization": "General Practitioner", "location":"Ontario", "thumbnail": "doc7"},
+      {"id": 8, "firstname": "Ojo", "lastname": "Damilola", "specialization": "General Practitioner", "location":"Port Harcourt", "thumbnail": "doc8"},
+      {"id": 9, "firstname": "Collins", "lastname": "Uche", "specialization": "General Practitioner", "location":"Gwagwalada", "thumbnail": "doc9"},
+      {"id": 10, "firstname": "Nneoma", "lastname": "Ike", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc10"},
+      {"id": 11, "firstname": "Victoria Ene", "lastname": "Abah", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc11"},
+      {"id": 12, "firstname": "Asuquo", "lastname": "Ekpenyong", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc12"},
+      {"id": 13, "firstname": "James", "lastname": "Udom", "specialization": "General Practitioner", "location":"Lagos", "thumbnail": "doc13"},
+      {"id": 14, "firstname": "Ebere", "midname": "Gift", "lastname": "Okere", "specialization": "Nutritionist", "location":"Port Harcourt", "thumbnail": "doc14"},
+      {"id": 15, "firstname": "Maryam", "lastname": "", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc15"},
+      {"id": 16, "firstname": "Nusaibah", "lastname": "Bashir", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc16"},
+      {"id": 17, "firstname": "Ekomobong", "lastname": "Edeghe", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc17"},
+      {"id": 18, "firstname": "Adline", "lastname": "Eze", "specialization": "General Practitioner", "location":"Port Harcourt", "thumbnail": "doc18"},
+      {"id": 19, "firstname": "Efe", "midname": "Iyi", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc19"},
+      {"id": 20, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "General Practitioner", "location":"Port Harcourt", "thumbnail": "doc20"},
+      {"id": 21, "firstname": "Busayo", "midname": "Felicia", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc21"},
+      {"id": 22, "firstname": "Henrietta", "midname": "Eseoghene", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc22"},
+      {"id": 23, "firstname": "Ebai", "midname": "Romanus", "lastname": "Ashu", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc23"},
+      {"id": 24, "firstname": "Hajara", "midname": "Dalhatu", "lastname": "Musa", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc24"},
+      {"id": 25, "firstname": "Hannatu", "lastname": "Yakasai", "specialization": "General Practitioner", "location":"Abuja", "thumbnail": "doc25"},
+      {"id": 26, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "Medical Officer", "location":"Port Harcourt", "thumbnail": "doc26"}
     ]};
 
     let doctorsList = fallbackData.doctors;
@@ -613,6 +613,14 @@
       }
     }
 
+    function getDoctorPhotoUrl(doctor) {
+      if (!doctor) return 'https://presibo-wl.vercel.app/photos/doc1.jpg';
+      const thumb = doctor.thumbnail || doctor.photo || `doc${doctor.id || 1}`;
+      if (thumb.startsWith('http://') || thumb.startsWith('https://')) return thumb;
+      const fileName = (thumb.endsWith('.jpg') || thumb.endsWith('.png') || thumb.endsWith('.jpeg')) ? thumb : `${thumb}.jpg`;
+      return `https://presibo-wl.vercel.app/photos/${fileName}`;
+    }
+
     function pairDoctor() {
       if (!doctorsList || doctorsList.length === 0) return;
 
@@ -627,8 +635,15 @@
       docSpecialty.innerText = matched.specialization || matched.specialty || 'General Practitioner';
       docLocation.innerText = `• ${matched.location || 'Nigeria'}`;
 
-      const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
-      docAvatar.innerText = initials || '🩺';
+      const photoUrl = getDoctorPhotoUrl(matched);
+      const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase() || '🩺';
+
+      docAvatar.innerHTML = `
+        <img src="${photoUrl}" 
+             alt="${fullName}" 
+             class="w-full h-full object-cover rounded-2xl" 
+             onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'font-black text-white text-base\'>${initials}</span>';">
+      `;
     }
 
     function generatePrimeAppointmentDateTime() {
