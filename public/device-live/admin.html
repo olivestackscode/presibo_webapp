@@ -395,13 +395,6 @@
         resultModal.style.display = 'flex';
     }
 
-    function resetAndStartNew() {
-        form.reset();
-        setCurrentDateTime();
-        resultModal.style.display = 'none';
-        document.getElementById('first_name').focus();
-    }
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -458,7 +451,11 @@
         }
     });
 
-    btnNewReadingModal.addEventListener('click', resetAndStartNew);
+    // Refresh page when New Reading is clicked
+    btnNewReadingModal.addEventListener('click', () => {
+        window.location.reload();
+    });
+
     btnCloseModal.addEventListener('click', () => {
         resultModal.style.display = 'none';
     });
