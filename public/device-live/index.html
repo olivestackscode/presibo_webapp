@@ -209,7 +209,6 @@
             line-height: 1.5;
         }
 
-        /* Doctor Pairing Box */
         .doctor-box {
             background: var(--doctor-bg);
             border: 1px solid var(--doctor-border);
@@ -266,7 +265,7 @@
 
         .booking-status {
             display: none;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-radius: 10px;
             font-size: 0.9rem;
             font-weight: 500;
@@ -287,6 +286,18 @@
             background: #fef2f2;
             color: #991b1b;
             border: 1px solid #fecaca;
+        }
+
+        .meeting-link-banner {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .meeting-link-banner a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
         }
 
         .btn-group {
@@ -416,7 +427,8 @@
 <script>
     const DEVICES_API_URL      = "https://api.presibo.com/devices/index.php";
     const DOCTORS_API_URL      = "https://app.presibo.com/doctors.json";
-    const APPOINTMENTS_API_URL = "https://api.presibo.com/appointments/new.php";
+    const APPOINTMENTS_NEW_URL = "https://api.presibo.com/appointments/new.php";
+    const APPOINTMENTS_GET_URL = "https://api.presibo.com/appointments/index.php?action=get_appointments";
     const EMAIL_API_URL        = "https://api.presibo.com/email/index.php";
     const POLL_INTERVAL        = 3000;
 
@@ -515,8 +527,26 @@
         docAvatar.innerText = initials || '🩺';
     }
 
-    // Consolidated email: Vitals + Clinical Evaluation + Confirmed Appointment Date & Time
-    async function sendCombinedReportEmail(record, doctor, apptDate, apptTime) {
+    // Fetches the latest appointment ID from index.php and computes ID + 1
+    async function getNextAppointmentId() {
+        try {
+            const res = await fetch(APPOINTMENTS_GET_URL, { cache: "no-store" });
+            if (res.ok) {
+                const result = await res.json();
+                if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+                    const latestId = parseInt(result.data[0].id, 10);
+                    if (!isNaN(latestId)) {
+                        return latestId + 1;
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn("Could not fetch last appointment ID:", err);
+        }
+        return Math.floor(1000 + Math.random() * 9000); // Safe numeric fallback
+    }
+
+    async function sendCombinedReportEmail(record, doctor, apptDate, apptTime, meetingUrl) {
         const recipientEmail = record.email || '';
         if (!recipientEmail || recipientEmail.trim() === '') return;
 
@@ -550,8 +580,8 @@
                 <p style="margin: 0; color: #1e3a8a; line-height: 1.5;">${record.evaluation || 'No clinical observations logged.'}</p>
             </div>
 
-            <h3 style="color: #16a34a; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment Details</h3>
-            <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #16a34a; margin: 20px 0 10px 0; font-size: 16px;">3. Confirmed Appointment &amp; Consultation Link</h3>
+            <table style="width: 100%; border-collapse: collapse; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 15px;">
                 <tr>
                     <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0;"><strong>Assigned Doctor:</strong></td>
                     <td style="padding: 10px 14px; border-bottom: 1px solid #bbf7d0; font-weight: bold; color: #14532d;">${formattedDocName}</td>
@@ -574,7 +604,12 @@
                 </tr>
             </table>
 
-            <p style="margin-top: 15px;">Please be ready 10 minutes before your scheduled appointment time. If you need any assistance, reach us at support@presibo.com.</p>
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="${meetingUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px;">Join Video Consultation Room</a>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748b;">Direct Link: <a href="${meetingUrl}" style="color: #2563eb;">${meetingUrl}</a></p>
+            </div>
+
+            <p style="margin-top: 15px; font-size: 13px; color: #64748b;">Please click the button above at your scheduled time to connect directly with your doctor. If you need assistance, reach us at support@presibo.com.</p>
         `;
 
         const emailPayload = {
@@ -582,7 +617,7 @@
             type: "custom",
             email: recipientEmail,
             name: patientName,
-            title: `Presibo Health - Vitals Evaluation & Appointment Confirmation`,
+            title: `Presibo Health - Vitals Evaluation & Consultation Link`,
             message: emailMessageHtml
         };
 
@@ -639,6 +674,10 @@
         bookBtnText.innerText = 'Processing Booking...';
         bookingStatus.className = 'booking-status';
 
+        // 1. Get the next appointment ID (last ID + 1) purely in JS
+        const nextId = await getNextAppointmentId();
+        const meetingUrl = `https://meet.jit.si/presibo-${nextId}`;
+
         const now = new Date();
         const apptDate = now.toISOString().slice(0, 10);
         const apptTime = now.toTimeString().slice(0, 8);
@@ -663,7 +702,7 @@
         };
 
         try {
-            const response = await fetch(APPOINTMENTS_API_URL, {
+            const response = await fetch(APPOINTMENTS_NEW_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -675,11 +714,16 @@
             const resData = await response.json();
 
             if (response.ok && (resData.status === 'success' || resData.success)) {
-                // Dispatch complete results + appointment date & time email
-                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, apptDate, apptTime);
+                // Send email with vitals, evaluation, date, time, and calculated meeting link
+                sendCombinedReportEmail(currentPatientRecord, currentMatchedDoctor, apptDate, apptTime, meetingUrl);
 
                 bookingStatus.className = 'booking-status success';
-                bookingStatus.innerHTML = `✓ Appointment Confirmed for <strong>${apptDate} at ${apptTime}</strong>.<br>Full report & confirmation sent to your email.`;
+                bookingStatus.innerHTML = `
+                    ✓ Appointment Confirmed for <strong>${apptDate} at ${apptTime}</strong>.<br>
+                    <div class="meeting-link-banner">
+                        Meeting Room: <a href="${meetingUrl}" target="_blank">${meetingUrl}</a>
+                    </div>
+                `;
                 bookBtnText.innerText = 'Booking Confirmed';
             } else {
                 throw new Error(resData.message || 'Failed to complete appointment booking.');
