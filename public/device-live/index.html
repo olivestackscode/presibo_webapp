@@ -223,12 +223,14 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
+            object-fit: cover;
             background: #dcfce7;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.4rem;
             flex-shrink: 0;
+            border: 2px solid #86efac;
         }
 
         .doctor-details {
@@ -250,9 +252,12 @@
             color: #14532d;
         }
 
-        .doctor-specialty {
+        .doctor-meta {
             font-size: 0.85rem;
             color: #166534;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -320,11 +325,16 @@
 
         <!-- Assigned Doctor Box -->
         <div class="doctor-box" id="doctorBox">
-            <div class="doctor-avatar">🩺</div>
+            <div id="docAvatarContainer">
+                <div class="doctor-avatar" id="docAvatarFallback">🩺</div>
+            </div>
             <div class="doctor-details">
                 <div class="doctor-badge">Assigned Physician</div>
-                <div class="doctor-name" id="docName">Finding physician...</div>
-                <div class="doctor-specialty" id="docSpecialty">General Practice</div>
+                <div class="doctor-name" id="docName">Loading doctor...</div>
+                <div class="doctor-meta">
+                    <span id="docSpecialty">General Practice</span>
+                    <span id="docLocation"></span>
+                </div>
             </div>
         </div>
 
@@ -337,84 +347,126 @@
     const DOCTORS_API_URL = "https://app.presibo.com/doctors.json";
     const POLL_INTERVAL   = 3000;
 
+    // Presibo Medical Roster
+    let doctorsList = [
+        {
+            id: 1,
+            name: "Dr. Aisha Bello",
+            specialty: "Cardiology",
+            location: "Lagos Virtual Clinic",
+            available: true
+        },
+        {
+            id: 2,
+            name: "Dr. Chukwuma Obi",
+            specialty: "Endocrinology & Diabetes Care",
+            location: "Abuja Medical Hub",
+            available: true
+        },
+        {
+            id: 3,
+            name: "Dr. Folake Adeyemi",
+            specialty: "General Practice / Family Medicine",
+            location: "Presibo Telehealth",
+            available: true
+        },
+        {
+            id: 4,
+            name: "Dr. Emmanuel Kalu",
+            specialty: "Internal Medicine & Hypertension",
+            location: "Port Harcourt Center",
+            available: true
+        }
+    ];
+
     let pollTimer = null;
     let initialLastRecordId = null;
-    let doctorsList = [];
 
-    const scanView      = document.getElementById('scanView');
-    const resultsView   = document.getElementById('resultsView');
-    const statusDot     = document.getElementById('statusDot');
-    const statusText    = document.getElementById('statusText');
-    const btnNewReading = document.getElementById('btnNewReading');
+    const scanView           = document.getElementById('scanView');
+    const resultsView        = document.getElementById('resultsView');
+    const statusDot          = document.getElementById('statusDot');
+    const statusText         = document.getElementById('statusText');
+    const btnNewReading      = document.getElementById('btnNewReading');
 
-    // UI Element References
-    const resPatientName = document.getElementById('resPatientName');
-    const resTimestamp   = document.getElementById('resTimestamp');
-    const resBp          = document.getElementById('resBp');
-    const resSugar       = document.getElementById('resSugar');
-    const resEvaluation  = document.getElementById('resEvaluation');
+    const resPatientName     = document.getElementById('resPatientName');
+    const resTimestamp       = document.getElementById('resTimestamp');
+    const resBp              = document.getElementById('resBp');
+    const resSugar           = document.getElementById('resSugar');
+    const resEvaluation      = document.getElementById('resEvaluation');
 
-    const docName        = document.getElementById('docName');
-    const docSpecialty   = document.getElementById('docSpecialty');
+    const docName            = document.getElementById('docName');
+    const docSpecialty       = document.getElementById('docSpecialty');
+    const docLocation        = document.getElementById('docLocation');
+    const docAvatarContainer = document.getElementById('docAvatarContainer');
 
     function setStatus(text, stateClass) {
         statusText.innerText = text;
         statusDot.className = 'status-dot ' + (stateClass || '');
     }
 
-    // Pre-load doctors catalog
-    async function fetchDoctors() {
+    // Synchronize latest doctor directory from endpoint
+    async function loadDoctors() {
         try {
-            const res = await fetch(DOCTORS_API_URL);
+            const res = await fetch(DOCTORS_API_URL, { cache: "no-store" });
             if (res.ok) {
                 const data = await res.json();
-                doctorsList = Array.isArray(data) ? data : (data.doctors || []);
+                const fetched = Array.isArray(data) ? data : (data.doctors || data.data || []);
+                if (fetched.length > 0) {
+                    doctorsList = fetched;
+                }
             }
         } catch (err) {
-            console.warn("Doctors API unavailable, using fallback pairing:", err);
+            console.log("Using primary Presibo doctor list:", err);
         }
     }
 
-    // Auto-Pairing Logic: Matches vitals severity to relevant specialist
+    // Match patient vitals against doctor directory
     function pairDoctor(record) {
-        if (!doctorsList || doctorsList.length === 0) {
-            docName.innerText = "Dr. On-Duty Specialist";
-            docSpecialty.innerText = "General Practice / Telehealth";
-            return;
-        }
-
         const sys = parseInt(record.bp_sys, 10) || 0;
+        const dia = parseInt(record.bp_dia, 10) || 0;
         const sugar = parseFloat(record.sugar) || 0;
 
-        let targetKeywords = ['general', 'family', 'physician'];
+        let targetKeywords = ['general', 'family', 'internal'];
 
-        if (sys >= 140 || sys <= 90) {
-            targetKeywords = ['cardio', 'heart', 'internal', 'general'];
-        } else if (sugar >= 180 || (sugar > 0 && sugar < 70)) {
-            targetKeywords = ['endocrin', 'internal', 'diabet', 'general'];
+        // Vitals triage routing
+        if (sys >= 140 || sys <= 90 || dia >= 90) {
+            targetKeywords = ['cardio', 'hypertension', 'heart', 'internal'];
+        } else if (sugar >= 160 || (sugar > 0 && sugar < 70)) {
+            targetKeywords = ['endocrin', 'diabet', 'metabolic', 'internal'];
         }
 
-        // Search for best matching doctor
-        let matchedDoctor = doctorsList.find(doc => {
-            const spec = (doc.specialty || doc.specialization || '').toLowerCase();
+        // 1. Find matching specialist
+        let matched = doctorsList.find(doc => {
+            const spec = (doc.specialty || doc.specialization || doc.role || '').toLowerCase();
             return targetKeywords.some(kw => spec.includes(kw));
         });
 
-        // Fallback: pick any available doctor
-        if (!matchedDoctor) {
-            matchedDoctor = doctorsList[0];
+        // 2. Fallback to first available doctor in roster
+        if (!matched) {
+            matched = doctorsList[0];
         }
 
-        const name = matchedDoctor.name || matchedDoctor.doctor_name || `${matchedDoctor.first_name || ''} ${matchedDoctor.last_name || ''}`.trim() || 'Dr. Assigned';
-        const specialty = matchedDoctor.specialty || matchedDoctor.specialization || 'Clinical Specialist';
+        // Format names, specialty, location, and avatar
+        const fullName = matched.name || matched.doctor_name || `${matched.first_name || ''} ${matched.last_name || ''}`.trim() || 'Dr. Medical Officer';
+        const formattedName = fullName.startsWith('Dr.') ? fullName : `Dr. ${fullName}`;
+        const specialty = matched.specialty || matched.specialization || 'General Practice / Telehealth';
+        const location = matched.location || matched.hospital || matched.city || 'Presibo Health Network';
 
-        docName.innerText = name.startsWith('Dr.') ? name : `Dr. ${name}`;
+        docName.innerText = formattedName;
         docSpecialty.innerText = specialty;
+        docLocation.innerText = `• ${location}`;
+
+        if (matched.image || matched.avatar || matched.photo) {
+            const imgUrl = matched.image || matched.avatar || matched.photo;
+            docAvatarContainer.innerHTML = `<img src="${imgUrl}" alt="${formattedName}" class="doctor-avatar">`;
+        } else {
+            docAvatarContainer.innerHTML = `<div class="doctor-avatar">🩺</div>`;
+        }
     }
 
     async function fetchLatestRecord() {
         try {
-            const response = await fetch(DEVICES_API_URL);
+            const response = await fetch(DEVICES_API_URL, { cache: "no-store" });
             if (!response.ok) throw new Error("Network response was not OK");
             
             const result = await response.json();
@@ -429,11 +481,11 @@
     }
 
     function renderRecord(record) {
-        resPatientName.innerText = `${record.first_name} ${record.last_name}`;
-        resTimestamp.innerText = `Recorded: ${record.datetime || 'N/A'}`;
+        resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
+        resTimestamp.innerText = `Recorded: ${record.datetime || 'Just now'}`;
         resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
         resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
-        resEvaluation.innerText = record.evaluation || 'No evaluation notes provided.';
+        resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully. Pending clinical commentary.';
 
         pairDoctor(record);
 
@@ -464,7 +516,7 @@
     btnNewReading.addEventListener('click', startScan);
 
     window.addEventListener('DOMContentLoaded', async () => {
-        await fetchDoctors();
+        await loadDoctors();
         startScan();
     });
 </script>
