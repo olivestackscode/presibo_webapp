@@ -8,6 +8,8 @@
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
@@ -83,7 +85,7 @@
         }
 
         .status-dot.ready {
-            background-color: #10b981;
+            background-color: var(--success);
         }
 
         @keyframes pulse {
@@ -207,12 +209,13 @@
             line-height: 1.5;
         }
 
+        /* Doctor Pairing Box */
         .doctor-box {
             background: var(--doctor-bg);
             border: 1px solid var(--doctor-border);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 14px;
@@ -226,7 +229,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             flex-shrink: 0;
             border: 2px solid #86efac;
             font-weight: 700;
@@ -261,28 +264,83 @@
             align-items: center;
         }
 
-        .doctor-contact {
-            font-size: 0.8rem;
-            color: #047857;
-            margin-top: 2px;
+        /* Booking Notification Banner */
+        .booking-status {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .booking-status.success {
+            display: block;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .booking-status.error {
+            display: block;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            background-color: var(--primary);
-            color: white;
             border: none;
             border-radius: 10px;
             padding: 14px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
+        .btn-primary {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
     </style>
 </head>
@@ -297,14 +355,14 @@
         </div>
     </div>
 
-    <!-- SCANNING STATE -->
+    <!-- SCANNING VIEW -->
     <div class="scan-view" id="scanView">
         <div class="spinner"></div>
         <h3 style="margin-bottom: 8px;">Waiting for device...</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem;">Please connect sensor or perform reading</p>
     </div>
 
-    <!-- RESULTS & DOCTOR PAIRING DISPLAY -->
+    <!-- RESULTS & BOOKING DISPLAY -->
     <div class="results-view" id="resultsView">
         <div class="patient-info">
             <div class="patient-label">Patient Record</div>
@@ -330,401 +388,84 @@
             <p class="analysis-text" id="resEvaluation">--</p>
         </div>
 
-        <!-- Matched Doctor Card -->
+        <!-- Matched Doctor Card (No Phone/Email displayed) -->
         <div class="doctor-box">
             <div class="doctor-avatar" id="docAvatar">🩺</div>
             <div class="doctor-details">
                 <div class="doctor-badge">Assigned Physician</div>
-                <div class="doctor-name" id="docName">Finding doctor...</div>
+                <div class="doctor-name" id="docName">Selecting doctor...</div>
                 <div class="doctor-meta">
                     <span id="docSpecialty">General Practitioner</span>
                     <span id="docLocation"></span>
                 </div>
-                <div class="doctor-contact" id="docContact"></div>
             </div>
         </div>
 
-        <button class="btn" id="btnNewReading">New Reading</button>
+        <div class="booking-status" id="bookingStatus"></div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" id="btnBookAppointment">
+                <span class="btn-spinner" id="bookSpinner"></span>
+                <span id="bookBtnText">Confirm Doctor Booking</span>
+            </button>
+            <button class="btn btn-secondary" id="btnNewReading">New Reading</button>
+        </div>
     </div>
 </div>
 
 <script>
-    const DEVICES_API_URL = "https://api.presibo.com/devices/index.php";
-    const DOCTORS_API_URL = "https://app.presibo.com/doctors.json";
-    const POLL_INTERVAL   = 3000;
+    const DEVICES_API_URL      = "https://api.presibo.com/devices/index.php";
+    const DOCTORS_API_URL      = "https://app.presibo.com/doctors.json";
+    const APPOINTMENTS_API_URL = "https://api.presibo.com/appointments/new.php";
+    const POLL_INTERVAL        = 3000;
 
-    // Fallback data structure using the explicit "doctors" key
     const fallbackData = {"doctors": [
-      {
-        "id": 1,
-        "firstname": "Sopuru",
-        "lastname": "Akandu",
-        "phone": "09032873891",
-        "email": "sopugo@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "693",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 13,
-        "thumbnail": "doc1"
-      },
-      {
-        "id": 34,
-        "firstname": "Farida",
-        "lastname": "Bello",
-        "phone": "07067659113",
-        "email": "bellofarida101@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "47",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc34"
-      },
-      {
-        "id": 2,
-        "firstname": "Firdausi",
-        "lastname": "Usman",
-        "phone": "07065042693",
-        "email": "fidoussy@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "128",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "doc2"
-      },
-      {
-        "id": 3,
-        "firstname": "Chinenye",
-        "midname": "Ozioma",
-        "lastname": "Nnabuife",
-        "phone": "09037717664",
-        "email": "nenye.nwan@yahoo.com", 
-        "specialization": "General Practitioner",
-        "cases": "74",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "doc3"
-      },
-      {
-        "id": 4,
-        "firstname": "Abu",
-        "lastname": "Abdulrashid",
-        "phone": "07068346935",
-        "email": "abubakarabdulrashid@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "81",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "doc4"
-      },
-      {
-        "id": 5,
-        "firstname": "Fatima",
-        "midname": "Aderonke",
-        "lastname": "Adebisi",
-        "phone": "08160548255",
-        "email": "bintazaara@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "49",
-        "location":"Lagos Island",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "doc5"
-      },
-      {
-        "id": 6,
-        "firstname": "Titilope",
-        "lastname": "Adedeji",
-        "phone": "08062644506",
-        "email": "dr.titilopeadedeji@gmail.com", 
-        "specialization": "Family Medicine",
-        "cases": "65",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "coo"
-      },
-      {
-        "id": 7,
-        "firstname": "Enny",
-        "lastname": "Aikodon",
-        "phone": "08172886650",
-        "email": "ennyaikodon@gmail.com",
-        "specialization": "General Practitioner",
-        "cases": "152",
-        "location":"Ontario",
-        "country": "Canada",
-        "years": 3,
-        "thumbnail": "cmo"
-      },
-      {
-        "id": 8,
-        "firstname": "Ojo",
-        "lastname": "Damilola",
-        "phone": "08065387193",
-        "email": "damilolamichael110@gmail.com",
-        "specialization": "General Practitioner",
-        "cases": "89",
-        "location":"Port Harcourt",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "doc8"
-      },
-      {
-        "id": 9,
-        "firstname": "Collins",
-        "lastname": "Uche",
-        "phone": "08168620125",
-        "email": "Collins6381@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "61",
-        "location":"Gwagwalada",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc6"
-      },
-      {
-        "id": 10,
-        "firstname": "Nneoma",
-        "lastname": "Ike",
-        "phone": "09044851757",
-        "email": "nneomaike3@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "126",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "doc10"
-      },
-      {
-        "id": 11,
-        "firstname": "Victoria Ene",
-        "lastname": "Abah",
-        "phone": "08143873826",
-        "email": "victoriaabah7@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "56",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 1,
-        "thumbnail": "doc11"
-      },
-      {
-        "id": 12,
-        "firstname": "Asuquo",
-        "lastname": "Ekpenyong",
-        "phone": "07060511500",
-        "email": "talk2asq@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "435",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "cdo"
-      },
-      {
-        "id": 13,
-        "firstname": "James",
-        "lastname": "Udom",
-        "phone": "09033896420",
-        "email": "jamesudom9@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "153",
-        "location":"Lagos",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "doc13"
-      },
-      {
-        "id": 14,
-        "firstname": "Ebere",
-        "midname": "Gift",
-        "lastname": "Okere",
-        "phone": "08187586667",
-        "email": "giftmoses667@gmail.com", 
-        "specialization": "Nutritionist",
-        "cases": "82",
-        "location":"Port Harcourt",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "doc14"
-      },
-      {
-        "id": 15,
-        "firstname": "Maryam",
-        "lastname": "",
-        "phone": "07080777333",
-        "email": "yamyam011@live.com", 
-        "specialization": "General Practitioner",
-        "cases": "70",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc15"
-      },
-      {
-        "id": 16,
-        "firstname": "Nusaibah",
-        "lastname": "Bashir",
-        "phone": "08037686616",
-        "email": "nusaybahbashir@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "182",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 5,
-        "thumbnail": "doc16"
-      },
-      {
-        "id": 17,
-        "firstname": "Ekomobong",
-        "lastname": "Edeghe",
-        "phone": "08059577451",
-        "email": "ekomedeghe@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "46",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 1,
-        "thumbnail": "doc9"
-      },
-      {
-        "id": 18,
-        "firstname": "Adline",
-        "lastname": "Eze",
-        "phone": "08059577451",
-        "email": "adline.eze@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "275",
-        "location":"Port Harcourt",
-        "country": "Nigeria",
-        "years": 6,
-        "thumbnail": "doc9"
-      },
-      {
-        "id": 19,
-        "firstname": "Efe",
-        "midname": "Iyi",
-        "lastname": "Akandu",
-        "phone": "09137400884",
-        "email": "dashingefe@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "417",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 4,
-        "thumbnail": "doc7"
-      },
-      {
-        "id": 20,
-        "firstname": "Vincent",
-        "lastname": "Ugwu",
-        "phone": "08166731894",
-        "email": "Uvinchin@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "2",
-        "location":"Port Harcourt",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc9"
-      },
-      {
-        "id": 21,
-        "firstname": "Busayo",
-        "midname": "Felicia",
-        "lastname": "Afolabi",
-        "phone": "07069340762",
-        "email": "busayomiasani@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "41",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 1,
-        "thumbnail": "doc19"
-      },
-      {
-        "id": 22,
-        "firstname": "Henrietta",
-        "midname": "Eseoghene",
-        "lastname": "Afolabi",
-        "phone": "08060185285",
-        "email": "drhakpobasa@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "617",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 10,
-        "thumbnail": "doc21"
-      },
-      {
-        "id": 23,
-        "firstname": "Ebai",
-        "midname": "Romanus",
-        "lastname": "Ashu",
-        "phone": "09068738535",
-        "email": "ebairomanus8@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "43",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc22"
-      },
-      {
-        "id": 24,
-        "firstname": "Hajara",
-        "midname": "Dalhatu",
-        "lastname": "Musa",
-        "phone": "09036466550",
-        "email": "hajaramusa@yahoo.com", 
-        "specialization": "General Practitioner",
-        "cases": "291",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 9,
-        "thumbnail": "doc23"
-      },
-      {
-        "id": 25,
-        "firstname": "Hannatu",
-        "lastname": "Yakasai",
-        "phone": "08033301263",
-        "email": "hnyakasai@gmail.com", 
-        "specialization": "General Practitioner",
-        "cases": "246",
-        "location":"Abuja",
-        "country": "Nigeria",
-        "years": 3,
-        "thumbnail": "doc9"
-      },
-      {
-        "id": 26,
-        "firstname": "Vincent",
-        "lastname": "Ugwu",
-        "phone": "08166731894",
-        "email": "Elsavvy911@gmail.com", 
-        "specialization": "Medical Officer",
-        "cases": "87",
-        "location":"Port Harcourt",
-        "country": "Nigeria",
-        "years": 2,
-        "thumbnail": "doc25"
-      }
+      {"id": 1, "firstname": "Sopuru", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 34, "firstname": "Farida", "lastname": "Bello", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 2, "firstname": "Firdausi", "lastname": "Usman", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 3, "firstname": "Chinenye", "midname": "Ozioma", "lastname": "Nnabuife", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 4, "firstname": "Abu", "lastname": "Abdulrashid", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 5, "firstname": "Fatima", "midname": "Aderonke", "lastname": "Adebisi", "specialization": "General Practitioner", "location":"Lagos Island"},
+      {"id": 6, "firstname": "Titilope", "lastname": "Adedeji", "specialization": "Family Medicine", "location":"Abuja"},
+      {"id": 7, "firstname": "Enny", "lastname": "Aikodon", "specialization": "General Practitioner", "location":"Ontario"},
+      {"id": 8, "firstname": "Ojo", "lastname": "Damilola", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 9, "firstname": "Collins", "lastname": "Uche", "specialization": "General Practitioner", "location":"Gwagwalada"},
+      {"id": 10, "firstname": "Nneoma", "lastname": "Ike", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 11, "firstname": "Victoria Ene", "lastname": "Abah", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 12, "firstname": "Asuquo", "lastname": "Ekpenyong", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 13, "firstname": "James", "lastname": "Udom", "specialization": "General Practitioner", "location":"Lagos"},
+      {"id": 14, "firstname": "Ebere", "midname": "Gift", "lastname": "Okere", "specialization": "Nutritionist", "location":"Port Harcourt"},
+      {"id": 15, "firstname": "Maryam", "lastname": "", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 16, "firstname": "Nusaibah", "lastname": "Bashir", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 17, "firstname": "Ekomobong", "lastname": "Edeghe", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 18, "firstname": "Adline", "lastname": "Eze", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 19, "firstname": "Efe", "midname": "Iyi", "lastname": "Akandu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 20, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "General Practitioner", "location":"Port Harcourt"},
+      {"id": 21, "firstname": "Busayo", "midname": "Felicia", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 22, "firstname": "Henrietta", "midname": "Eseoghene", "lastname": "Afolabi", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 23, "firstname": "Ebai", "midname": "Romanus", "lastname": "Ashu", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 24, "firstname": "Hajara", "midname": "Dalhatu", "lastname": "Musa", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 25, "firstname": "Hannatu", "lastname": "Yakasai", "specialization": "General Practitioner", "location":"Abuja"},
+      {"id": 26, "firstname": "Vincent", "lastname": "Ugwu", "specialization": "Medical Officer", "location":"Port Harcourt"}
     ]};
 
     let doctorsList = fallbackData.doctors;
     let pollTimer = null;
     let initialLastRecordId = null;
 
+    // Track active record and paired doctor for appointment booking
+    let currentPatientRecord = null;
+    let currentMatchedDoctor = null;
+
     const scanView           = document.getElementById('scanView');
     const resultsView        = document.getElementById('resultsView');
     const statusDot          = document.getElementById('statusDot');
     const statusText         = document.getElementById('statusText');
     const btnNewReading      = document.getElementById('btnNewReading');
+    const btnBookAppointment = document.getElementById('btnBookAppointment');
+    const bookSpinner        = document.getElementById('bookSpinner');
+    const bookBtnText        = document.getElementById('bookBtnText');
+    const bookingStatus      = document.getElementById('bookingStatus');
 
     const resPatientName     = document.getElementById('resPatientName');
     const resTimestamp       = document.getElementById('resTimestamp');
@@ -735,7 +476,6 @@
     const docName            = document.getElementById('docName');
     const docSpecialty       = document.getElementById('docSpecialty');
     const docLocation        = document.getElementById('docLocation');
-    const docContact         = document.getElementById('docContact');
     const docAvatar          = document.getElementById('docAvatar');
 
     function setStatus(text, stateClass) {
@@ -749,9 +489,7 @@
             if (res.ok) {
                 const data = await res.json();
                 const fetched = Array.isArray(data) ? data : (data.doctors || []);
-                if (fetched.length > 0) {
-                    doctorsList = fetched;
-                }
+                if (fetched.length > 0) doctorsList = fetched;
             }
         } catch (err) {
             console.log("Using built-in doctors fallback roster.");
@@ -762,31 +500,27 @@
         const sugar = parseFloat(record.sugar) || 0;
         let matched = null;
 
-        // Route to Nutritionist/Diet specialist if blood sugar reading exists and is abnormal
         if (sugar >= 140 || (sugar > 0 && sugar < 70)) {
             matched = doctorsList.find(d => (d.specialization || d.specialty || '').toLowerCase().includes('nutrition'));
         }
 
-        // Route to Family Medicine / Senior General Practitioner for elevated readings
         if (!matched) {
             matched = doctorsList.find(d => (d.specialization || d.specialty || '').toLowerCase().includes('family'));
         }
 
-        // Fallback: Pick top physician by experience/cases
         if (!matched) {
             matched = doctorsList[0];
         }
 
-        // Construct display name
+        currentMatchedDoctor = matched;
+
         const names = [matched.firstname, matched.midname, matched.lastname].filter(Boolean).join(' ');
         const fullName = names.startsWith('Dr.') ? names : `Dr. ${names}`;
 
         docName.innerText = fullName;
         docSpecialty.innerText = matched.specialization || matched.specialty || 'General Practitioner';
         docLocation.innerText = `• ${matched.location || 'Nigeria'}`;
-        docContact.innerText = `Tel: ${matched.phone || 'N/A'} | ${matched.email || ''}`;
 
-        // Generate initials avatar
         const initials = `${(matched.firstname || '')[0] || ''}${(matched.lastname || '')[0] || ''}`.toUpperCase();
         docAvatar.innerText = initials || '🩺';
     }
@@ -808,6 +542,8 @@
     }
 
     function renderRecord(record) {
+        currentPatientRecord = record;
+
         resPatientName.innerText = `${record.first_name || 'Patient'} ${record.last_name || ''}`.trim();
         resTimestamp.innerText = `Recorded: ${record.datetime || 'Just now'}`;
         resBp.innerText = `${record.bp_sys || '--'}/${record.bp_dia || '--'}`;
@@ -816,9 +552,75 @@
 
         pairDoctor(record);
 
+        // Reset booking button state
+        bookingStatus.className = 'booking-status';
+        bookingStatus.innerText = '';
+        btnBookAppointment.disabled = false;
+        bookBtnText.innerText = 'Confirm Doctor Booking';
+        bookSpinner.style.display = 'none';
+
         scanView.style.display = 'none';
         resultsView.style.display = 'block';
         setStatus("Reading Complete", "ready");
+    }
+
+    async function bookAppointment() {
+        if (!currentPatientRecord || !currentMatchedDoctor) return;
+
+        btnBookAppointment.disabled = true;
+        bookSpinner.style.display = 'inline-block';
+        bookBtnText.innerText = 'Processing Booking...';
+        bookingStatus.className = 'booking-status';
+
+        const now = new Date();
+        const apptDate = now.toISOString().slice(0, 10);
+        const apptTime = now.toTimeString().slice(0, 8);
+
+        const patientFullName = `${currentPatientRecord.first_name || ''} ${currentPatientRecord.last_name || ''}`.trim() || 'Patient';
+        const docFullName = [currentMatchedDoctor.firstname, currentMatchedDoctor.midname, currentMatchedDoctor.lastname].filter(Boolean).join(' ');
+        
+        const reasonText = `Device Reading: BP ${currentPatientRecord.bp_sys}/${currentPatientRecord.bp_dia} mmHg, Sugar: ${currentPatientRecord.sugar || 'N/A'} mg/dL. Evaluation: ${currentPatientRecord.evaluation || 'None'}`;
+
+        const payload = {
+            name: patientFullName,
+            email: currentPatientRecord.email || 'patient@presibo.com',
+            phone: currentPatientRecord.phone || '',
+            date: apptDate,
+            time: apptTime,
+            doctor_id: String(currentMatchedDoctor.id || ''),
+            doctor: docFullName.startsWith('Dr.') ? docFullName : `Dr. ${docFullName}`,
+            specialty: currentMatchedDoctor.specialization || currentMatchedDoctor.specialty || 'General Practitioner',
+            location: currentMatchedDoctor.location || 'Virtual Clinic',
+            description: reasonText
+        };
+
+        try {
+            const response = await fetch(APPOINTMENTS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const resData = await response.json();
+
+            if (response.ok && (resData.status === 'success' || resData.success)) {
+                bookingStatus.className = 'booking-status success';
+                bookingStatus.innerText = '✓ Appointment booked successfully!';
+                bookBtnText.innerText = 'Booking Confirmed';
+            } else {
+                throw new Error(resData.message || 'Failed to complete appointment booking.');
+            }
+        } catch (err) {
+            bookingStatus.className = 'booking-status error';
+            bookingStatus.innerText = `Error: ${err.message || 'Booking failed. Try again.'}`;
+            btnBookAppointment.disabled = false;
+            bookBtnText.innerText = 'Retry Doctor Booking';
+        } finally {
+            bookSpinner.style.display = 'none';
+        }
     }
 
     async function startScan() {
@@ -840,6 +642,7 @@
         }, POLL_INTERVAL);
     }
 
+    btnBookAppointment.addEventListener('click', bookAppointment);
     btnNewReading.addEventListener('click', startScan);
 
     window.addEventListener('DOMContentLoaded', async () => {
