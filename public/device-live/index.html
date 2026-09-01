@@ -388,7 +388,7 @@
             <p class="analysis-text" id="resEvaluation">--</p>
         </div>
 
-        <!-- Matched Doctor Card (No Phone/Email displayed) -->
+        <!-- Matched Doctor Card -->
         <div class="doctor-box">
             <div class="doctor-avatar" id="docAvatar">🩺</div>
             <div class="doctor-details">
@@ -453,7 +453,6 @@
     let pollTimer = null;
     let initialLastRecordId = null;
 
-    // Track active record and paired doctor for appointment booking
     let currentPatientRecord = null;
     let currentMatchedDoctor = null;
 
@@ -496,21 +495,12 @@
         }
     }
 
-    function pairDoctor(record) {
-        const sugar = parseFloat(record.sugar) || 0;
-        let matched = null;
+    // Pure Random Doctor Selection
+    function pairDoctor() {
+        if (!doctorsList || doctorsList.length === 0) return;
 
-        if (sugar >= 140 || (sugar > 0 && sugar < 70)) {
-            matched = doctorsList.find(d => (d.specialization || d.specialty || '').toLowerCase().includes('nutrition'));
-        }
-
-        if (!matched) {
-            matched = doctorsList.find(d => (d.specialization || d.specialty || '').toLowerCase().includes('family'));
-        }
-
-        if (!matched) {
-            matched = doctorsList[0];
-        }
+        const randomIndex = Math.floor(Math.random() * doctorsList.length);
+        const matched = doctorsList[randomIndex];
 
         currentMatchedDoctor = matched;
 
@@ -550,7 +540,8 @@
         resSugar.innerText = record.sugar ? `${record.sugar}` : 'N/A';
         resEvaluation.innerText = record.evaluation || 'Vital signs logged successfully.';
 
-        pairDoctor(record);
+        // Pick a fresh random doctor for every reading
+        pairDoctor();
 
         // Reset booking button state
         bookingStatus.className = 'booking-status';
