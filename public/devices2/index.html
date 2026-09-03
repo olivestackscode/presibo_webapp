@@ -83,6 +83,7 @@
       border-radius: 1rem;
     }
   </style>
+  <script src="/assets/js/config.js"></script>
 </head>
 
 <body class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
@@ -317,69 +318,7 @@
       </button>
     </div>
 
-    <!-- Latest Reading Result Display Card -->
-    <div id="resultCard" class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-      
-      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
-        <div>
-          <p class="text-xs uppercase tracking-wider text-gray-400 font-extrabold">Latest Reading Assessment</p>
-          <p id="resultTime" class="text-xs text-gray-400 mt-0.5">Recorded Yesterday, 5:14 PM</p>
-        </div>
 
-        <div id="resultStatus" class="px-4 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold border border-emerald-200 dark:border-emerald-800">
-          Normal
-        </div>
-      </div>
-
-      <!-- Result Numbers -->
-      <div class="text-center py-4">
-        <div class="flex justify-center items-baseline gap-2">
-          <span id="systolic" class="text-6xl sm:text-7xl font-black text-gray-900 dark:text-white">120</span>
-          <span class="text-3xl text-gray-400">/</span>
-          <span id="diastolic" class="text-5xl sm:text-6xl font-extrabold text-gray-700 dark:text-gray-300">80</span>
-        </div>
-        <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-2">mmHg</p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto">
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 text-center border border-gray-100 dark:border-gray-700">
-          <span class="text-xs text-gray-400 uppercase font-semibold">Systolic</span>
-          <p id="systolicSmall" class="text-xl font-extrabold text-gray-900 dark:text-white mt-1">120 mmHg</p>
-        </div>
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 text-center border border-gray-100 dark:border-gray-700">
-          <span class="text-xs text-gray-400 uppercase font-semibold">Diastolic</span>
-          <p id="diastolicSmall" class="text-xl font-extrabold text-gray-900 dark:text-white mt-1">80 mmHg</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Complete 10 BP History Log Section -->
-    <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-      
-      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
-        <div>
-          <h2 class="text-xl font-extrabold text-gray-900 dark:text-white">BP History Log</h2>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Your last 10 synchronized measurements</p>
-        </div>
-        <button onclick="exportCSV()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-          <i class="fas fa-file-csv"></i> Export CSV
-        </button>
-      </div>
-
-      <div id="historyList" class="divide-y divide-gray-100 dark:divide-gray-800">
-        <!-- 10 Mock History Items populated by JavaScript -->
-      </div>
-
-      <div id="emptyHistory" class="hidden text-center py-8">
-        <div class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto text-gray-400">
-          <i class="fas fa-heart-pulse"></i>
-        </div>
-        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mt-3">No readings yet</p>
-        <p class="text-xs text-gray-400 mt-1">Your BP readings will appear here.</p>
-      </div>
-
-    </div>
 
     <!-- Paystack Store / Order Section -->
     <div class="bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 rounded-3xl p-6 sm:p-8 space-y-4">
@@ -474,19 +413,22 @@
 
     function loadLatestReading() {
       const latest = MOCK_HISTORY[0];
-      document.getElementById("systolic").textContent = latest.systolic;
-      document.getElementById("diastolic").textContent = latest.diastolic;
-      document.getElementById("systolicSmall").textContent = `${latest.systolic} mmHg`;
-      document.getElementById("diastolicSmall").textContent = `${latest.diastolic} mmHg`;
-      document.getElementById("resultTime").textContent = `Recorded ${latest.displayTime}`;
+      if (!latest) return;
+      const elSys = document.getElementById("systolic"); if (elSys) elSys.textContent = latest.systolic;
+      const elDia = document.getElementById("diastolic"); if (elDia) elDia.textContent = latest.diastolic;
+      const elSysSm = document.getElementById("systolicSmall"); if (elSysSm) elSysSm.textContent = `${latest.systolic} mmHg`;
+      const elDiaSm = document.getElementById("diastolicSmall"); if (elDiaSm) elDiaSm.textContent = `${latest.diastolic} mmHg`;
+      const elResTime = document.getElementById("resultTime"); if (elResTime) elResTime.textContent = `Recorded ${latest.displayTime}`;
 
       const status = getBPStatus(latest.systolic, latest.diastolic);
       const statusEl = document.getElementById("resultStatus");
-      statusEl.textContent = status.text;
-      statusEl.className = `px-4 py-1 rounded-full text-xs font-extrabold border ${status.classes}`;
+      if (statusEl) {
+        statusEl.textContent = status.text;
+        statusEl.className = `px-4 py-1 rounded-full text-xs font-extrabold border ${status.classes}`;
+      }
 
-      document.getElementById("tileBp").textContent = `${latest.systolic}/${latest.diastolic}`;
-      document.getElementById("tileBpm").textContent = latest.pulse;
+      const elTileBp = document.getElementById("tileBp"); if (elTileBp) elTileBp.textContent = `${latest.systolic}/${latest.diastolic}`;
+      const elTileBpm = document.getElementById("tileBpm"); if (elTileBpm) elTileBpm.textContent = latest.pulse;
     }
 
     function loadMockHistory() {

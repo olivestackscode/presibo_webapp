@@ -23,6 +23,7 @@ app.get('/api/config', (req, res) => {
     API_RESET_TOKEN_URL: process.env.API_RESET_TOKEN_URL || 'https://api.presibo.com/tokens/reset-token.php',
     API_AI_URL: process.env.API_AI_URL || 'https://api.presibo.com/ai/openrouter.php',
     API_DOCTORS_URL: process.env.API_DOCTORS_URL || 'http://localhost:3000/api/doctors/index.php',
+    API_ADMIN_URL: process.env.API_ADMIN_URL || 'https://api.presibo.com/admin/index.php',
 
     // Internal API Routes
     API_WALLET_TOPUP_URL: process.env.API_WALLET_TOPUP_URL || '/api/wallet/top-up',

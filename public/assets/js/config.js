@@ -13,6 +13,7 @@ let CONFIG = {
   API_RESET_TOKEN_URL: 'https://api.presibo.com/tokens/reset-token.php',
   API_AI_URL: 'https://api.presibo.com/ai/openrouter.php',
   API_DOCTORS_URL: 'https://api.presibo.com/doctors/index.php',
+  API_ADMIN_URL: 'https://api.presibo.com/admin/index.php',
   
   API_WALLET_TOPUP_URL: '/api/wallet/top-up',
   API_AUTH_LOGOUT_URL: '/api/auth/logout',
@@ -50,6 +51,7 @@ async function loadConfig() {
       API_RESET_TOKEN_URL: 'https://api.presibo.com/tokens/reset-token.php',
       API_AI_URL: 'https://api.presibo.com/ai/openrouter.php',
       API_DOCTORS_URL: 'https://api.presibo.com/doctors/index.php',
+      API_ADMIN_URL: 'https://api.presibo.com/admin/index.php',
       
       API_WALLET_TOPUP_URL: '/api/wallet/top-up',
       API_AUTH_LOGOUT_URL: '/api/auth/logout',
