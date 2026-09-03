@@ -220,56 +220,7 @@
       </div>
     </div>
 
-    <!-- Overview Metrics Cards Row -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
-          <span>PAIRED DEVICES</span>
-          <i class="fas fa-laptop-medical text-purple-600 dark:text-purple-400 text-base"></i>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="totalPairedDevices">3</span>
-          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">All online</span>
-        </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">BP, Glucose & Watch</p>
-      </div>
 
-      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
-          <span>BATTERY HEALTH</span>
-          <i class="fas fa-battery-three-quarters text-emerald-600 dark:text-emerald-400 text-base"></i>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="avgBatteryLevel">88%</span>
-          <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Good</span>
-        </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No low battery alerts</p>
-      </div>
-
-      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
-          <span>SYNC FREQUENCY</span>
-          <i class="fas fa-sync text-blue-600 dark:text-blue-400 text-base"></i>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-extrabold text-gray-900 dark:text-white">Auto</span>
-          <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">BLE 5.3</span>
-        </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Background Vitals Sync</p>
-      </div>
-
-      <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
-        <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-semibold">
-          <span>TELEMETRY RECORDS</span>
-          <i class="fas fa-database text-amber-600 dark:text-amber-400 text-base"></i>
-        </div>
-        <div class="mt-2 flex items-baseline gap-2">
-          <span class="text-2xl font-extrabold text-gray-900 dark:text-white" id="historyRecordCount">10</span>
-          <span class="text-xs text-purple-600 dark:text-purple-400 font-medium">Saved</span>
-        </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Logged to Presibo Profile</p>
-      </div>
-    </div>
 
     <!-- Active Device Management Section -->
     <div class="space-y-6">
@@ -391,37 +342,7 @@
       </div>
     </div>
 
-    <!-- BP & Telemetry Ingestion History Log -->
-    <div class="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-extrabold text-gray-900 dark:text-white">Telemetry Log & Vitals History</h2>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Recorded measurements automatically ingested from your paired medical hardware.</p>
-        </div>
 
-        <div class="flex items-center space-x-2">
-          <button onclick="exportCSV()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fas fa-file-csv"></i> Export CSV
-          </button>
-          <button onclick="clearHistoryLog()" class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-            <i class="fas fa-trash-alt"></i> Reset
-          </button>
-        </div>
-      </div>
-
-      <!-- History Table / Cards -->
-      <div id="historyList" class="divide-y divide-gray-100 dark:divide-gray-800">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <div id="emptyHistory" class="hidden text-center py-10">
-        <div class="w-14 h-14 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mx-auto text-2xl">
-          <i class="fas fa-heart-pulse"></i>
-        </div>
-        <p class="text-sm font-bold text-gray-700 dark:text-gray-300 mt-3">No Readings Recorded Yet</p>
-        <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">Connect your Presibo BP Monitor or click "Take BP Measurement Now" to record your first vital sign reading.</p>
-      </div>
-    </div>
 
   </main>
 
